@@ -1,12 +1,28 @@
 package io
 
-import "os"
+import (
+	"log/slog"
+	"os"
+	"path"
+)
 
 type FileWriter struct {
+	outputFolder string
+}
+
+func NewFileWriter(outputFolder string) FileWriter {
+	return FileWriter{
+		outputFolder: outputFolder,
+	}
 }
 
 func (fw FileWriter) Write(fileName string, content string) error {
-	file, err := os.Open(fileName)
+	err := os.MkdirAll(fw.outputFolder, 0755)
+	if err != nil {
+		slog.Error(err.Error())
+	}
+
+	file, err := os.Create(path.Join(fw.outputFolder, fileName))
 	if err != nil {
 		return err
 	}

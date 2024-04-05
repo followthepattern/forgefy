@@ -22,3 +22,5 @@ go.work
 
 # ignore .vscode
 .vscode
+
+output
