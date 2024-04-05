@@ -7,10 +7,6 @@ type ProjectMap struct {
 	plugins    map[string]Plugin
 }
 
-func (p ProjectMap) Write() {
-
-}
-
 type Plugin interface {
 	Name() string
 }
