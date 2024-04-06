@@ -1,33 +1,29 @@
 package projectmap
 
 import (
-	"fmt"
 	"path"
 )
 
-type FolderMap struct {
-	parentFolder *FolderMap
-	folderName   string
-	files        map[string]File
-	folders      map[string]FolderMap
+type Directory struct {
+	parentFolder  *Directory
+	directoryName string
+	files         map[string]File
+	directories   map[string]Directory
 }
 
-func (fm FolderMap) DirName() string {
-	if fm.parentFolder == nil {
-		return fm.folderName
+func (dir Directory) DirName() string {
+	if dir.parentFolder == nil {
+		return dir.directoryName
 	}
-	return path.Join(fm.parentFolder.DirName(), fm.folderName)
+	return path.Join(dir.parentFolder.DirName(), dir.directoryName)
 }
 
-func (fm FolderMap) Walk(fn func(folderName string, f File)) {
-	for _, file := range fm.files {
-		fmt.Println("inside printing files in folderMap")
-		fmt.Println(fm.DirName())
-		fn(fm.DirName(), file)
+func (dir Directory) Walk(fn func(directoryName string, f File)) {
+	for _, file := range dir.files {
+		fn(dir.DirName(), file)
 	}
 
-	for _, dir := range fm.folders {
-		fmt.Println("inside walking folderMap")
+	for _, dir := range dir.directories {
 		dir.Walk(fn)
 	}
 }

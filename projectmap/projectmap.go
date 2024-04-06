@@ -10,7 +10,7 @@ import (
 type ProjectMap struct {
 	folderName string
 	files      map[string]File
-	folders    map[string]FolderMap
+	folders    map[string]Directory
 	plugins    map[string]Plugin
 }
 
@@ -25,16 +25,16 @@ func NewProjectMap() ProjectMap {
 		template: frontend.PackageJSON,
 	}
 
-	frontend := FolderMap{
-		folderName: "frontend",
+	frontend := Directory{
+		directoryName: "frontend",
 		files: map[string]File{
 			packageJson.fileName: packageJson,
 		},
 	}
 
-	apps := FolderMap{
-		folderName: "app",
-		folders: map[string]FolderMap{
+	apps := Directory{
+		directoryName: "app",
+		directories: map[string]Directory{
 			"frontend": frontend,
 		},
 	}
@@ -45,7 +45,7 @@ func NewProjectMap() ProjectMap {
 		files: map[string]File{
 			dockerCompose.fileName: dockerCompose,
 		},
-		folders: map[string]FolderMap{
+		folders: map[string]Directory{
 			"apps": apps,
 		},
 	}
