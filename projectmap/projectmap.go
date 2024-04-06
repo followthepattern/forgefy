@@ -11,7 +11,16 @@ type ProjectMap struct {
 	plugins map[string]Plugin
 }
 
-func NewProjectMap() ProjectMap {
+func NewProjectMap(projectName string) ProjectMap {
+	return ProjectMap{
+		Directory: Directory{
+			directoryName: projectName,
+			directories:   make(map[string]Directory),
+		},
+	}
+}
+
+func NewProjectMap2() ProjectMap {
 	dockerCompose := File{
 		fileName: "docker-compose.yaml",
 		template: apptemplates.DockerCompose,

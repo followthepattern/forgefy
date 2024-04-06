@@ -6,6 +6,14 @@ type File struct {
 	data     any
 }
 
+func NewFile(fileName string, template string, data any) File {
+	return File{
+		fileName: fileName,
+		template: template,
+		data:     data,
+	}
+}
+
 func (f File) FileName() string {
 	return f.fileName
 }

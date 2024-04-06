@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	project := projectmap.NewProjectMap()
+	project := projectmap.NewProjectMap("project")
 
 	writer := io.NewFileWriter("output")
 
