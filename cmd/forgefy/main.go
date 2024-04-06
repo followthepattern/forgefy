@@ -12,8 +12,8 @@ func main() {
 
 	writer := io.NewFileWriter("output")
 
-	project.Walk(func(f projectmap.File) {
-		err := writer.Write(f.FileName(), f.Template())
+	project.Walk(func(folderName string, f projectmap.File) {
+		err := writer.Write(folderName, f.FileName(), f.Template())
 		if err != nil {
 			slog.Error(err.Error())
 		}

@@ -1,6 +1,11 @@
 package projectmap
 
-import "github.com/followthepattern/forgefy/apptemplates"
+import (
+	"fmt"
+
+	"github.com/followthepattern/forgefy/apptemplates"
+	"github.com/followthepattern/forgefy/apptemplates/apps/frontend"
+)
 
 type ProjectMap struct {
 	folderName string
@@ -15,9 +20,33 @@ func NewProjectMap() ProjectMap {
 		template: apptemplates.DockerCompose,
 	}
 
+	packageJson := File{
+		fileName: "package.json",
+		template: frontend.PackageJSON,
+	}
+
+	frontend := FolderMap{
+		folderName: "frontend",
+		files: map[string]File{
+			packageJson.fileName: packageJson,
+		},
+	}
+
+	apps := FolderMap{
+		folderName: "app",
+		folders: map[string]FolderMap{
+			"frontend": frontend,
+		},
+	}
+
+	frontend.parentFolder = &apps
+
 	return ProjectMap{
 		files: map[string]File{
 			dockerCompose.fileName: dockerCompose,
+		},
+		folders: map[string]FolderMap{
+			"apps": apps,
 		},
 	}
 }
@@ -31,8 +60,12 @@ func (p *ProjectMap) WithPlugin(plugin Plugin) *ProjectMap {
 	return p
 }
 
-func (p ProjectMap) Walk(fn func(f File)) {
+func (p ProjectMap) Walk(fn func(folderName string, f File)) {
 	for _, file := range p.files {
-		fn(file)
+		fn(p.folderName, file)
+	}
+	for _, dir := range p.folders {
+		fmt.Println("starts walking folderMap")
+		dir.Walk(fn)
 	}
 }

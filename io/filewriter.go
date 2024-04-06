@@ -16,13 +16,15 @@ func NewFileWriter(outputFolder string) FileWriter {
 	}
 }
 
-func (fw FileWriter) Write(fileName string, content string) error {
-	err := os.MkdirAll(fw.outputFolder, 0755)
+func (fw FileWriter) Write(folderName string, fileName string, content string) error {
+	destDir := path.Join(fw.outputFolder, folderName)
+
+	err := os.MkdirAll(destDir, 0755)
 	if err != nil {
 		slog.Error(err.Error())
 	}
 
-	file, err := os.Create(path.Join(fw.outputFolder, fileName))
+	file, err := os.Create(path.Join(destDir, fileName))
 	if err != nil {
 		return err
 	}
