@@ -1,17 +1,14 @@
 package projectmap
 
 import (
-	"fmt"
-
 	"github.com/followthepattern/forgefy/apptemplates"
+	"github.com/followthepattern/forgefy/apptemplates/apps/backend"
 	"github.com/followthepattern/forgefy/apptemplates/apps/frontend"
 )
 
 type ProjectMap struct {
-	folderName string
-	files      map[string]File
-	folders    map[string]Directory
-	plugins    map[string]Plugin
+	Directory
+	plugins map[string]Plugin
 }
 
 func NewProjectMap() ProjectMap {
@@ -25,6 +22,18 @@ func NewProjectMap() ProjectMap {
 		template: frontend.PackageJSON,
 	}
 
+	goMod := File{
+		fileName: "go.mod",
+		template: backend.GoMod,
+	}
+
+	backend := Directory{
+		directoryName: "backend",
+		files: map[string]File{
+			goMod.fileName: goMod,
+		},
+	}
+
 	frontend := Directory{
 		directoryName: "frontend",
 		files: map[string]File{
@@ -32,23 +41,31 @@ func NewProjectMap() ProjectMap {
 		},
 	}
 
+	projectmap := ProjectMap{
+		Directory: Directory{
+			files: map[string]File{
+				dockerCompose.fileName: dockerCompose,
+			},
+		},
+	}
+
 	apps := Directory{
-		directoryName: "app",
-		directories: map[string]Directory{
-			"frontend": frontend,
-		},
+		parentDirectory: &projectmap.Directory,
+		directoryName:   "apps",
+		directories:     map[string]Directory{},
 	}
 
-	frontend.parentFolder = &apps
+	backend.parentDirectory = &apps
+	frontend.parentDirectory = &apps
 
-	return ProjectMap{
-		files: map[string]File{
-			dockerCompose.fileName: dockerCompose,
-		},
-		folders: map[string]Directory{
-			"apps": apps,
-		},
+	apps.directories[frontend.directoryName] = frontend
+	apps.directories[backend.directoryName] = backend
+
+	projectmap.directories = map[string]Directory{
+		apps.directoryName: apps,
 	}
+
+	return projectmap
 }
 
 type Plugin interface {
@@ -58,14 +75,4 @@ type Plugin interface {
 func (p *ProjectMap) WithPlugin(plugin Plugin) *ProjectMap {
 	p.plugins[plugin.Name()] = plugin
 	return p
-}
-
-func (p ProjectMap) Walk(fn func(folderName string, f File)) {
-	for _, file := range p.files {
-		fn(p.folderName, file)
-	}
-	for _, dir := range p.folders {
-		fmt.Println("starts walking folderMap")
-		dir.Walk(fn)
-	}
 }

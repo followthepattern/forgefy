@@ -5,17 +5,17 @@ import (
 )
 
 type Directory struct {
-	parentFolder  *Directory
-	directoryName string
-	files         map[string]File
-	directories   map[string]Directory
+	parentDirectory *Directory
+	directoryName   string
+	files           map[string]File
+	directories     map[string]Directory
 }
 
 func (dir Directory) DirName() string {
-	if dir.parentFolder == nil {
+	if dir.parentDirectory == nil {
 		return dir.directoryName
 	}
-	return path.Join(dir.parentFolder.DirName(), dir.directoryName)
+	return path.Join(dir.parentDirectory.DirName(), dir.directoryName)
 }
 
 func (dir Directory) Walk(fn func(directoryName string, f File)) {
