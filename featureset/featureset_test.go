@@ -11,7 +11,13 @@ var _ = Describe("Feature Set", func() {
 		var (
 			yaml = `
 version: 0
-product_name: "test product"`
+product_name: "test product"
+apps:
+  - name: "Test frontend"
+    type: "frontend"
+  - name: "Test backend"
+    type: "backend"
+`
 		)
 
 		It("populates the feature set object with the values from the yaml", func() {

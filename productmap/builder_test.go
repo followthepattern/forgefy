@@ -11,9 +11,12 @@ var _ = Describe("Builder", func() {
 	Context("Creating Product Map from minimum FeatureSet", func() {
 		var (
 			yaml = `
-product_name: "test product"`
+product_name: "test product"
+apps:
+  - name: backend1
+    type: backend`
 		)
-		It("adds local dev files", func() {
+		It("checks if local dev files are available", func() {
 			fs, err := featureset.UnmarshalYaml([]byte(yaml))
 			Expect(err).Should(Succeed())
 
@@ -29,16 +32,33 @@ product_name: "test product"`
 		var (
 			yaml = `
 version: 0
-product_name: "test product"`
+product_name: "test product"
+apps:
+  - name: frontend1
+    type: frontend
+  - name: backend1
+    type: backend
+`
 		)
-		It("checks if local dev files are available", func() {
+		It("checks if frontend files are added", func() {
 			fs, err := featureset.UnmarshalYaml([]byte(yaml))
 			Expect(err).Should(Succeed())
 
 			builder := productmap.NewBuilder(fs)
 			pm := builder.Build()
 
-			exists := pm.Exists("docker-compose.yaml")
+			exists := pm.Exists("frontend1/package.json")
+			Expect(exists).Should(BeTrue())
+		})
+
+		It("checks if backend files are added", func() {
+			fs, err := featureset.UnmarshalYaml([]byte(yaml))
+			Expect(err).Should(Succeed())
+
+			builder := productmap.NewBuilder(fs)
+			pm := builder.Build()
+
+			exists := pm.Exists("backend1/go.mod")
 			Expect(exists).Should(BeTrue())
 		})
 	})
