@@ -15,7 +15,7 @@ func main() {
 
 	builder := productmap.NewBuilder(fs)
 
-	product := builder.Create()
+	product := builder.Build()
 
 	writer := io.NewFileWriter("output")
 

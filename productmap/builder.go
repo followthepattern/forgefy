@@ -15,7 +15,7 @@ func NewBuilder(fs featureset.FeatureSet) Builder {
 	}
 }
 
-func (builder Builder) Create() ProductMap {
+func (builder Builder) Build() ProductMap {
 	pm := NewProductMap(builder.fs.ProductName)
 	pm = builder.addDefaults(pm)
 	pm = builder.addlocalDevFiles(pm)
