@@ -1,14 +1,33 @@
 package projectmap
 
-import "github.com/followthepattern/forgefy/featureset"
+import (
+	"github.com/followthepattern/forgefy/apptemplates"
+	"github.com/followthepattern/forgefy/featureset"
+)
 
 type Builder struct {
+	fs featureset.FeatureSet
 }
 
-func NewBuilder() Builder {
-	return Builder{}
+func NewBuilder(fs featureset.FeatureSet) Builder {
+	return Builder{
+		fs: fs,
+	}
 }
 
-func (f Builder) Create(fs featureset.FeatureSet) ProjectMap {
-	return ProjectMap{}
+func (builder Builder) Create() ProjectMap {
+	pm := NewProjectMap(builder.fs.ProjectName)
+	pm = builder.addDefaults(pm)
+	pm = builder.addlocalDevFiles(pm)
+
+	return pm
+}
+
+func (f Builder) addDefaults(pm ProjectMap) ProjectMap {
+	return pm
+}
+
+func (f Builder) addlocalDevFiles(pm ProjectMap) ProjectMap {
+	pm.Insert("", NewFileFromTemplate(apptemplates.DockerCompose))
+	return pm
 }

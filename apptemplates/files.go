@@ -5,4 +5,9 @@ import (
 )
 
 //go:embed docker-compose.yaml.tmpl
-var DockerCompose string
+var dockerComposeContent string
+
+var DockerCompose = TemplateFile{
+	Name:     "docker-compose.yaml",
+	Template: dockerComposeContent,
+}

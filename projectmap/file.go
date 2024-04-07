@@ -1,5 +1,7 @@
 package projectmap
 
+import "github.com/followthepattern/forgefy/apptemplates"
+
 type File struct {
 	fileName string
 	template string
@@ -11,6 +13,13 @@ func NewFile(fileName string, template string, data any) File {
 		fileName: fileName,
 		template: template,
 		data:     data,
+	}
+}
+
+func NewFileFromTemplate(tpl apptemplates.TemplateFile) File {
+	return File{
+		fileName: tpl.Name,
+		template: tpl.Template,
 	}
 }
 
