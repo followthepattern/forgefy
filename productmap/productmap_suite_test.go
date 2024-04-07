@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestProjectMap(t *testing.T) {
+func TestProductMap(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Project Map Suite")
+	RunSpecs(t, "Product Map Suite")
 }
