@@ -39,11 +39,16 @@ apps:
   - name: backend1
     type: backend
 `
+			fs featureset.FeatureSet
 		)
-		It("checks if frontend files are added", func() {
-			fs, err := featureset.UnmarshalYaml([]byte(yaml))
-			Expect(err).Should(Succeed())
 
+		BeforeEach(func() {
+			var err error
+			fs, err = featureset.UnmarshalYaml([]byte(yaml))
+			Expect(err).Should(Succeed())
+		})
+
+		It("checks if frontend files are added", func() {
 			builder := productmap.NewBuilder(fs)
 			pm := builder.Build()
 
@@ -52,9 +57,6 @@ apps:
 		})
 
 		It("checks if backend files are added", func() {
-			fs, err := featureset.UnmarshalYaml([]byte(yaml))
-			Expect(err).Should(Succeed())
-
 			builder := productmap.NewBuilder(fs)
 			pm := builder.Build()
 
