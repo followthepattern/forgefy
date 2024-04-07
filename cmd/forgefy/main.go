@@ -5,21 +5,21 @@ import (
 
 	"github.com/followthepattern/forgefy/featureset"
 	"github.com/followthepattern/forgefy/io"
-	"github.com/followthepattern/forgefy/projectmap"
+	"github.com/followthepattern/forgefy/productmap"
 )
 
 func main() {
 	fs := featureset.FeatureSet{
-		ProjectName: "project",
+		ProductName: "product",
 	}
 
-	builder := projectmap.NewBuilder(fs)
+	builder := productmap.NewBuilder(fs)
 
-	project := builder.Create()
+	product := builder.Create()
 
 	writer := io.NewFileWriter("output")
 
-	project.Walk(func(folderName string, f projectmap.File) {
+	product.Walk(func(folderName string, f productmap.File) {
 		err := writer.Write(folderName, f.FileName(), f.Template())
 		if err != nil {
 			slog.Error(err.Error())

@@ -1,4 +1,4 @@
-package projectmap
+package productmap
 
 import "github.com/followthepattern/forgefy/apptemplates"
 

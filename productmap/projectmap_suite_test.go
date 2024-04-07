@@ -1,4 +1,4 @@
-package projectmap_test
+package productmap_test
 
 import (
 	"testing"

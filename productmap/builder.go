@@ -1,4 +1,4 @@
-package projectmap
+package productmap
 
 import (
 	"github.com/followthepattern/forgefy/apptemplates"
@@ -15,19 +15,19 @@ func NewBuilder(fs featureset.FeatureSet) Builder {
 	}
 }
 
-func (builder Builder) Create() ProjectMap {
-	pm := NewProjectMap(builder.fs.ProjectName)
+func (builder Builder) Create() ProductMap {
+	pm := NewProductMap(builder.fs.ProductName)
 	pm = builder.addDefaults(pm)
 	pm = builder.addlocalDevFiles(pm)
 
 	return pm
 }
 
-func (f Builder) addDefaults(pm ProjectMap) ProjectMap {
+func (f Builder) addDefaults(pm ProductMap) ProductMap {
 	return pm
 }
 
-func (f Builder) addlocalDevFiles(pm ProjectMap) ProjectMap {
+func (f Builder) addlocalDevFiles(pm ProductMap) ProductMap {
 	pm.Insert("", NewFileFromTemplate(apptemplates.DockerCompose))
 	return pm
 }
