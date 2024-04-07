@@ -1,5 +1,5 @@
 package featureset
 
 type FeatureSet struct {
-	Name string
+	ProjectName string
 }
