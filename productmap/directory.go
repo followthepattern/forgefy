@@ -13,6 +13,7 @@ type Directory struct {
 	directories     map[string]Directory
 }
 
+// Deprecated
 func NewDirectory(directoryName string) Directory {
 	return Directory{
 		directoryName: directoryName,
@@ -84,7 +85,11 @@ func (dir *Directory) insert(directoryPath string, file File) error {
 		return fmt.Errorf("file %s already exists at %s", file.FileName(), dir.DirName())
 	}
 
-	if len(directoryPath) == 0 || directoryPath == dir.directoryName {
+	// todo: root directory - productDirectory has to be "" and assume it in each algorithm
+
+	dirs := strings.Split(directoryPath, "/")
+
+	if len(dirs) == 0 || (len(dirs) == 1 && dirs[0] == dir.directoryName) {
 		dir.files[file.FileName()] = file
 		return nil
 	}
@@ -94,11 +99,13 @@ func (dir *Directory) insert(directoryPath string, file File) error {
 		d.AddFile(file)
 	}
 
-	dirs := strings.Split(directoryPath, "/")
 	newDir := NewDirectory(dirs[0])
 
 	directoryPath = strings.Join(dirs[1:], "/")
-	dir.AddDirectory(newDir)
+	err := dir.AddDirectory(newDir)
+	if err != nil {
+		return err
+	}
 
 	return newDir.insert(directoryPath, file)
 }
@@ -108,7 +115,7 @@ func (dir Directory) Walk(fn func(directoryName string, f File)) {
 		fn(dir.DirName(), file)
 	}
 
-	for _, dir := range dir.directories {
-		dir.Walk(fn)
+	for _, d := range dir.directories {
+		d.Walk(fn)
 	}
 }

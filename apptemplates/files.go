@@ -4,8 +4,14 @@ import (
 	_ "embed"
 )
 
-//go:embed docker-compose.yaml.tmpl
-var dockerComposeContent string
+var (
+	//go:embed docker-compose.yaml.tmpl
+	dockerComposeContent string
+)
+
+func RootDirectory(dirName string) string {
+	return dirName
+}
 
 var DockerCompose = TemplateFile{
 	Name:     "docker-compose.yaml",

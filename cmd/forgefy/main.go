@@ -2,6 +2,7 @@ package main
 
 import (
 	"log/slog"
+	"os"
 
 	"github.com/followthepattern/forgefy/featureset"
 	"github.com/followthepattern/forgefy/io"
@@ -15,7 +16,11 @@ func main() {
 
 	builder := productmap.NewBuilder(fs)
 
-	product := builder.Build()
+	product, err := builder.Build()
+	if err != nil {
+		slog.Error(err.Error())
+		os.Exit(1)
+	}
 
 	writer := io.NewFileWriter("output")
 

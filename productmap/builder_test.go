@@ -1,6 +1,9 @@
 package productmap_test
 
 import (
+	"fmt"
+	"path"
+
 	"github.com/followthepattern/forgefy/featureset"
 	"github.com/followthepattern/forgefy/productmap"
 	. "github.com/onsi/ginkgo/v2"
@@ -11,7 +14,7 @@ var _ = Describe("Builder", func() {
 	Context("Creating Product Map from minimum FeatureSet", func() {
 		var (
 			yaml = `
-product_name: "test product"
+product_name: "test"
 apps:
   - name: backend1
     type: backend`
@@ -21,9 +24,10 @@ apps:
 			Expect(err).Should(Succeed())
 
 			builder := productmap.NewBuilder(fs)
-			pm := builder.Build()
+			pm, err := builder.Build()
+			Expect(err).Should(Succeed())
 
-			exists := pm.Exists("docker-compose.yaml")
+			exists := pm.Exists("/docker-compose.yaml")
 			Expect(exists).Should(BeTrue())
 		})
 	})
@@ -34,10 +38,10 @@ apps:
 version: 0
 product_name: "test product"
 apps:
-  - name: frontend1
-    type: frontend
   - name: backend1
     type: backend
+  - name: frontend1
+    type: frontend
 `
 			fs featureset.FeatureSet
 		)
@@ -48,20 +52,33 @@ apps:
 			Expect(err).Should(Succeed())
 		})
 
-		It("checks if frontend files are added", func() {
+		FIt("checks if frontend files are added", func() {
 			builder := productmap.NewBuilder(fs)
-			pm := builder.Build()
+			pm, err := builder.Build()
+			Expect(err).Should(Succeed())
 
-			exists := pm.Exists("frontend1/package.json")
+			exists := pm.Exists("apps/frontend1/package.json")
 			Expect(exists).Should(BeTrue())
 		})
 
 		It("checks if backend files are added", func() {
 			builder := productmap.NewBuilder(fs)
-			pm := builder.Build()
+			pm, err := builder.Build()
+			Expect(err).Should(Succeed())
 
-			exists := pm.Exists("backend1/go.mod")
+			exists := pm.Exists("apps/backend1/go.mod")
 			Expect(exists).Should(BeTrue())
+		})
+
+		It("checks if backend files are added", func() {
+			builder := productmap.NewBuilder(fs)
+			pm, err := builder.Build()
+			Expect(err).Should(Succeed())
+
+			pm.Walk(func(directoryName string, f productmap.File) {
+				fmt.Println(path.Join(directoryName, f.FileName()))
+			})
+			Expect(false).Should(BeTrue())
 		})
 	})
 })

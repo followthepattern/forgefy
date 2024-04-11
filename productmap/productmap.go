@@ -7,7 +7,7 @@ type ProductMap struct {
 
 func NewProductMap(productName string) ProductMap {
 	return ProductMap{
-		Directory: NewDirectory(productName),
+		Directory: NewDirectory(""),
 	}
 }
 

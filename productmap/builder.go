@@ -1,6 +1,8 @@
 package productmap
 
 import (
+	"fmt"
+
 	"github.com/followthepattern/forgefy/apptemplates"
 	"github.com/followthepattern/forgefy/apptemplates/apps/backend"
 	"github.com/followthepattern/forgefy/apptemplates/apps/frontend"
@@ -8,7 +10,8 @@ import (
 )
 
 type Builder struct {
-	fs featureset.FeatureSet
+	fs                featureset.FeatureSet
+	rootDirectoryName string
 }
 
 func NewBuilder(fs featureset.FeatureSet) Builder {
@@ -17,41 +20,68 @@ func NewBuilder(fs featureset.FeatureSet) Builder {
 	}
 }
 
-func (builder Builder) Build() ProductMap {
+func (builder Builder) Build() (ProductMap, error) {
 	productName := builder.fs.ProductName
 	fs := builder.fs
 
 	pm := NewProductMap(productName)
 
-	builder.addDefaultFiles(pm)
-	builder.addlocalDevFiles(pm)
+	err := builder.addDefaultFiles(pm)
+	if err != nil {
+		return pm, err
+	}
+
+	err = builder.addlocalDevFiles(pm)
+	if err != nil {
+		return pm, err
+	}
 
 	for _, app := range fs.Apps {
-		builder.addAppSpecificFiles(pm, app)
+		err = builder.addAppSpecificFiles(pm, app)
+		if err != nil {
+			return pm, err
+		}
 	}
 
-	return pm
+	fmt.Println(pm)
+
+	return pm, nil
 }
 
-func (builder Builder) addDefaultFiles(pm ProductMap) {}
+func (builder Builder) addDefaultFiles(pm ProductMap) error { return nil }
 
-func (builder Builder) addlocalDevFiles(pm ProductMap) {
-	pm.Insert("", NewFileFromTemplate(apptemplates.DockerCompose))
+func (builder Builder) addlocalDevFiles(pm ProductMap) (err error) {
+	dir := apptemplates.RootDirectory(builder.rootDirectoryName)
+	return pm.Insert(dir, NewFileFromTemplate(apptemplates.DockerCompose))
 }
 
-func (b Builder) addAppSpecificFiles(pm ProductMap, app featureset.App) {
+func (b Builder) addAppSpecificFiles(pm ProductMap, app featureset.App) (err error) {
 	switch app.Type {
 	case featureset.Backend:
-		b.addBackendFiles(pm, app)
+		err = b.addBackendFiles(pm, app)
 	case featureset.Frontend:
-		b.addFrontendFiles(pm, app)
+		err = b.addFrontendFiles(pm, app)
 	}
+	return
 }
 
-func (b Builder) addBackendFiles(pm ProductMap, app featureset.App) {
-	pm.Insert(app.Name, NewFileFromTemplate(backend.GoMod))
+func (b Builder) addBackendFiles(pm ProductMap, app featureset.App) error {
+	dir := backend.Directory(b.rootDirectoryName, app.Name)
+	err := pm.Insert(dir, NewFileFromTemplate(backend.GoMod))
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (b Builder) addFrontendFiles(pm ProductMap, app featureset.App) {
-	pm.Insert(app.Name, NewFileFromTemplate(frontend.PackageJSON))
+func (b Builder) addFrontendFiles(pm ProductMap, app featureset.App) error {
+	dir := frontend.Directory(b.rootDirectoryName, app.Name)
+	err := pm.Insert(dir, NewFileFromTemplate(frontend.PackageJSON))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

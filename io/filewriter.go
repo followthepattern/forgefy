@@ -19,7 +19,7 @@ func NewFileWriter(outputFolder string) FileWriter {
 func (fw FileWriter) Write(folderName string, fileName string, content string) error {
 	destDir := path.Join(fw.outputFolder, folderName)
 
-	err := os.MkdirAll(destDir, 0755)
+	err := os.MkdirAll(destDir, os.ModePerm)
 	if err != nil {
 		slog.Error(err.Error())
 	}
