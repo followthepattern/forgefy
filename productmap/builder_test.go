@@ -1,9 +1,6 @@
 package productmap_test
 
 import (
-	"fmt"
-	"path"
-
 	"github.com/followthepattern/forgefy/featureset"
 	"github.com/followthepattern/forgefy/productmap"
 	. "github.com/onsi/ginkgo/v2"
@@ -27,7 +24,7 @@ apps:
 			pm, err := builder.Build()
 			Expect(err).Should(Succeed())
 
-			exists := pm.Exists("/docker-compose.yaml")
+			exists := pm.Exists("docker-compose.yaml")
 			Expect(exists).Should(BeTrue())
 		})
 	})
@@ -52,7 +49,7 @@ apps:
 			Expect(err).Should(Succeed())
 		})
 
-		FIt("checks if frontend files are added", func() {
+		It("checks if frontend files are added", func() {
 			builder := productmap.NewBuilder(fs)
 			pm, err := builder.Build()
 			Expect(err).Should(Succeed())
@@ -68,17 +65,6 @@ apps:
 
 			exists := pm.Exists("apps/backend1/go.mod")
 			Expect(exists).Should(BeTrue())
-		})
-
-		It("checks if backend files are added", func() {
-			builder := productmap.NewBuilder(fs)
-			pm, err := builder.Build()
-			Expect(err).Should(Succeed())
-
-			pm.Walk(func(directoryName string, f productmap.File) {
-				fmt.Println(path.Join(directoryName, f.FileName()))
-			})
-			Expect(false).Should(BeTrue())
 		})
 	})
 })

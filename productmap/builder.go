@@ -1,8 +1,6 @@
 package productmap
 
 import (
-	"fmt"
-
 	"github.com/followthepattern/forgefy/apptemplates"
 	"github.com/followthepattern/forgefy/apptemplates/apps/backend"
 	"github.com/followthepattern/forgefy/apptemplates/apps/frontend"
@@ -21,10 +19,9 @@ func NewBuilder(fs featureset.FeatureSet) Builder {
 }
 
 func (builder Builder) Build() (ProductMap, error) {
-	productName := builder.fs.ProductName
 	fs := builder.fs
 
-	pm := NewProductMap(productName)
+	pm := NewProductMap()
 
 	err := builder.addDefaultFiles(pm)
 	if err != nil {
@@ -42,8 +39,6 @@ func (builder Builder) Build() (ProductMap, error) {
 			return pm, err
 		}
 	}
-
-	fmt.Println(pm)
 
 	return pm, nil
 }

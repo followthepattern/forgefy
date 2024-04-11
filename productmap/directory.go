@@ -28,13 +28,9 @@ func (dir Directory) Exists(filePath string) bool {
 }
 
 func (dir Directory) exists(dirPath string, fileName string) bool {
-	_, ok := dir.files[fileName]
-	if ok {
-		return true
-	}
-
 	if len(dirPath) == 0 {
-		return false
+		_, ok := dir.files[fileName]
+		return ok
 	}
 
 	dirs := strings.Split(dirPath, "/")
@@ -85,29 +81,28 @@ func (dir *Directory) insert(directoryPath string, file File) error {
 		return fmt.Errorf("file %s already exists at %s", file.FileName(), dir.DirName())
 	}
 
-	// todo: root directory - productDirectory has to be "" and assume it in each algorithm
+	if len(directoryPath) == 0 {
+		return dir.AddFile(file)
+	}
 
 	dirs := strings.Split(directoryPath, "/")
 
-	if len(dirs) == 0 || (len(dirs) == 1 && dirs[0] == dir.directoryName) {
-		dir.files[file.FileName()] = file
-		return nil
-	}
+	childDirName := dirs[0]
 
-	d, ok := dir.directories[directoryPath]
-	if ok {
-		d.AddFile(file)
-	}
-
-	newDir := NewDirectory(dirs[0])
-
+	childDir, ok := dir.directories[childDirName]
 	directoryPath = strings.Join(dirs[1:], "/")
-	err := dir.AddDirectory(newDir)
+
+	if ok {
+		return childDir.insert(directoryPath, file)
+	}
+
+	newChildDir := NewDirectory(childDirName)
+	err := dir.AddDirectory(newChildDir)
 	if err != nil {
 		return err
 	}
 
-	return newDir.insert(directoryPath, file)
+	return newChildDir.insert(directoryPath, file)
 }
 
 func (dir Directory) Walk(fn func(directoryName string, f File)) {

@@ -22,7 +22,7 @@ var _ = Describe("Product Map", func() {
 			err = directory2.AddDirectory(directory1)
 			Expect(err).Should(Succeed())
 
-			pm := productmap.NewProductMap("product")
+			pm := productmap.NewProductMap()
 
 			err = pm.AddDirectory(directory2)
 			Expect(err).Should(Succeed())
@@ -37,7 +37,7 @@ var _ = Describe("Product Map", func() {
 
 	Context("Insert", func() {
 		It("inserts file successfully", func() {
-			pm := productmap.NewProductMap("product")
+			pm := productmap.NewProductMap()
 
 			appleFile := productmap.NewFile("apple.txt", "apple content", nil)
 
