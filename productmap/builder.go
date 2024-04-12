@@ -43,7 +43,7 @@ func (builder Builder) Build() (ProductMap, error) {
 	return pm, nil
 }
 
-func (builder Builder) addDefaultFiles(pm ProductMap) error { return nil }
+func (builder Builder) addDefaultFiles(_ ProductMap) error { return nil }
 
 func (builder Builder) addlocalDevFiles(pm ProductMap) (err error) {
 	dir := apptemplates.RootDirectory(builder.rootDirectoryName)
