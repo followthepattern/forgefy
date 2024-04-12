@@ -1,12 +1,8 @@
 package main
 
 import (
-	"log/slog"
-	"os"
-
-	"github.com/followthepattern/forgefy/featureset"
+	"github.com/followthepattern/forgefy"
 	"github.com/followthepattern/forgefy/io"
-	"github.com/followthepattern/forgefy/productmap"
 )
 
 func main() {
@@ -19,26 +15,8 @@ apps:
   - name: frontend1
     type: frontend
 `
-	fs, err := featureset.UnmarshalYaml([]byte(yaml))
-	if err != nil {
-		slog.Error(err.Error())
-		os.Exit(1)
-	}
+	f := forgefy.New()
+	fw := io.NewFileWriter("output")
 
-	builder := productmap.NewBuilder(fs)
-
-	product, err := builder.Build()
-	if err != nil {
-		slog.Error(err.Error())
-		os.Exit(1)
-	}
-
-	writer := io.NewFileWriter("output")
-
-	product.Walk(func(folderName string, f productmap.File) {
-		err := writer.Write(folderName, f.FileName(), f.Template())
-		if err != nil {
-			slog.Error(err.Error())
-		}
-	})
+	f.Forge(yaml, fw)
 }

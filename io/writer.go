@@ -1,5 +1,5 @@
 package io
 
 type Writer interface {
-	Write(string) error
+	Write(folderName string, fileName string, content string) error
 }
