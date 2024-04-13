@@ -10,12 +10,12 @@ var _ = Describe("Product Map", func() {
 	Context("Exists", func() {
 		It("finds files in product map by filepath", func() {
 			directory1 := productmap.NewDirectory("directory1")
-			file1 := productmap.NewFile("file1", "content1", nil)
+			file1 := productmap.NewFile("file1", "content1")
 			err := directory1.AddFile(file1)
 			Expect(err).Should(Succeed())
 
 			directory2 := productmap.NewDirectory("directory2")
-			file2 := productmap.NewFile("file2", "content2", nil)
+			file2 := productmap.NewFile("file2", "content2")
 			err = directory2.AddFile(file2)
 			Expect(err).Should(Succeed())
 
@@ -39,7 +39,7 @@ var _ = Describe("Product Map", func() {
 		It("inserts file successfully", func() {
 			pm := productmap.NewProductMap()
 
-			appleFile := productmap.NewFile("apple.txt", "apple content", nil)
+			appleFile := productmap.NewFile("apple.txt", "apple content")
 
 			err := pm.Insert("/test/apps", appleFile)
 			Expect(err).Should(Succeed())

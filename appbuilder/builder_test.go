@@ -1,8 +1,8 @@
-package productmap_test
+package appbuilder_test
 
 import (
+	"github.com/followthepattern/forgefy/appbuilder"
 	"github.com/followthepattern/forgefy/featureset"
-	"github.com/followthepattern/forgefy/productmap"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -20,7 +20,7 @@ apps:
 			fs, err := featureset.UnmarshalYaml([]byte(yaml))
 			Expect(err).Should(Succeed())
 
-			builder := productmap.NewBuilder(fs)
+			builder := appbuilder.NewBuilder(fs)
 			pm, err := builder.Build()
 			Expect(err).Should(Succeed())
 
@@ -50,7 +50,7 @@ apps:
 		})
 
 		It("checks if frontend files are added", func() {
-			builder := productmap.NewBuilder(fs)
+			builder := appbuilder.NewBuilder(fs)
 			pm, err := builder.Build()
 			Expect(err).Should(Succeed())
 
@@ -59,7 +59,7 @@ apps:
 		})
 
 		It("checks if backend files are added", func() {
-			builder := productmap.NewBuilder(fs)
+			builder := appbuilder.NewBuilder(fs)
 			pm, err := builder.Build()
 			Expect(err).Should(Succeed())
 

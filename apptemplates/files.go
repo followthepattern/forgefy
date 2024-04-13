@@ -2,6 +2,8 @@ package apptemplates
 
 import (
 	_ "embed"
+
+	"github.com/followthepattern/forgefy/productmap"
 )
 
 var (
@@ -13,7 +15,4 @@ func RootDirectory(dirName string) string {
 	return dirName
 }
 
-var DockerCompose = TemplateFile{
-	Name:     "docker-compose.yaml",
-	Template: dockerComposeContent,
-}
+var DockerCompose = productmap.NewFile("docker-compose.yaml", dockerComposeContent)

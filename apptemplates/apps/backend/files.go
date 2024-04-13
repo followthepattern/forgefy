@@ -4,8 +4,8 @@ import (
 	_ "embed"
 	"path"
 
-	"github.com/followthepattern/forgefy/apptemplates"
 	"github.com/followthepattern/forgefy/apptemplates/apps"
+	"github.com/followthepattern/forgefy/productmap"
 )
 
 func Directory(productName, appName string) string {
@@ -17,7 +17,4 @@ var (
 	goMod string
 )
 
-var GoMod = apptemplates.TemplateFile{
-	Name:     "go.mod",
-	Template: goMod,
-}
+var GoMod = productmap.NewFile("go.mod", goMod)
