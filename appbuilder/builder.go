@@ -48,7 +48,7 @@ func (builder Builder) addDefaultFiles(_ productmap.ProductMap) error { return n
 
 func (builder Builder) addlocalDevFiles(pm productmap.ProductMap) (err error) {
 	dir := apptemplates.RootDirectory(builder.rootDirectoryName)
-	return pm.Insert(dir, productmap.NewFileFromTemplate(apptemplates.DockerCompose))
+	return pm.Insert(dir, apptemplates.DockerCompose)
 }
 
 func (b Builder) addAppSpecificFiles(pm productmap.ProductMap, app featureset.App) (err error) {
@@ -63,7 +63,7 @@ func (b Builder) addAppSpecificFiles(pm productmap.ProductMap, app featureset.Ap
 
 func (b Builder) addBackendFiles(pm productmap.ProductMap, app featureset.App) error {
 	dir := backend.Directory(b.rootDirectoryName, app.Name)
-	err := pm.Insert(dir, productmap.NewFileFromTemplate(backend.GoMod))
+	err := pm.Insert(dir, backend.GoMod)
 
 	if err != nil {
 		return err
@@ -74,9 +74,7 @@ func (b Builder) addBackendFiles(pm productmap.ProductMap, app featureset.App) e
 
 func (b Builder) addFrontendFiles(pm productmap.ProductMap, app featureset.App) error {
 	dir := frontend.Directory(b.rootDirectoryName, app.Name)
-	packageJSON := productmap.NewFileFromTemplate(frontend.PackageJSON).WithData(struct {
-		FrontendProjectName string
-	}{
+	packageJSON := frontend.PackageJSON.WithData(frontend.PackageJsonModel{
 		FrontendProjectName: app.Name,
 	})
 

@@ -3,8 +3,6 @@ package productmap
 import (
 	"strings"
 	"text/template"
-
-	"github.com/followthepattern/forgefy/apptemplates"
 )
 
 type File struct {
@@ -13,18 +11,10 @@ type File struct {
 	data     any
 }
 
-func NewFile(fileName string, template string, data any) File {
+func NewFile(fileName string, template string) File {
 	return File{
 		fileName: fileName,
 		template: template,
-		data:     data,
-	}
-}
-
-func NewFileFromTemplate(tpl apptemplates.TemplateFile) File {
-	return File{
-		fileName: tpl.Name,
-		template: tpl.Template,
 	}
 }
 

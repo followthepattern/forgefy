@@ -4,8 +4,8 @@ import (
 	_ "embed"
 	"path"
 
-	"github.com/followthepattern/forgefy/apptemplates"
 	"github.com/followthepattern/forgefy/apptemplates/apps"
+	"github.com/followthepattern/forgefy/productmap"
 )
 
 func Directory(productName, appName string) string {
@@ -17,7 +17,4 @@ var (
 	packageJSON string
 )
 
-var PackageJSON = apptemplates.TemplateFile{
-	Name:     "package.json",
-	Template: packageJSON,
-}
+var PackageJSON = productmap.NewFile("package.json", packageJSON)
