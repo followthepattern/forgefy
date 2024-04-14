@@ -10,13 +10,13 @@ const (
 )
 
 type App struct {
-	Name string  `yaml:"name"`
-	Type AppType `yaml:"type"`
+	AppName string  `yaml:"name"`
+	AppType AppType `yaml:"type"`
 }
 
 func (a App) Validate() error {
 	return validation.ValidateStruct(&a,
-		validation.Field(&a.Name, validation.Required),
-		validation.Field(&a.Type, validation.In(Backend, Frontend)),
+		validation.Field(&a.AppName, validation.Required),
+		validation.Field(&a.AppType, validation.In(Backend, Frontend)),
 	)
 }

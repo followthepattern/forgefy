@@ -2,8 +2,6 @@ package appbuilder
 
 import (
 	"github.com/followthepattern/forgefy/apptemplates"
-	"github.com/followthepattern/forgefy/apptemplates/apps/backend"
-	"github.com/followthepattern/forgefy/apptemplates/apps/frontend"
 	"github.com/followthepattern/forgefy/featureset"
 	"github.com/followthepattern/forgefy/productmap"
 )
@@ -52,36 +50,11 @@ func (builder Builder) addlocalDevFiles(pm productmap.ProductMap) (err error) {
 }
 
 func (b Builder) addAppSpecificFiles(pm productmap.ProductMap, app featureset.App) (err error) {
-	switch app.Type {
+	switch app.AppType {
 	case featureset.Backend:
 		err = b.addBackendFiles(pm, app)
 	case featureset.Frontend:
 		err = b.addFrontendFiles(pm, app)
 	}
 	return
-}
-
-func (b Builder) addBackendFiles(pm productmap.ProductMap, app featureset.App) error {
-	dir := backend.Directory(b.rootDirectoryName, app.Name)
-	err := pm.Insert(dir, backend.GoMod)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (b Builder) addFrontendFiles(pm productmap.ProductMap, app featureset.App) error {
-	dir := frontend.Directory(b.rootDirectoryName, app.Name)
-	packageJSON := frontend.PackageJSON.WithData(frontend.PackageJsonModel{
-		FrontendProjectName: app.Name,
-	})
-
-	err := pm.Insert(dir, packageJSON)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

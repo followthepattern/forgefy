@@ -15,6 +15,9 @@ func Directory(productName, appName string) string {
 var (
 	//go:embed go.mod.tmpl
 	goMod string
+	//go:embed Dockerfile.tmpl
+	dockerFile string
 )
 
 var GoMod = productmap.NewFile("go.mod", goMod)
+var DockerFile = productmap.NewFile("Dockerfile", dockerFile)

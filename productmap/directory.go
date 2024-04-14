@@ -72,8 +72,14 @@ func (dir *Directory) AddDirectory(directory Directory) error {
 	return nil
 }
 
-func (dir *Directory) Insert(directoryPath string, file File) error {
-	return dir.insert(directoryPath, file)
+func (dir *Directory) Insert(directoryPath string, files ...File) error {
+	for _, file := range files {
+		if err := dir.insert(directoryPath, file); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (dir *Directory) insert(directoryPath string, file File) error {
