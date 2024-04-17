@@ -6,9 +6,10 @@ import (
 )
 
 type FeatureSet struct {
-	Version     string `yaml:"version"`
-	ProductName string `yaml:"product_name"`
-	Apps        []App  `yaml:"apps"`
+	Version     string    `yaml:"version"`
+	ProductName string    `yaml:"product_name"`
+	Apps        []App     `yaml:"apps"`
+	Features    []Feature `yaml:"features"`
 }
 
 func (fs FeatureSet) Validate() error {
