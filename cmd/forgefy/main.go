@@ -16,7 +16,25 @@ apps:
     type: frontend
 features:
   - name: user
+    fields:
+      - name: ID
+        type: string
+      - name: FirstName
+        type: string
+      - name: LastName
+        type: string
+      - name: Age
+        type: int
   - name: product
+    fields:
+      - name: ID
+        type: string
+      - name: Name
+        type: string
+      - name: Type
+        type: string
+      - name: Price
+        type: int
   - name: task
   - name: image
 `
