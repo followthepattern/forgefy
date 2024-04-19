@@ -13,12 +13,12 @@ type Directory struct {
 	directories     map[string]Directory
 }
 
-// Deprecated
-func NewDirectory(directoryName string) Directory {
+func newDirectory(directoryName string, parentDir *Directory) Directory {
 	return Directory{
-		directoryName: directoryName,
-		files:         make(map[string]File),
-		directories:   make(map[string]Directory),
+		parentDirectory: parentDir,
+		directoryName:   directoryName,
+		files:           make(map[string]File),
+		directories:     make(map[string]Directory),
 	}
 }
 
@@ -62,8 +62,8 @@ func (dir *Directory) AddFile(file File) error {
 }
 
 func (dir *Directory) AddDirectory(directory Directory) error {
-	_, ok := dir.directories[directory.directoryName]
-	if ok {
+	_, exists := dir.directories[directory.directoryName]
+	if exists {
 		return fmt.Errorf("directory %s already exists at %s", dir.directoryName, dir.DirName())
 	}
 
@@ -72,7 +72,21 @@ func (dir *Directory) AddDirectory(directory Directory) error {
 	return nil
 }
 
+func (dir *Directory) AddChild(dirName string) (*Directory, error) {
+	_, exists := dir.directories[dirName]
+	if exists {
+		return nil, fmt.Errorf("directory %s already exists at %s", dir.directoryName, dir.DirName())
+	}
+
+	childDir := newDirectory(dirName, dir)
+	dir.directories[dirName] = childDir
+
+	return &childDir, nil
+}
+
 func (dir *Directory) Insert(directoryPath string, files ...File) error {
+	directoryPath, _ = strings.CutPrefix(directoryPath, "/")
+
 	for _, file := range files {
 		if err := dir.insert(directoryPath, file); err != nil {
 			return err
@@ -80,6 +94,29 @@ func (dir *Directory) Insert(directoryPath string, files ...File) error {
 	}
 
 	return nil
+}
+
+func (dir Directory) FindDirectory(dirName string) *Directory {
+	if len(dirName) == 0 {
+		return nil
+	}
+
+	dirs := strings.Split(dirName, "/")
+	if len(dirs) == 1 {
+		d, ok := dir.directories[dirs[0]]
+		if ok {
+			return &d
+		}
+		return nil
+	}
+
+	d, ok := dir.directories[dirs[0]]
+	if !ok {
+		return nil
+	}
+
+	return d.FindDirectory(strings.Join(dirs[1:], "/"))
+
 }
 
 func (dir *Directory) insert(directoryPath string, file File) error {
@@ -92,18 +129,15 @@ func (dir *Directory) insert(directoryPath string, file File) error {
 	}
 
 	dirs := strings.Split(directoryPath, "/")
-
 	childDirName := dirs[0]
 
-	childDir, ok := dir.directories[childDirName]
 	directoryPath = strings.Join(dirs[1:], "/")
 
-	if ok {
+	if childDir, ok := dir.directories[childDirName]; ok {
 		return childDir.insert(directoryPath, file)
 	}
 
-	newChildDir := NewDirectory(childDirName)
-	err := dir.AddDirectory(newChildDir)
+	newChildDir, err := dir.AddChild(childDirName)
 	if err != nil {
 		return err
 	}

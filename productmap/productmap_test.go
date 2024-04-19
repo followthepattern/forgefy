@@ -9,28 +9,24 @@ import (
 var _ = Describe("Product Map", func() {
 	Context("Exists", func() {
 		It("finds files in product map by filepath", func() {
-			directory1 := productmap.NewDirectory("directory1")
 			file1 := productmap.NewFile("file1", "content1")
-			err := directory1.AddFile(file1)
-			Expect(err).Should(Succeed())
-
-			directory2 := productmap.NewDirectory("directory2")
 			file2 := productmap.NewFile("file2", "content2")
-			err = directory2.AddFile(file2)
-			Expect(err).Should(Succeed())
-
-			err = directory2.AddDirectory(directory1)
-			Expect(err).Should(Succeed())
 
 			pm := productmap.NewProductMap()
+			dir1, err := pm.AddChild("dir1")
+			Expect(err).ShouldNot(HaveOccurred())
+			err = dir1.AddFile(file1)
+			Expect(err).ShouldNot(HaveOccurred())
 
-			err = pm.AddDirectory(directory2)
-			Expect(err).Should(Succeed())
+			dir2, err := dir1.AddChild("dir2")
+			Expect(err).ShouldNot(HaveOccurred())
+			err = dir2.AddFile(file2)
+			Expect(err).ShouldNot(HaveOccurred())
 
-			exists := pm.Exists("directory2/directory1/file1")
+			exists := pm.Exists("dir1/file1")
 			Expect(exists).Should(BeTrue())
 
-			exists = pm.Exists("directory2/file2")
+			exists = pm.Exists("dir1/dir2/file2")
 			Expect(exists).Should(BeTrue())
 		})
 	})
@@ -41,11 +37,29 @@ var _ = Describe("Product Map", func() {
 
 			appleFile := productmap.NewFile("apple.txt", "apple content")
 
-			err := pm.Insert("/test/apps", appleFile)
+			err := pm.Insert("test/apps", appleFile)
 			Expect(err).Should(Succeed())
 
-			exists := pm.Exists("/test/apps/apple.txt")
+			exists := pm.Exists("test/apps/apple.txt")
 			Expect(exists).Should(BeTrue())
+		})
+	})
+
+	Context("Dirname", func() {
+		It("successfully returns with a directory name", func() {
+			pm := productmap.NewProductMap()
+			dirName := "apps/backend/features/feature"
+
+			appleFile := productmap.NewFile("apple.txt", "apple content")
+
+			err := pm.Insert(dirName, appleFile)
+			Expect(err).Should(Succeed())
+
+			dir := pm.FindDirectory(dirName)
+			Expect(dir).ShouldNot(BeNil())
+
+			Expect(dir.DirName()).Should(Equal(dirName))
+
 		})
 	})
 })

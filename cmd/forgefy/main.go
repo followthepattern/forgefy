@@ -14,6 +14,11 @@ apps:
     type: backend
   - name: frontend1
     type: frontend
+features:
+  - name: user
+  - name: product
+  - name: task
+  - name: image
 `
 	f := forgefy.New()
 	fw := io.NewFileWriter("output")

@@ -33,7 +33,7 @@ func (builder Builder) Build() (productmap.ProductMap, error) {
 	}
 
 	for _, app := range fs.Apps {
-		err = builder.addAppSpecificFiles(pm, app)
+		err = builder.addAppSpecificFiles(pm, app, fs.Features)
 		if err != nil {
 			return pm, err
 		}
@@ -49,10 +49,10 @@ func (builder Builder) addlocalDevFiles(pm productmap.ProductMap) (err error) {
 	return pm.Insert(dir, apptemplates.DockerCompose)
 }
 
-func (b Builder) addAppSpecificFiles(pm productmap.ProductMap, app featureset.App) (err error) {
+func (b Builder) addAppSpecificFiles(pm productmap.ProductMap, app featureset.App, features []featureset.Feature) (err error) {
 	switch app.AppType {
 	case featureset.Backend:
-		err = b.addBackendFiles(pm, app)
+		err = b.addBackendFiles(pm, app, features)
 	case featureset.Frontend:
 		err = b.addFrontendFiles(pm, app)
 	}

@@ -9,7 +9,7 @@ type ProductMap struct {
 
 func NewProductMap() ProductMap {
 	return ProductMap{
-		Directory: NewDirectory(rootDirectory),
+		Directory: newDirectory(rootDirectory, nil),
 	}
 }
 
