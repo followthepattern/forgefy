@@ -19,6 +19,8 @@ features:
     fields:
       - name: ID
         type: string
+      - name: email
+        type: string
       - name: FirstName
         type: string
       - name: LastName

@@ -42,7 +42,10 @@ func (f File) Content() (string, error) {
 	}
 	s := &strings.Builder{}
 
-	tmpl.Execute(s, f.data)
+	err = tmpl.Execute(s, f.data)
+	if err != nil {
+		return "", err
+	}
 
 	return s.String(), nil
 }
