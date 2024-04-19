@@ -10,8 +10,9 @@ const (
 )
 
 type App struct {
-	AppName string  `yaml:"name"`
-	AppType AppType `yaml:"type"`
+	AppName  string    `yaml:"name"`
+	AppType  AppType   `yaml:"type"`
+	Features []Feature `yaml:"features"`
 }
 
 func (a App) Validate() error {

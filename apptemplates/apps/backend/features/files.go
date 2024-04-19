@@ -7,5 +7,5 @@ import (
 )
 
 func Directory(productName, appName string) string {
-	return path.Join(backend.Directory(productName, appName))
+	return path.Join(backend.Directory(productName, appName), "features")
 }
