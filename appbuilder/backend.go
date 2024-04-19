@@ -25,5 +25,17 @@ func (b Builder) addBackendFiles(pm productmap.ProductMap, app featureset.App, f
 func (b Builder) addFeature(pm productmap.ProductMap, app featureset.App, f featureset.Feature) error {
 	dir := feature.Directory(b.rootDirectoryName, app.AppName, f.FeatureName)
 
+	d := struct {
+		featureset.Feature
+		featureset.App
+	}{
+		Feature: f,
+		App:     app,
+	}
+
+	for i := 0; i < len(feature.Files); i++ {
+		feature.Files[i] = feature.Files[i].WithData(d)
+	}
+
 	return pm.Insert(dir, feature.Files...)
 }

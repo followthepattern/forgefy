@@ -1,35 +1,36 @@
-package product
+package {{ .FeatureName }}
 
 import (
-	"github.com/followthepattern/adapticc/models"
-	"github.com/followthepattern/adapticc/types"
+	"forgefy/{{.AppName}}/models"
+	"forgefy/{{.AppName}}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
-type ProductModel struct {
-	ID          types.String `db:"id" goqu:"omitempty"`
-	Title       types.String `db:"title" goqu:"omitempty"`
-	Description types.String `db:"description" goqu:"omitempty"`
+type {{ .FeatureName }} struct {
+	{{- range .Fields }}
+	{{ .Name }} {{ .Type }} `db:"{{ .Name }}" goqu:"omitempty"`
+	{{- end }}
 	models.Userlog
 }
 
-func (m ProductModel) IsDefault() bool {
+func (m {{ .FeatureName }}) IsDefault() bool {
 	return m.ID.Len() < 1
 }
 
-func (m ProductModel) CreateValidate() error {
+func (m {{ .FeatureName }}) CreateValidate() error {
 	return validation.ValidateStruct(&m,
-		validation.Field(&m.Title, validation.Required),
-		validation.Field(&m.Description, validation.Required),
+		{{- range .Fields }}
+		validation.Field(&m.{{ .Name }}, validation.Required),
+		{{- end }}
 	)
 }
 
-func (m ProductModel) UpdateValidate() error {
+func (m {{ .FeatureName }}) UpdateValidate() error {
 	return validation.ValidateStruct(&m,
 		validation.Field(&m.ID, validation.Required),
 	)
 }
 
-type ProductListRequestParams = models.ListRequestParams[models.ListFilter]
+type {{ .FeatureName }}ListRequestParams = models.ListRequestParams[models.ListFilter]
 
-type ProductListResponse = models.ListResponse[ProductModel]
+type {{ .FeatureName }}ListResponse = models.ListResponse[{{ .FeatureName }}Model]
