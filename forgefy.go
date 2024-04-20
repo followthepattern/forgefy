@@ -1,8 +1,6 @@
 package forgefy
 
 import (
-	"log/slog"
-
 	"github.com/followthepattern/forgefy/appbuilder"
 	"github.com/followthepattern/forgefy/featureset"
 	"github.com/followthepattern/forgefy/io"
@@ -15,30 +13,26 @@ func New() Forgefy {
 	return Forgefy{}
 }
 
-func (f Forgefy) Forge(yaml string, fw io.Writer) error {
+func (f Forgefy) Forge(yaml string, fw io.Writer) (string, error) {
 	fs, err := featureset.UnmarshalYaml([]byte(yaml))
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	builder := appbuilder.NewBuilder(fs)
 
 	product, err := builder.Build()
 	if err != nil {
-		return err
+		return fs.ProductName, err
 	}
 
-	product.Walk(func(folderName string, f productmap.File) {
-		content, err := f.Content()
+	err = product.Walk(func(folderName string, file productmap.File) error {
+		content, err := file.Content()
 		if err != nil {
-			slog.Error(err.Error())
+			return err
 		}
-
-		err = fw.Write(folderName, f.FileName(), content)
-		if err != nil {
-			slog.Error(err.Error())
-		}
+		return fw.Write(folderName, file.FileName(), content)
 	})
 
-	return nil
+	return fs.ProductName, err
 }

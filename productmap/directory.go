@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+type WalkFn func(directoryName string, f File) error
+
 type Directory struct {
 	parentDirectory *Directory
 	directoryName   string
@@ -145,12 +147,19 @@ func (dir *Directory) insert(directoryPath string, file File) error {
 	return newChildDir.insert(directoryPath, file)
 }
 
-func (dir Directory) Walk(fn func(directoryName string, f File)) {
+func (dir Directory) Walk(fn WalkFn) error {
 	for _, file := range dir.files {
-		fn(dir.DirName(), file)
+		err := fn(dir.DirName(), file)
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, d := range dir.directories {
-		d.Walk(fn)
+		err := d.Walk(fn)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
