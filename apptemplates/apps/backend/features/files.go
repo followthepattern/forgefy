@@ -6,6 +6,6 @@ import (
 	"github.com/followthepattern/forgefy/apptemplates/apps/backend"
 )
 
-func Directory(productName, appName string) string {
-	return path.Join(backend.Directory(productName, appName), "features")
+func Directory(appName string) string {
+	return path.Join(backend.Directory(appName), "features")
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/followthepattern/forgefy/productmap"
 )
 
-func Directory(productName, appName, featureName string) string {
-	return path.Join(features.Directory(productName, appName), featureName)
+func Directory(appName, featureName string) string {
+	return path.Join(features.Directory(appName), featureName)
 }
 
 var (

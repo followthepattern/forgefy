@@ -1,23 +1,42 @@
-package appbuilder
+package gobackend
 
 import (
 	"github.com/followthepattern/forgefy/apptemplates/apps/backend"
 	"github.com/followthepattern/forgefy/apptemplates/apps/backend/features/feature"
 	"github.com/followthepattern/forgefy/apptemplates/apps/backend/tests/integration/testdata"
 	"github.com/followthepattern/forgefy/featureset"
+	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/productmap"
 )
 
-func (b Builder) addBackendFiles(pm productmap.ProductMap, app featureset.App, features []featureset.Feature) error {
+var _ plugins.App = &GoBackendPluginApp{}
+
+type GoBackendPluginApp struct{}
+
+func (GoBackendPluginApp) Name() string {
+	return "Go Back-end application"
+}
+
+func (GoBackendPluginApp) Type() string {
+	return "go-backend"
+}
+
+func (GoBackendPluginApp) AddDefaultFiles(pm productmap.ProductMap, fs featureset.FeatureSet) error {
+	return nil
+}
+
+func (plugin GoBackendPluginApp) Builder(pm productmap.ProductMap, fs featureset.FeatureSet, app featureset.App) error {
 	dir := backend.Directory(app.AppName)
 
-	err := b.addTests(pm, app, features)
+	features := append(fs.Features, app.Features...)
+
+	err := plugin.addTests(pm, app, features)
 	if err != nil {
 		return err
 	}
 
 	for _, feat := range features {
-		err := b.addFeature(pm, app, feat)
+		err := plugin.addFeature(pm, app, feat)
 		if err != nil {
 			return err
 		}
@@ -28,7 +47,7 @@ func (b Builder) addBackendFiles(pm productmap.ProductMap, app featureset.App, f
 		backend.DockerFile.WithData(app))
 }
 
-func (b Builder) addTests(pm productmap.ProductMap, app featureset.App, features []featureset.Feature) error {
+func (b GoBackendPluginApp) addTests(pm productmap.ProductMap, app featureset.App, features []featureset.Feature) error {
 	dir := testdata.Directory(app.AppName)
 
 	d := struct {
@@ -48,7 +67,7 @@ func (b Builder) addTests(pm productmap.ProductMap, app featureset.App, features
 	)
 }
 
-func (b Builder) addFeature(pm productmap.ProductMap, app featureset.App, f featureset.Feature) error {
+func (b GoBackendPluginApp) addFeature(pm productmap.ProductMap, app featureset.App, f featureset.Feature) error {
 	dir := feature.Directory(app.AppName, f.FeatureName)
 
 	d := struct {

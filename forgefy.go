@@ -4,6 +4,8 @@ import (
 	"github.com/followthepattern/forgefy/appbuilder"
 	"github.com/followthepattern/forgefy/featureset"
 	"github.com/followthepattern/forgefy/io"
+	"github.com/followthepattern/forgefy/plugins/gobackend"
+	"github.com/followthepattern/forgefy/plugins/reactfrontend"
 	"github.com/followthepattern/forgefy/productmap"
 )
 
@@ -21,7 +23,7 @@ func (f Forgefy) Forge(yaml string, fw io.Writer) (string, error) {
 
 	builder := appbuilder.NewBuilder(fs)
 
-	product, err := builder.Build()
+	product, err := builder.Build(gobackend.Plugin{}, reactfrontend.Plugin{})
 	if err != nil {
 		return fs.ProductName, err
 	}

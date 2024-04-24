@@ -7,7 +7,7 @@ import (
 )
 
 func (b Builder) addFrontendFiles(pm productmap.ProductMap, app featureset.App) error {
-	dir := frontend.Directory(b.rootDirectoryName, app.AppName)
+	dir := frontend.Directory(app.AppName)
 
 	return pm.Insert(dir,
 		frontend.PackageJSON.WithData(app))
