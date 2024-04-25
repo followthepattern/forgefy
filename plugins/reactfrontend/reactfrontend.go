@@ -1,9 +1,9 @@
 package reactfrontend
 
 import (
-	"github.com/followthepattern/forgefy/apptemplates/apps/frontend"
 	"github.com/followthepattern/forgefy/featureset"
 	"github.com/followthepattern/forgefy/plugins"
+	"github.com/followthepattern/forgefy/plugins/reactfrontend/apptemplates"
 	"github.com/followthepattern/forgefy/productmap"
 )
 
@@ -24,8 +24,8 @@ func (ReactFrontend) AddDefaultFiles(pm productmap.ProductMap, fs featureset.Fea
 }
 
 func (plugin ReactFrontend) Builder(pm productmap.ProductMap, fs featureset.FeatureSet, app featureset.App) error {
-	dir := frontend.Directory(app.AppName)
+	dir := apptemplates.Directory(app.AppName)
 
 	return pm.Insert(dir,
-		frontend.PackageJSON.WithData(app))
+		apptemplates.PackageJSON.WithData(app))
 }
