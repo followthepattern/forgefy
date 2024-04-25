@@ -1,4 +1,4 @@
-package appbuilder
+package forgefy
 
 import (
 	"fmt"
@@ -23,37 +23,20 @@ func NewBuilder(fs featureset.FeatureSet) Builder {
 	}
 }
 
-func (builder Builder) verifyPlugins(_ []plugins.Plugin) error { return nil }
-
-func (builder *Builder) setPlugins(plugins []plugins.Plugin) error {
-	err := builder.verifyPlugins(plugins)
-
-	if err != nil {
-		return err
-	}
-
+func (builder Builder) withPlugins(plugins ...plugins.Plugin) Builder {
 	builder.plugins = plugins
+	return builder
+}
 
-	for _, plugin := range plugins {
-		for _, appBuilder := range plugin.Apps() {
-			appBuilders := builder.apps[appBuilder.Type()]
-			builder.apps[appBuilder.Type()] = append(appBuilders, appBuilder)
-		}
-	}
-	return nil
+func (builder Builder) withApps(apps map[string][]plugins.App) Builder {
+	builder.apps = apps
+	return builder
 }
 
 func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, error) {
-	fs := builder.fs
-
-	err := builder.setPlugins(plugins)
-	if err != nil {
-		return productmap.ProductMap{}, nil
-	}
-
 	pm := productmap.NewProductMap()
 
-	err = builder.addDefaultFiles(pm)
+	err := builder.addDefaultFiles(pm)
 	if err != nil {
 		return pm, err
 	}
@@ -64,14 +47,14 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 	}
 
 	for _, plugin := range builder.plugins {
-		err = plugin.AddFiles(pm, fs)
+		err = plugin.AddFiles(pm, builder.fs)
 		if err != nil {
 			return pm, err
 		}
 	}
 
-	for _, app := range fs.Apps {
-		err = builder.addAppSpecificFiles(pm, fs, app)
+	for _, app := range builder.fs.Apps {
+		err = builder.addAppSpecificFiles(pm, builder.fs, app)
 		if err != nil {
 			return pm, err
 		}

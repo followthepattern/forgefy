@@ -6,6 +6,8 @@ import (
 
 	"github.com/followthepattern/forgefy"
 	"github.com/followthepattern/forgefy/io"
+	"github.com/followthepattern/forgefy/plugins/gobackend"
+	"github.com/followthepattern/forgefy/plugins/reactfrontend"
 	"github.com/spf13/cobra"
 )
 
@@ -46,6 +48,9 @@ func main() {
 	}
 
 	f := forgefy.New()
+
+	f.SetPlugins(gobackend.Plugin{}, reactfrontend.Plugin{})
+
 	fw := io.NewFileWriter(outputDir)
 
 	productName, err := f.Forge(string(forgeFile), fw)

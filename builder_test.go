@@ -1,7 +1,7 @@
-package appbuilder_test
+package forgefy_test
 
 import (
-	"github.com/followthepattern/forgefy/appbuilder"
+	"github.com/followthepattern/forgefy"
 	"github.com/followthepattern/forgefy/featureset"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -20,7 +20,7 @@ apps:
 			fs, err := featureset.UnmarshalYaml([]byte(yaml))
 			Expect(err).Should(Succeed())
 
-			builder := appbuilder.NewBuilder(fs)
+			builder := forgefy.NewBuilder(fs)
 			pm, err := builder.Build()
 			Expect(err).Should(Succeed())
 
@@ -50,7 +50,7 @@ apps:
 		})
 
 		It("checks if frontend files are added", func() {
-			builder := appbuilder.NewBuilder(fs)
+			builder := forgefy.NewBuilder(fs)
 			pm, err := builder.Build()
 			Expect(err).Should(Succeed())
 
@@ -59,7 +59,7 @@ apps:
 		})
 
 		It("checks if backend files are added", func() {
-			builder := appbuilder.NewBuilder(fs)
+			builder := forgefy.NewBuilder(fs)
 			pm, err := builder.Build()
 			Expect(err).Should(Succeed())
 
