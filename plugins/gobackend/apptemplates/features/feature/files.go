@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"path"
 
-	"github.com/followthepattern/forgefy/apptemplates/apps/backend/features"
+	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/features"
 	"github.com/followthepattern/forgefy/productmap"
 )
 

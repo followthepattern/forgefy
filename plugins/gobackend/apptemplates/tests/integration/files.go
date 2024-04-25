@@ -3,7 +3,7 @@ package integration
 import (
 	"path"
 
-	"github.com/followthepattern/forgefy/apptemplates/apps/backend/tests"
+	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/tests"
 )
 
 func Directory(appName string) string {

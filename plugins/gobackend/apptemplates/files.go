@@ -1,4 +1,4 @@
-package backend
+package apptemplates
 
 import (
 	_ "embed"

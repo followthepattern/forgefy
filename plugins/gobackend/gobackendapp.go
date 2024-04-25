@@ -1,11 +1,11 @@
 package gobackend
 
 import (
-	"github.com/followthepattern/forgefy/apptemplates/apps/backend"
-	"github.com/followthepattern/forgefy/apptemplates/apps/backend/features/feature"
-	"github.com/followthepattern/forgefy/apptemplates/apps/backend/tests/integration/testdata"
 	"github.com/followthepattern/forgefy/featureset"
 	"github.com/followthepattern/forgefy/plugins"
+	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates"
+	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/features/feature"
+	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/tests/integration/testdata"
 	"github.com/followthepattern/forgefy/productmap"
 )
 
@@ -26,7 +26,7 @@ func (GoBackendPluginApp) AddDefaultFiles(pm productmap.ProductMap, fs featurese
 }
 
 func (plugin GoBackendPluginApp) Builder(pm productmap.ProductMap, fs featureset.FeatureSet, app featureset.App) error {
-	dir := backend.Directory(app.AppName)
+	dir := apptemplates.Directory(app.AppName)
 
 	features := append(fs.Features, app.Features...)
 
@@ -43,8 +43,8 @@ func (plugin GoBackendPluginApp) Builder(pm productmap.ProductMap, fs featureset
 	}
 
 	return pm.Insert(dir,
-		backend.GoMod.WithData(app),
-		backend.DockerFile.WithData(app))
+		apptemplates.GoMod.WithData(app),
+		apptemplates.DockerFile.WithData(app))
 }
 
 func (b GoBackendPluginApp) addTests(pm productmap.ProductMap, app featureset.App, features []featureset.Feature) error {
