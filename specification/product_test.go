@@ -1,12 +1,12 @@
-package featureset_test
+package specification_test
 
 import (
-	"github.com/followthepattern/forgefy/featureset"
+	"github.com/followthepattern/forgefy/specification"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Feature Set", func() {
+var _ = Describe("Specification", func() {
 	Context("Unmarshal yaml file", func() {
 		var (
 			yaml = `
@@ -20,12 +20,12 @@ apps:
 `
 		)
 
-		It("populates the feature set object with the values from the yaml", func() {
-			fs, err := featureset.UnmarshalYaml([]byte(yaml))
+		It("populates the product specification with the values from the yaml", func() {
+			fs, err := specification.UnmarshalYaml([]byte(yaml))
 			Expect(err).Should(Succeed())
 
 			Expect(fs.ProductName).Should(Equal("test product"))
-			Expect(fs.Version).Should(Equal("0"))
+			Expect(fs.ForgeVersion).Should(Equal("0"))
 		})
 	})
 })

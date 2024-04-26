@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/followthepattern/forgefy"
-	"github.com/followthepattern/forgefy/io"
+	"github.com/followthepattern/forgefy/forgeio"
 	"github.com/followthepattern/forgefy/plugins/gobackend"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend"
 	"github.com/spf13/cobra"
@@ -51,7 +51,7 @@ func main() {
 
 	f.SetPlugins(gobackend.Plugin{}, reactfrontend.Plugin{})
 
-	fw := io.NewFileWriter(outputDir)
+	fw := forgeio.NewFileWriter(outputDir)
 
 	productName, err := f.Forge(string(forgeFile), fw)
 	if err != nil {

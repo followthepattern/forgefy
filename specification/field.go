@@ -1,4 +1,4 @@
-package featureset
+package specification
 
 import (
 	"github.com/followthepattern/forgefy/datagenerator"

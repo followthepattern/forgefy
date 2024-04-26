@@ -3,19 +3,19 @@ package forgefy
 import (
 	"fmt"
 
-	"github.com/followthepattern/forgefy/apptemplates"
-	"github.com/followthepattern/forgefy/featureset"
+	"github.com/followthepattern/forgefy/devtemplates"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/productmap"
+	"github.com/followthepattern/forgefy/specification"
 )
 
 type Builder struct {
-	fs      featureset.FeatureSet
+	fs      specification.Product
 	plugins []plugins.Plugin
 	apps    map[string][]plugins.App
 }
 
-func NewBuilder(fs featureset.FeatureSet) Builder {
+func newBuilder(fs specification.Product) Builder {
 	return Builder{
 		fs:      fs,
 		plugins: make([]plugins.Plugin, 0),
@@ -41,7 +41,7 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 		return pm, err
 	}
 
-	err = builder.addProjectLevelFiles(pm)
+	err = builder.buildDevFiles(pm)
 	if err != nil {
 		return pm, err
 	}
@@ -54,7 +54,7 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 	}
 
 	for _, app := range builder.fs.Apps {
-		err = builder.addAppSpecificFiles(pm, builder.fs, app)
+		err = builder.appBuilders(pm, builder.fs, app)
 		if err != nil {
 			return pm, err
 		}
@@ -65,12 +65,12 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 
 func (builder Builder) addDefaultFiles(_ productmap.ProductMap) error { return nil }
 
-func (builder Builder) addProjectLevelFiles(pm productmap.ProductMap) error {
-	dir := apptemplates.RootDirectory()
-	return pm.Insert(dir, apptemplates.DockerCompose)
+func (builder Builder) buildDevFiles(pm productmap.ProductMap) error {
+	dir := devtemplates.RootDirectory()
+	return pm.Insert(dir, devtemplates.DockerCompose)
 }
 
-func (b Builder) addAppSpecificFiles(pm productmap.ProductMap, fs featureset.FeatureSet, app featureset.App) error {
+func (b Builder) appBuilders(pm productmap.ProductMap, fs specification.Product, app specification.App) error {
 	apps, ok := b.apps[string(app.AppType)]
 	if !ok {
 		return fmt.Errorf("unknown app definition: %s", app.AppType)

@@ -1,10 +1,10 @@
 package reactfrontend
 
 import (
-	"github.com/followthepattern/forgefy/featureset"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend/apptemplates"
 	"github.com/followthepattern/forgefy/productmap"
+	"github.com/followthepattern/forgefy/specification"
 )
 
 var _ plugins.App = &ReactFrontend{}
@@ -19,11 +19,11 @@ func (ReactFrontend) Type() string {
 	return "react-frontend"
 }
 
-func (ReactFrontend) AddDefaultFiles(pm productmap.ProductMap, fs featureset.FeatureSet) error {
+func (ReactFrontend) AddDefaultFiles(pm productmap.ProductMap, fs specification.Product) error {
 	return nil
 }
 
-func (plugin ReactFrontend) Builder(pm productmap.ProductMap, fs featureset.FeatureSet, app featureset.App) error {
+func (plugin ReactFrontend) Builder(pm productmap.ProductMap, fs specification.Product, app specification.App) error {
 	dir := apptemplates.Directory(app.AppName)
 
 	return pm.Insert(dir,

@@ -1,4 +1,4 @@
-package apptemplates
+package devtemplates
 
 import (
 	_ "embed"

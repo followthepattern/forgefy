@@ -1,9 +1,9 @@
 package gobackend
 
 import (
-	"github.com/followthepattern/forgefy/featureset"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/productmap"
+	"github.com/followthepattern/forgefy/specification"
 )
 
 var _ plugins.Plugin = Plugin{}
@@ -18,4 +18,4 @@ func (Plugin) Apps() []plugins.App {
 	}
 }
 
-func (Plugin) AddFiles(_ productmap.ProductMap, _ featureset.FeatureSet) error { return nil }
+func (Plugin) AddFiles(_ productmap.ProductMap, _ specification.Product) error { return nil }

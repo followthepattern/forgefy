@@ -1,10 +1,10 @@
 package forgefy
 
 import (
-	"github.com/followthepattern/forgefy/featureset"
-	"github.com/followthepattern/forgefy/io"
+	"github.com/followthepattern/forgefy/forgeio"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/productmap"
+	"github.com/followthepattern/forgefy/specification"
 )
 
 type Forgefy struct {
@@ -18,13 +18,13 @@ func New() Forgefy {
 	}
 }
 
-func (f Forgefy) Forge(yaml string, fw io.Writer) (string, error) {
-	fs, err := featureset.UnmarshalYaml([]byte(yaml))
+func (f Forgefy) Forge(yaml string, fw forgeio.Writer) (string, error) {
+	fs, err := specification.UnmarshalYaml([]byte(yaml))
 	if err != nil {
 		return "", err
 	}
 
-	builder := NewBuilder(fs).withPlugins(f.plugins...).withApps(f.apps)
+	builder := newBuilder(fs).withPlugins(f.plugins...).withApps(f.apps)
 
 	product, err := builder.Build()
 	if err != nil {
