@@ -1,4 +1,4 @@
-package featureset_test
+package specification_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestFeatureSet(t *testing.T) {
+func TestProductSpecification(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Feature Set Suite")
+	RunSpecs(t, "Specification Suite")
 }

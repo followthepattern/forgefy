@@ -3,11 +3,11 @@ package productmap
 const rootDirectory = ""
 
 type ProductMap struct {
-	Directory
+	directory
 }
 
 func NewProductMap() ProductMap {
 	return ProductMap{
-		Directory: newDirectory(rootDirectory, nil),
+		directory: newDirectory(rootDirectory, nil),
 	}
 }

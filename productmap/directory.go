@@ -8,28 +8,28 @@ import (
 
 type WalkFn func(directoryName string, f File) error
 
-type Directory struct {
-	parentDirectory *Directory
+type directory struct {
+	parentDirectory *directory
 	directoryName   string
 	files           map[string]File
-	directories     map[string]Directory
+	directories     map[string]directory
 }
 
-func newDirectory(directoryName string, parentDir *Directory) Directory {
-	return Directory{
+func newDirectory(directoryName string, parentDir *directory) directory {
+	return directory{
 		parentDirectory: parentDir,
 		directoryName:   directoryName,
 		files:           make(map[string]File),
-		directories:     make(map[string]Directory),
+		directories:     make(map[string]directory),
 	}
 }
 
-func (dir Directory) Exists(filePath string) bool {
+func (dir directory) Exists(filePath string) bool {
 	dirPath, fileName := path.Split(filePath)
 	return dir.exists(dirPath, fileName)
 }
 
-func (dir Directory) exists(dirPath string, fileName string) bool {
+func (dir directory) exists(dirPath string, fileName string) bool {
 	if len(dirPath) == 0 {
 		_, ok := dir.files[fileName]
 		return ok
@@ -44,14 +44,14 @@ func (dir Directory) exists(dirPath string, fileName string) bool {
 	return d.exists(strings.Join(dirs[1:], "/"), fileName)
 }
 
-func (dir Directory) DirName() string {
+func (dir directory) DirName() string {
 	if dir.parentDirectory == nil {
 		return dir.directoryName
 	}
 	return path.Join(dir.parentDirectory.DirName(), dir.directoryName)
 }
 
-func (dir *Directory) AddFile(file File) error {
+func (dir *directory) AddFile(file File) error {
 	_, ok := dir.files[file.FileName()]
 
 	if ok {
@@ -63,7 +63,7 @@ func (dir *Directory) AddFile(file File) error {
 	return nil
 }
 
-func (dir *Directory) AddDirectory(directory Directory) error {
+func (dir *directory) AddDirectory(directory directory) error {
 	_, exists := dir.directories[directory.directoryName]
 	if exists {
 		return fmt.Errorf("directory %s already exists at %s", dir.directoryName, dir.DirName())
@@ -74,7 +74,7 @@ func (dir *Directory) AddDirectory(directory Directory) error {
 	return nil
 }
 
-func (dir *Directory) AddChild(dirName string) (*Directory, error) {
+func (dir *directory) AddChild(dirName string) (*directory, error) {
 	_, exists := dir.directories[dirName]
 	if exists {
 		return nil, fmt.Errorf("directory %s already exists at %s", dir.directoryName, dir.DirName())
@@ -86,7 +86,7 @@ func (dir *Directory) AddChild(dirName string) (*Directory, error) {
 	return &childDir, nil
 }
 
-func (dir *Directory) Insert(directoryPath string, files ...File) error {
+func (dir *directory) Insert(directoryPath string, files ...File) error {
 	directoryPath, _ = strings.CutPrefix(directoryPath, "/")
 
 	for _, file := range files {
@@ -98,7 +98,7 @@ func (dir *Directory) Insert(directoryPath string, files ...File) error {
 	return nil
 }
 
-func (dir Directory) FindDirectory(dirName string) *Directory {
+func (dir directory) FindDirectory(dirName string) *directory {
 	if len(dirName) == 0 {
 		return nil
 	}
@@ -121,7 +121,7 @@ func (dir Directory) FindDirectory(dirName string) *Directory {
 
 }
 
-func (dir *Directory) insert(directoryPath string, file File) error {
+func (dir *directory) insert(directoryPath string, file File) error {
 	if exists := dir.exists(directoryPath, file.FileName()); exists {
 		return fmt.Errorf("file %s already exists at %s", file.FileName(), dir.DirName())
 	}
@@ -147,7 +147,7 @@ func (dir *Directory) insert(directoryPath string, file File) error {
 	return newChildDir.insert(directoryPath, file)
 }
 
-func (dir Directory) Walk(fn WalkFn) error {
+func (dir directory) Walk(fn WalkFn) error {
 	for _, file := range dir.files {
 		err := fn(dir.DirName(), file)
 		if err != nil {

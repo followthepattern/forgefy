@@ -4,18 +4,18 @@ import (
 	"fmt"
 
 	"github.com/followthepattern/forgefy/apptemplates"
-	"github.com/followthepattern/forgefy/featureset"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/productmap"
+	"github.com/followthepattern/forgefy/specification"
 )
 
 type Builder struct {
-	fs      featureset.FeatureSet
+	fs      specification.Product
 	plugins []plugins.Plugin
 	apps    map[string][]plugins.App
 }
 
-func NewBuilder(fs featureset.FeatureSet) Builder {
+func newBuilder(fs specification.Product) Builder {
 	return Builder{
 		fs:      fs,
 		plugins: make([]plugins.Plugin, 0),
@@ -70,7 +70,7 @@ func (builder Builder) addProjectLevelFiles(pm productmap.ProductMap) error {
 	return pm.Insert(dir, apptemplates.DockerCompose)
 }
 
-func (b Builder) addAppSpecificFiles(pm productmap.ProductMap, fs featureset.FeatureSet, app featureset.App) error {
+func (b Builder) addAppSpecificFiles(pm productmap.ProductMap, fs specification.Product, app specification.App) error {
 	apps, ok := b.apps[string(app.AppType)]
 	if !ok {
 		return fmt.Errorf("unknown app definition: %s", app.AppType)
