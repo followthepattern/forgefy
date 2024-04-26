@@ -6,6 +6,6 @@ import (
 	"github.com/followthepattern/forgefy/apptemplates"
 )
 
-func Directory(productName string) string {
-	return path.Join(apptemplates.RootDirectory(productName), "apps")
+func Directory() string {
+	return path.Join(apptemplates.RootDirectory(), "apps")
 }

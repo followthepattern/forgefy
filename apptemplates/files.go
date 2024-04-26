@@ -11,8 +11,8 @@ var (
 	dockerComposeContent string
 )
 
-func RootDirectory(dirName string) string {
-	return dirName
+func RootDirectory() string {
+	return ""
 }
 
 var DockerCompose = productmap.NewFile("docker-compose.yaml", dockerComposeContent)

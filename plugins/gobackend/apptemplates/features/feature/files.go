@@ -4,12 +4,12 @@ import (
 	_ "embed"
 	"path"
 
-	"github.com/followthepattern/forgefy/apptemplates/apps/backend/features"
+	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/features"
 	"github.com/followthepattern/forgefy/productmap"
 )
 
-func Directory(productName, appName, featureName string) string {
-	return path.Join(features.Directory(productName, appName), featureName)
+func Directory(appName, featureName string) string {
+	return path.Join(features.Directory(appName), featureName)
 }
 
 var (
