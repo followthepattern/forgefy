@@ -3,7 +3,7 @@ package forgefy
 import (
 	"fmt"
 
-	"github.com/followthepattern/forgefy/apptemplates"
+	"github.com/followthepattern/forgefy/devtemplates"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
@@ -66,8 +66,8 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 func (builder Builder) addDefaultFiles(_ productmap.ProductMap) error { return nil }
 
 func (builder Builder) addProjectLevelFiles(pm productmap.ProductMap) error {
-	dir := apptemplates.RootDirectory()
-	return pm.Insert(dir, apptemplates.DockerCompose)
+	dir := devtemplates.RootDirectory()
+	return pm.Insert(dir, devtemplates.DockerCompose)
 }
 
 func (b Builder) addAppSpecificFiles(pm productmap.ProductMap, fs specification.Product, app specification.App) error {
