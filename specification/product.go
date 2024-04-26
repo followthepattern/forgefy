@@ -15,7 +15,6 @@ type Product struct {
 func (fs Product) Validate() error {
 	return validation.ValidateStruct(&fs,
 		validation.Field(&fs.ProductName, validation.Required),
-		validation.Field(&fs.Apps, validation.Required),
 	)
 }
 
