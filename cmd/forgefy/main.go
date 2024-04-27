@@ -49,7 +49,7 @@ func main() {
 
 	f := forgefy.New()
 
-	f.SetPlugins(gobackend.Plugin{}, reactfrontend.Plugin{})
+	f.InstallPlugins(gobackend.Plugin{}, reactfrontend.Plugin{})
 
 	fw := forgeio.NewFileWriter(outputDir)
 

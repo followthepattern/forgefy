@@ -1,4 +1,4 @@
-package forgefy_test
+package gobackend_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestForgefy(t *testing.T) {
+func TestGoBackendApp(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Forgefy Test Suite")
+	RunSpecs(t, "Go Back-end App Test Suite")
 }
