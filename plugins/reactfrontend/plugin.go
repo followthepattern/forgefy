@@ -10,7 +10,7 @@ var _ plugins.Plugin = Plugin{}
 
 type Plugin struct{}
 
-func (Plugin) Name() string { return "Go Plugin" }
+func (Plugin) Name() string { return "React Plugin" }
 
 func (Plugin) Apps() []plugins.App {
 	return []plugins.App{
