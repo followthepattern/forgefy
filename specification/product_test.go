@@ -10,7 +10,7 @@ var _ = Describe("Specification", func() {
 	Context("Unmarshal yaml file", func() {
 		var (
 			yaml = `
-version: 0
+forge_version: 0
 product_name: "test product"
 apps:
   - name: "Test frontend"

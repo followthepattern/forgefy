@@ -44,7 +44,7 @@ func (f Forgefy) Forge(yaml string, fw forgeio.Writer) (string, error) {
 
 func (f Forgefy) verifyPlugins(_ []plugins.Plugin) error { return nil }
 
-func (f *Forgefy) SetPlugins(plugins ...plugins.Plugin) error {
+func (f *Forgefy) InstallPlugins(plugins ...plugins.Plugin) error {
 	if len(plugins) < 1 {
 		return nil
 	}
