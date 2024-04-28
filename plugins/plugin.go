@@ -15,4 +15,10 @@ type App interface {
 	Name() string
 	Type() string
 	Builder(productmap.ProductMap, specification.Product, specification.App) error
+	DockerComposeInfos(appName, appPath string) []DockerComposeInfo
+}
+
+type DockerComposeInfo struct {
+	ServiceName           string
+	DockerComposeFilePath string
 }

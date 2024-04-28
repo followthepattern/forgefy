@@ -1,6 +1,8 @@
 package reactfrontend
 
 import (
+	"fmt"
+
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend/apptemplates"
 	"github.com/followthepattern/forgefy/productmap"
@@ -17,6 +19,15 @@ func (ReactFrontend) Name() string {
 
 func (ReactFrontend) Type() string {
 	return "react-frontend"
+}
+
+func (ReactFrontend) DockerComposeInfos(appName, appPath string) []plugins.DockerComposeInfo {
+	return []plugins.DockerComposeInfo{
+		{
+			ServiceName:           appName,
+			DockerComposeFilePath: fmt.Sprintf("%s/docker-compose.yml", appPath),
+		},
+	}
 }
 
 func (ReactFrontend) AddDefaultFiles(pm productmap.ProductMap, fs specification.Product) error {

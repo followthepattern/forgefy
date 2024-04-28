@@ -4,7 +4,11 @@ product_name: "Startup CMS"
 apps:
   - name: backend1
     type: go-backend
+  - name: backend2
+    type: go-backend
   - name: frontend1
+    type: react-frontend
+  - name: frontend2
     type: react-frontend
 features:
   - name: user

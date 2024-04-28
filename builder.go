@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/followthepattern/forgefy/devtemplates"
+	"github.com/followthepattern/forgefy/devtemplates/apps"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
@@ -65,9 +66,45 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 
 func (builder Builder) addDefaultFiles(_ productmap.ProductMap) error { return nil }
 
-func (builder Builder) buildDevFiles(pm productmap.ProductMap) error {
+func (builder Builder) buildDevFiles(pm productmap.ProductMap) (err error) {
+	err = builder.buildDockerCompose(pm)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (builder Builder) buildDockerCompose(pm productmap.ProductMap) error {
 	dir := devtemplates.RootDirectory()
-	return pm.Insert(dir, devtemplates.DockerCompose)
+
+	dockerCompose := make(map[string]plugins.DockerComposeInfo)
+
+	for _, appSpec := range builder.fs.Apps {
+		pluginApps, ok := builder.apps[string(appSpec.AppType)]
+		if !ok {
+			continue
+		}
+
+		for _, app := range pluginApps {
+			specs := app.DockerComposeInfos(appSpec.AppName, apps.Directory())
+
+			for _, spec := range specs {
+				dockerCompose[spec.ServiceName] = spec
+			}
+		}
+	}
+
+	data := devtemplates.DockerCompose.WithData(
+		struct {
+			DockerComposeInfos map[string]plugins.DockerComposeInfo
+		}{
+			DockerComposeInfos: dockerCompose,
+		},
+	)
+
+	return pm.Insert(dir, data)
 }
 
 func (b Builder) appBuilders(pm productmap.ProductMap, fs specification.Product, app specification.App) error {
