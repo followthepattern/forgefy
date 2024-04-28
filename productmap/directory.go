@@ -63,17 +63,6 @@ func (dir *directory) AddFile(file File) error {
 	return nil
 }
 
-func (dir *directory) AddDirectory(directory directory) error {
-	_, exists := dir.directories[directory.directoryName]
-	if exists {
-		return fmt.Errorf("directory %s already exists at %s", dir.directoryName, dir.DirName())
-	}
-
-	dir.directories[directory.directoryName] = directory
-
-	return nil
-}
-
 func (dir *directory) AddChild(dirName string) (*directory, error) {
 	_, exists := dir.directories[dirName]
 	if exists {
@@ -122,11 +111,10 @@ func (dir directory) FindDirectory(dirName string) *directory {
 }
 
 func (dir *directory) insert(directoryPath string, file File) error {
-	if exists := dir.exists(directoryPath, file.FileName()); exists {
-		return fmt.Errorf("file %s already exists at %s", file.FileName(), dir.DirName())
-	}
-
 	if len(directoryPath) == 0 {
+		if _, exists := dir.files[file.FileName()]; exists {
+			return fmt.Errorf("file %s already exists at %s", file.FileName(), dir.DirName())
+		}
 		return dir.AddFile(file)
 	}
 

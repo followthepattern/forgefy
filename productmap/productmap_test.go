@@ -43,6 +43,54 @@ var _ = Describe("Product Map", func() {
 			exists := pm.Exists("test/apps/apple.txt")
 			Expect(exists).Should(BeTrue())
 		})
+
+		It("returns error inserting the same file twice", func() {
+			pm := productmap.NewProductMap()
+
+			appleFile := productmap.NewFile("apple.txt", "apple content")
+
+			err := pm.Insert("test/apps", appleFile)
+			Expect(err).Should(Succeed())
+
+			err = pm.Insert("test/apps", appleFile)
+			Expect(err).Should(HaveOccurred())
+			Expect(err).Should(MatchError("file apple.txt already exists at test/apps"))
+		})
+	})
+
+	Context("AddChild", func() {
+		It("adds a child to directory", func() {
+			pm := productmap.NewProductMap()
+
+			appleFile := productmap.NewFile("apple.txt", "apple content")
+
+			err := pm.Insert("test/apps", appleFile)
+			Expect(err).Should(Succeed())
+
+			dir := pm.FindDirectory("test")
+			Expect(dir).ShouldNot(BeNil())
+
+			dir, err = dir.AddChild("apps2")
+			Expect(err).Should(Succeed())
+			Expect(dir).ShouldNot(BeNil())
+		})
+
+		It("fails to add child to directory, because it already exists", func() {
+			pm := productmap.NewProductMap()
+
+			appleFile := productmap.NewFile("apple.txt", "apple content")
+
+			err := pm.Insert("test/apps", appleFile)
+			Expect(err).Should(Succeed())
+
+			dir := pm.FindDirectory("test")
+			Expect(dir).ShouldNot(BeNil())
+
+			dir, err = dir.AddChild("apps")
+			Expect(err).ShouldNot(Succeed())
+			Expect(err).Should(MatchError("directory test already exists at test"))
+			Expect(dir).Should(BeNil())
+		})
 	})
 
 	Context("Dirname", func() {
