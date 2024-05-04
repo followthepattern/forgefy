@@ -1,13 +1,13 @@
 package forgeio
 
 import (
+	"io"
 	"path"
 )
 
 type DummyFile struct {
 	dirName  string
 	fileName string
-	content  string
 }
 
 var _ Writer = &DummyWriter{}
@@ -16,18 +16,18 @@ type DummyWriter struct {
 	files map[string]DummyFile
 }
 
-func NewDummyWriter() DummyWriter {
-	return DummyWriter{
-		files: make(map[string]DummyFile, 0),
-	}
-}
-
-func (d *DummyWriter) Write(dirName, fileName, content string) error {
+// IOWriter implements Writer.
+func (d *DummyWriter) Write(dirName string, fileName string, _ func(io.Writer) error) error {
 	filePath := path.Join(dirName, fileName)
 	d.files[filePath] = DummyFile{
 		dirName:  dirName,
 		fileName: fileName,
-		content:  content,
 	}
 	return nil
+}
+
+func NewDummyWriter() DummyWriter {
+	return DummyWriter{
+		files: make(map[string]DummyFile, 0),
+	}
 }
