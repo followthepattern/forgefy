@@ -1,5 +1,7 @@
 package forgeio
 
+import "io"
+
 type Writer interface {
-	Write(folderName string, fileName string, content string) error
+	Write(dirName, fileName string, writerFn func(io.Writer) error) error
 }

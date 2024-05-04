@@ -1,22 +1,19 @@
 package forgeio
 
 import (
+	"io"
 	"log/slog"
 	"os"
 	"path"
 )
 
+var _ Writer = FileWriter{}
+
 type FileWriter struct {
 	outputFolder string
 }
 
-func NewFileWriter(outputFolder string) FileWriter {
-	return FileWriter{
-		outputFolder: outputFolder,
-	}
-}
-
-func (fw FileWriter) Write(folderName string, fileName string, content string) error {
+func (fw FileWriter) Write(folderName string, fileName string, writerFn func(io.Writer) error) error {
 	destDir := path.Join(fw.outputFolder, folderName)
 
 	err := os.MkdirAll(destDir, os.ModePerm)
@@ -29,10 +26,11 @@ func (fw FileWriter) Write(folderName string, fileName string, content string) e
 		return err
 	}
 
-	_, err = file.Write([]byte(content))
-	if err != nil {
-		return err
-	}
+	return writerFn(file)
+}
 
-	return nil
+func NewFileWriter(outputFolder string) FileWriter {
+	return FileWriter{
+		outputFolder: outputFolder,
+	}
 }
