@@ -1,8 +1,6 @@
 package gobackend
 
 import (
-	"fmt"
-
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/features/feature"
@@ -21,23 +19,6 @@ func (GoBackendPluginApp) Name() string {
 
 func (GoBackendPluginApp) Type() string {
 	return "go-backend"
-}
-
-func (GoBackendPluginApp) DockerComposeInfos(appName, appPath string) []plugins.DockerComposeInfo {
-	return []plugins.DockerComposeInfo{
-		{
-			ServiceName:           "db",
-			DockerComposeFilePath: fmt.Sprintf("%s/docker-compose.yml", appPath),
-		},
-		{
-			ServiceName:           "cerbos",
-			DockerComposeFilePath: fmt.Sprintf("%s/docker-compose.yml", appPath),
-		},
-		{
-			ServiceName:           appName,
-			DockerComposeFilePath: fmt.Sprintf("%s/docker-compose.yml", appPath),
-		},
-	}
 }
 
 func (GoBackendPluginApp) AddDefaultFiles(pm productmap.ProductMap, fs specification.Product) error {
@@ -89,11 +70,8 @@ func (b GoBackendPluginApp) addTests(pm productmap.ProductMap, app specification
 func (b GoBackendPluginApp) addFeature(pm productmap.ProductMap, app specification.App, f specification.Feature) error {
 	dir := feature.Directory(app.AppName, f.FeatureName)
 
-	d := struct {
-		specification.Feature
-		specification.App
-	}{
-		Feature: f,
+	d := FeatureTemplateModel{
+		Feature: Feature(f),
 		App:     app,
 	}
 
