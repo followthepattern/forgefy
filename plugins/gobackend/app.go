@@ -5,6 +5,7 @@ import (
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/features/feature"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/tests/integration/testdata"
+	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/types"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
 )
@@ -21,7 +22,13 @@ func (GoBackendPluginApp) Type() string {
 	return "go-backend"
 }
 
-func (GoBackendPluginApp) AddDefaultFiles(pm productmap.ProductMap, fs specification.Product) error {
+func (GoBackendPluginApp) AddStaticFiles(pm productmap.ProductMap, fs specification.Product, app specification.App) error {
+	err := pm.Insert(types.Directory(app.AppName),
+		types.Files...)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -31,6 +38,11 @@ func (plugin GoBackendPluginApp) Builder(pm productmap.ProductMap, fs specificat
 	features := append(fs.Features, app.Features...)
 
 	err := plugin.addTests(pm, app, features)
+	if err != nil {
+		return err
+	}
+
+	err = plugin.AddStaticFiles(pm, fs, app)
 	if err != nil {
 		return err
 	}
