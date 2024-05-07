@@ -1,6 +1,10 @@
 package gobackend
 
 import (
+	"io/fs"
+	"path"
+	"strings"
+
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/features/feature"
@@ -37,7 +41,7 @@ func (GoBackendPluginApp) AddStaticFiles(pm productmap.ProductMap, fs specificat
 	return nil
 }
 
-func (plugin GoBackendPluginApp) Builder(pm productmap.ProductMap, fs specification.Product, app specification.App) error {
+func (plugin GoBackendPluginApp) Builder2(pm productmap.ProductMap, fs specification.Product, app specification.App) error {
 	dir := apptemplates.Directory(app.AppName)
 
 	features := append(fs.Features, app.Features...)
@@ -62,6 +66,39 @@ func (plugin GoBackendPluginApp) Builder(pm productmap.ProductMap, fs specificat
 	return pm.Insert(dir,
 		apptemplates.GoMod.WithData(app),
 		apptemplates.DockerFile.WithData(app))
+}
+
+func (plugin GoBackendPluginApp) Builder(pm productmap.ProductMap, product specification.Product, app specification.App) error {
+	dir := apptemplates.EntireDir
+	// features := append(product.Features, app.Features...)
+
+	return fs.WalkDir(dir, ".", func(filepath string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !strings.HasSuffix(filepath, ".tmpl") {
+			return nil
+		}
+
+		content, err := fs.ReadFile(dir, filepath)
+		if err != nil {
+			return err
+		}
+
+		filepath = path.Join(apptemplates.Directory(app.AppName), filepath)
+
+		dirName, fileName := path.Split(filepath)
+
+		file := productmap.NewFile(
+			fileName,
+			string(content),
+		).WithData(app)
+
+		pm.Insert(dirName, file)
+
+		return nil
+	})
 }
 
 func (b GoBackendPluginApp) addTests(pm productmap.ProductMap, app specification.App, features []specification.Feature) error {

@@ -1,6 +1,7 @@
 package apptemplates
 
 import (
+	"embed"
 	_ "embed"
 	"path"
 
@@ -17,6 +18,9 @@ var (
 	goMod string
 	//go:embed Dockerfile.tmpl
 	dockerFile string
+
+	//go:embed *
+	EntireDir embed.FS
 )
 
 var GoMod = productmap.NewFile("go.mod", goMod)
