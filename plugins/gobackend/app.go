@@ -7,7 +7,6 @@ import (
 
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates"
-	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/features/feature"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/models"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/tests/integration/testdata"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates/types"
@@ -56,13 +55,6 @@ func (plugin GoBackendPluginApp) Builder2(pm productmap.ProductMap, fs specifica
 		return err
 	}
 
-	for _, feat := range features {
-		err := plugin.addFeature(pm, app, feat)
-		if err != nil {
-			return err
-		}
-	}
-
 	return pm.Insert(dir,
 		apptemplates.GoMod.WithData(app),
 		apptemplates.DockerFile.WithData(app))
@@ -70,7 +62,7 @@ func (plugin GoBackendPluginApp) Builder2(pm productmap.ProductMap, fs specifica
 
 func (plugin GoBackendPluginApp) Builder(pm productmap.ProductMap, product specification.Product, app specification.App) error {
 	dir := apptemplates.EntireDir
-	// features := append(product.Features, app.Features...)
+	features := append(product.Features, app.Features...)
 
 	return fs.WalkDir(dir, ".", func(filepath string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -86,17 +78,41 @@ func (plugin GoBackendPluginApp) Builder(pm productmap.ProductMap, product speci
 			return err
 		}
 
-		filepath = path.Join(apptemplates.Directory(app.AppName), filepath)
+		filepath = strings.TrimSuffix(filepath, ".tmpl")
 
-		dirName, fileName := path.Split(filepath)
+		if strings.Contains(filepath, "[feature]") {
+			filepath = path.Join(apptemplates.Directory(app.AppName), filepath)
 
-		file := productmap.NewFile(
-			fileName,
-			string(content),
-		).WithData(app)
+			for _, feature := range features {
+				feat := Feature(feature)
 
-		pm.Insert(dirName, file)
+				newFilePath := strings.ReplaceAll(filepath, "[feature]", feat.PackageName())
 
+				dirName, fileName := path.Split(newFilePath)
+				file := productmap.NewFile(
+					fileName,
+					string(content),
+				).WithData(FeatureTemplateModel{
+					Feature: feat,
+					App:     app,
+				})
+
+				err = pm.Insert(dirName, file)
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			filepath = path.Join(apptemplates.Directory(app.AppName), filepath)
+
+			dirName, fileName := path.Split(filepath)
+			file := productmap.NewFile(
+				fileName,
+				string(content),
+			).WithData(app)
+
+			return pm.Insert(dirName, file)
+		}
 		return nil
 	})
 }
@@ -119,19 +135,4 @@ func (b GoBackendPluginApp) addTests(pm productmap.ProductMap, app specification
 	return pm.Insert(dir,
 		testdata.Files...,
 	)
-}
-
-func (b GoBackendPluginApp) addFeature(pm productmap.ProductMap, app specification.App, f specification.Feature) error {
-	dir := feature.Directory(app.AppName, f.FeatureName)
-
-	d := FeatureTemplateModel{
-		Feature: Feature(f),
-		App:     app,
-	}
-
-	for i := 0; i < len(feature.Files); i++ {
-		feature.Files[i] = feature.Files[i].WithData(d)
-	}
-
-	return pm.Insert(dir, feature.Files...)
 }
