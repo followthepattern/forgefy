@@ -5,6 +5,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/followthepattern/forgefy/devtemplates/apps"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates"
 	"github.com/followthepattern/forgefy/productmap"
@@ -49,7 +50,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product speci
 
 		filepath = strings.TrimSuffix(filepath, ".tmpl")
 
-		filepath = path.Join(apptemplates.Directory(app.AppName), filepath)
+		filepath = path.Join(apps.Directory(), app.AppName, filepath)
 
 		if !strings.Contains(filepath, "[feature]") {
 			dirName, fileName := path.Split(filepath)
