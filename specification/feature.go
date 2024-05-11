@@ -1,11 +1,19 @@
 package specification
 
-import validation "github.com/go-ozzo/ozzo-validation"
+import (
+	"strings"
+
+	validation "github.com/go-ozzo/ozzo-validation"
+)
 
 type Feature struct {
 	FeatureName         string  `yaml:"name"`
 	Fields              []Field `yaml:"fields"`
 	CountOfRandomValues int
+}
+
+func (f Feature) ToDirName() string {
+	return strings.ToLower(f.FeatureName)
 }
 
 func (f Feature) TemplateIterator() []int {
