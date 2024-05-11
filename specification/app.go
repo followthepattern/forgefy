@@ -1,6 +1,10 @@
 package specification
 
-import validation "github.com/go-ozzo/ozzo-validation"
+import (
+	"strings"
+
+	validation "github.com/go-ozzo/ozzo-validation"
+)
 
 type AppType string
 
@@ -8,6 +12,10 @@ type App struct {
 	AppName  string    `yaml:"name"`
 	AppType  AppType   `yaml:"type"`
 	Features []Feature `yaml:"features"`
+}
+
+func (a App) AppNameToFolderName() string {
+	return strings.ToLower(a.AppName)
 }
 
 func (a App) Validate() error {

@@ -1,12 +1,8 @@
 version: '3'
-{{if .DockerComposeInfos }}
-services:
-{{- range .DockerComposeInfos }}
-  {{ .ServiceName }}:
-    extends:
-      file: {{ .DockerComposeFilePath }}
-      service: {{ .ServiceName }}
+
+{{if .Apps }}
+include:
+{{- range .Apps }}
+  - apps/{{ .AppNameToFolderName }}/docker-compose.yml
 {{- end }}
 {{ end }}
-volumes:
-  shared-volume:
