@@ -1,8 +1,6 @@
 package forgefy
 
 import (
-	"fmt"
-
 	"github.com/followthepattern/forgefy/forgeio"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/productmap"
@@ -34,13 +32,7 @@ func (f Forgefy) Forge(yaml string, fw forgeio.Writer) (string, error) {
 	}
 
 	err = product.Walk(func(folderName string, file productmap.File) error {
-		if folderName == "apps/backend1" && file.FileName() == "Dockerfile.tmpl" {
-			fmt.Println()
-		}
-
-		err := fw.Write(folderName, file.FileName(), file.Write)
-
-		return err
+		return fw.Write(folderName, file.FileName(), file.Write)
 	})
 
 	return fs.ProductName, err

@@ -2,11 +2,9 @@ package apptemplates
 
 import (
 	"embed"
-	_ "embed"
 	"path"
 
-	"github.com/followthepattern/forgefy/devtemplates/apps"
-	"github.com/followthepattern/forgefy/productmap"
+	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
 )
 
 func Directory(appName string) string {
@@ -14,14 +12,6 @@ func Directory(appName string) string {
 }
 
 var (
-	//go:embed go.mod.tmpl
-	goMod string
-	//go:embed Dockerfile.tmpl
-	dockerFile string
-
 	//go:embed *
 	EntireDir embed.FS
 )
-
-var GoMod = productmap.NewFile("go.mod", goMod)
-var DockerFile = productmap.NewFile("Dockerfile", dockerFile)

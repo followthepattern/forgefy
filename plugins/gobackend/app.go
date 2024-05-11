@@ -5,9 +5,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/followthepattern/forgefy/devtemplates/apps"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates"
+	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
 )
@@ -24,7 +24,7 @@ func (GoBackendPluginApp) Type() string {
 	return "go-backend"
 }
 
-func (plugin GoBackendPluginApp) Builder(pm productmap.ProductMap, product specification.Product, app specification.App) error {
+func (plugin GoBackendPluginApp) Build(pm productmap.ProductMap, product specification.Product, app specification.App) error {
 	dir := apptemplates.EntireDir
 
 	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, product, app))
