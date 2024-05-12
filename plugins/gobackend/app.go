@@ -12,6 +12,12 @@ import (
 	"github.com/followthepattern/forgefy/specification"
 )
 
+type App specification.App
+
+func (a App) AppNameToPackageName() string {
+	return strings.ToLower(a.AppName)
+}
+
 var _ plugins.App = &GoBackendPluginApp{}
 
 type GoBackendPluginApp struct{}
@@ -33,6 +39,7 @@ func (plugin GoBackendPluginApp) Build(pm productmap.ProductMap, product specifi
 func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product specification.Product, app specification.App) func(filepath string, d fs.DirEntry, err error) error {
 	dir := apptemplates.EntireDir
 	features := append(product.Features, app.Features...)
+	goApp := App(app)
 
 	return func(filepath string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -50,14 +57,14 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product speci
 
 		filepath = strings.TrimSuffix(filepath, ".tmpl")
 
-		filepath = path.Join(apps.Directory(), app.AppName, filepath)
+		filepath = path.Join(apps.Directory(), goApp.AppName, filepath)
 
 		if !strings.Contains(filepath, "[feature]") {
 			dirName, fileName := path.Split(filepath)
 			file := productmap.NewFile(
 				fileName,
 				string(content),
-			).WithData(app)
+			).WithData(goApp)
 
 			return pm.Insert(dirName, file)
 		}
@@ -73,7 +80,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product speci
 				string(content),
 			).WithData(FeatureTemplateModel{
 				Feature: feat,
-				App:     app,
+				App:     goApp,
 			})
 
 			err = pm.Insert(dirName, file)
