@@ -18,4 +18,4 @@ func (Plugin) Apps() []plugins.App {
 	}
 }
 
-func (Plugin) AddFiles(_ productmap.ProductMap, _ specification.Product) error { return nil }
+func (Plugin) Build(_ productmap.ProductMap, _ specification.Product) error { return nil }

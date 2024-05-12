@@ -7,6 +7,7 @@ import (
 	"github.com/followthepattern/forgefy"
 	"github.com/followthepattern/forgefy/forgeio"
 	"github.com/followthepattern/forgefy/plugins/gobackend"
+	"github.com/followthepattern/forgefy/plugins/monorepo"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend"
 	"github.com/spf13/cobra"
 )
@@ -49,7 +50,7 @@ func main() {
 
 	f := forgefy.New()
 
-	f.InstallPlugins(gobackend.Plugin{}, reactfrontend.Plugin{})
+	f.InstallPlugins(monorepo.MonoRepo{}, gobackend.Plugin{}, reactfrontend.Plugin{})
 
 	fw := forgeio.NewFileWriter(outputDir)
 
