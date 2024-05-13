@@ -70,7 +70,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product speci
 		}
 
 		for _, feature := range features {
-			feat := Feature(feature)
+			feat := Feature{feature}
 
 			newFilePath := strings.ReplaceAll(filepath, "[feature]", feat.PackageName())
 

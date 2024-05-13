@@ -12,6 +12,10 @@ type Feature struct {
 	CountOfRandomValues int
 }
 
+func (f Feature) FeatureNameLowerCamel() string {
+	return LowerFirst(f.FeatureName)
+}
+
 func (f Feature) ToDirName() string {
 	return strings.ToLower(f.FeatureName)
 }

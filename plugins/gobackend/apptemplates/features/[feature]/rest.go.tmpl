@@ -1,31 +1,31 @@
-package product
+package {{ .PackageName }}
 
 import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/followthepattern/adapticc/api"
+	"github.com/{{ .AppNameToPackageName }}/api"
 )
 
-type ProductRest struct {
-	product ProductController
+type {{ .GoTypeName }}Rest struct {
+	{{ .FeatureNameLowerCamel }} {{ .GoTypeName }}Controller
 }
 
-func NewProductRest(ctrl ProductController) ProductRest {
-	return ProductRest{
-		product: ctrl,
+func New{{ .GoTypeName }}Rest(ctrl {{ .GoTypeName }}Controller) {{ .GoTypeName }}Rest {
+	return {{ .GoTypeName }}Rest{
+		{{ .FeatureNameLowerCamel }}: ctrl,
 	}
 }
 
-func (service ProductRest) Create(w http.ResponseWriter, r *http.Request) {
-	var product ProductModel
-	err := json.NewDecoder(r.Body).Decode(&product)
+func (service {{ .GoTypeName }}Rest) Create(w http.ResponseWriter, r *http.Request) {
+	var value {{ .GoTypeName }}Model
+	err := json.NewDecoder(r.Body).Decode(&value)
 	if err != nil {
 		api.BadRequest(w, api.FailedToDecodeRequestBody)
 		return
 	}
 
-	err = service.product.Create(r.Context(), product)
+	err = service.{{ .FeatureNameLowerCamel }}.Create(r.Context(), value)
 	if err != nil {
 		api.BadRequest(w, err.Error())
 		return

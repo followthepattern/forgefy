@@ -1,40 +1,40 @@
-package product
+package {{ .PackageName }}
 
 import (
 	"context"
 	"log/slog"
 
-	"github.com/followthepattern/adapticc/config"
-	"github.com/followthepattern/adapticc/container"
-	"github.com/followthepattern/adapticc/features/auth"
-	"github.com/followthepattern/adapticc/types"
+	"github.com/{{ .AppNameToPackageName }}/config"
+	"github.com/{{ .AppNameToPackageName }}/container"
+	"github.com/{{ .AppNameToPackageName }}/features/auth"
+	"github.com/{{ .AppNameToPackageName }}/types"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
-type ProductController struct {
-	product ProductService
+type {{ .GoTypeName }}Controller struct {
+	{{ .FeatureNameLowerCamel }} {{ .GoTypeName }}Service
 	logger  *slog.Logger
 	cfg     config.Config
 }
 
-func NewProductController(cont container.Container) ProductController {
-	authorizationService := auth.NewAuthorizationService(cont, "product")
-	productService := NewProductService(cont, authorizationService)
+func New{{ .GoTypeName }}Controller(cont container.Container) {{ .GoTypeName }}Controller {
+	authorizationService := auth.NewAuthorizationService(cont, "{{ .FeatureNameLowerCamel }}")
+	{{ .FeatureNameLowerCamel }}Service := New{{ .GoTypeName }}Service(cont, authorizationService)
 
-	return ProductController{
-		product: productService,
+	return {{ .GoTypeName }}Controller{
+		{{ .FeatureNameLowerCamel }}: {{ .FeatureNameLowerCamel }}Service,
 		logger:  cont.GetLogger(),
 		cfg:     cont.GetConfig(),
 	}
 }
 
-func (ctrl ProductController) GetByID(ctx context.Context, id string) (*ProductModel, error) {
-	if err := validation.Validate(id, types.Required("productID")); err != nil {
+func (ctrl {{ .GoTypeName }}Controller) GetByID(ctx context.Context, id string) (*{{ .GoTypeName }}Model, error) {
+	if err := validation.Validate(id, types.Required("{{ .FeatureNameLowerCamel }}ID")); err != nil {
 		return nil, err
 	}
 
-	result, err := ctrl.product.GetByID(ctx, id)
+	result, err := ctrl.{{ .FeatureNameLowerCamel }}.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -46,29 +46,29 @@ func (ctrl ProductController) GetByID(ctx context.Context, id string) (*ProductM
 	return result, nil
 }
 
-func (ctrl ProductController) Get(ctx context.Context, filter ProductListRequestParams) (*ProductListResponse, error) {
-	return ctrl.product.Get(ctx, filter)
+func (ctrl {{ .GoTypeName }}Controller) Get(ctx context.Context, filter {{ .GoTypeName }}ListRequestParams) (*{{ .GoTypeName }}ListResponse, error) {
+	return ctrl.{{ .FeatureNameLowerCamel }}.Get(ctx, filter)
 }
 
-func (ctrl ProductController) Create(ctx context.Context, value ProductModel) error {
+func (ctrl {{ .GoTypeName }}Controller) Create(ctx context.Context, value {{ .GoTypeName }}Model) error {
 	if err := value.CreateValidate(); err != nil {
 		return err
 	}
-	return ctrl.product.Create(ctx, value)
+	return ctrl.{{ .FeatureNameLowerCamel }}.Create(ctx, value)
 }
 
-func (ctrl ProductController) Update(ctx context.Context, value ProductModel) error {
+func (ctrl {{ .GoTypeName }}Controller) Update(ctx context.Context, value {{ .GoTypeName }}Model) error {
 	if err := value.UpdateValidate(); err != nil {
 		return err
 	}
 
-	return ctrl.product.Update(ctx, value)
+	return ctrl.{{ .FeatureNameLowerCamel }}.Update(ctx, value)
 }
 
-func (ctrl ProductController) Delete(ctx context.Context, id string) error {
-	if err := validation.Validate(id, types.Required("productID")); err != nil {
+func (ctrl {{ .GoTypeName }}Controller) Delete(ctx context.Context, id string) error {
+	if err := validation.Validate(id, types.Required("{{ .FeatureNameLowerCamel }}ID")); err != nil {
 		return err
 	}
 
-	return ctrl.product.Delete(ctx, id)
+	return ctrl.{{ .FeatureNameLowerCamel }}.Delete(ctx, id)
 }
