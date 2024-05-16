@@ -38,8 +38,8 @@ func (plugin GoBackendPluginApp) Build(pm productmap.ProductMap, product specifi
 
 func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product specification.Product, app specification.App) func(filepath string, d fs.DirEntry, err error) error {
 	dir := apptemplates.EntireDir
-	features := append(product.Features, app.Features...)
 	goApp := App(app)
+	goApp.Features = append(product.Features, app.Features...)
 
 	return func(filepath string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -69,7 +69,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product speci
 			return pm.Insert(dirName, file)
 		}
 
-		for _, feature := range features {
+		for _, feature := range goApp.Features {
 			feat := Feature{feature}
 
 			newFilePath := strings.ReplaceAll(filepath, "[feature]", feat.PackageName())

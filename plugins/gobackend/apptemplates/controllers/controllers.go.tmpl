@@ -3,9 +3,10 @@ package controllers
 import (
 	"github.com/{{ .AppNameToPackageName }}/container"
 	"github.com/{{ .AppNameToPackageName }}/features/auth"
-	"github.com/{{ .AppNameToPackageName }}/features/product"
-	"github.com/{{ .AppNameToPackageName }}/features/role"
-	"github.com/{{ .AppNameToPackageName }}/features/user"
+{{- $AppNameToPackageName := .AppNameToPackageName }}
+{{- range .Features }}
+	"github.com/{{ $AppNameToPackageName }}/features/{{ .FeatureName }}"
+{{- end }}
 )
 
 type Controllers struct {
