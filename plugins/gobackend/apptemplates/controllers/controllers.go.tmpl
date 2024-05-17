@@ -10,33 +10,24 @@ import (
 )
 
 type Controllers struct {
-	user    user.UserController
 	auth    auth.AuthController
-	product product.ProductController
-	role    role.RoleController
+{{- range .Features }}
+	{{ .FeatureNameLowerCamel }}    {{ .PackageName }}.{{ .GoTypeName }}Controller
+{{- end }}
 }
 
 func New(cont container.Container) Controllers {
 	return Controllers{
-		user:    user.NewUserController(cont),
 		auth:    auth.NewAuthController(cont),
-		product: product.NewProductController(cont),
-		role:    role.NewRoleController(cont),
+{{- range .Features }}
+		{{ .FeatureNameLowerCamel }}:    {{ .PackageName }}.New{{ .GoTypeName }}Controller(cont),
+{{- end }}
 	}
 }
 
-func (c Controllers) User() user.UserController {
-	return c.user
+{{- range .Features }}
+func (c Controllers) {{ .GoTypeName }}() {{ .PackageName }}.{{ .GoTypeName }}Controller {
+	return c.{{ .FeatureNameLowerCamel }}
 }
 
-func (c Controllers) Auth() auth.AuthController {
-	return c.auth
-}
-
-func (c Controllers) Product() product.ProductController {
-	return c.product
-}
-
-func (c Controllers) Role() role.RoleController {
-	return c.role
-}
+{{- end }}

@@ -12,10 +12,24 @@ import (
 	"github.com/followthepattern/forgefy/specification"
 )
 
-type App specification.App
+type App struct {
+	specification.App
+}
+
+func (a App) AppNameCapital() string {
+	return strings.ToUpper(a.AppName)
+}
 
 func (a App) AppNameToPackageName() string {
 	return strings.ToLower(a.AppName)
+}
+
+func (a App) Features() []Feature {
+	features := make([]Feature, len(a.App.Features))
+	for i, feature := range a.App.Features {
+		features[i] = Feature{feature}
+	}
+	return features
 }
 
 var _ plugins.App = &GoBackendPluginApp{}
@@ -38,8 +52,8 @@ func (plugin GoBackendPluginApp) Build(pm productmap.ProductMap, product specifi
 
 func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product specification.Product, app specification.App) func(filepath string, d fs.DirEntry, err error) error {
 	dir := apptemplates.EntireDir
-	goApp := App(app)
-	goApp.Features = append(product.Features, app.Features...)
+	goApp := App{app}
+	goApp.App.Features = append(product.Features, app.Features...)
 
 	return func(filepath string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -69,7 +83,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product speci
 			return pm.Insert(dirName, file)
 		}
 
-		for _, feature := range goApp.Features {
+		for _, feature := range goApp.App.Features {
 			feat := Feature{feature}
 
 			newFilePath := strings.ReplaceAll(filepath, "[feature]", feat.PackageName())
