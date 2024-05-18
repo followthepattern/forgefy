@@ -25,6 +25,10 @@ func New(cont container.Container) Controllers {
 	}
 }
 
+func (c Controllers) Auth() auth.AuthController {
+	return c.auth
+}
+
 {{- range .Features }}
 func (c Controllers) {{ .GoTypeName }}() {{ .PackageName }}.{{ .GoTypeName }}Controller {
 	return c.{{ .FeatureNameLowerCamel }}
