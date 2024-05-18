@@ -3,46 +3,44 @@ package graphql
 import (
 	"github.com/{{ .AppNameToPackageName }}/controllers"
 	"github.com/{{ .AppNameToPackageName }}/features/auth"
-	"github.com/{{ .AppNameToPackageName }}/features/product"
-	"github.com/{{ .AppNameToPackageName }}/features/role"
-	"github.com/{{ .AppNameToPackageName }}/features/user"
+	{{ $AppNameToPackageName := .AppNameToPackageName }}
+{{- range .Features }}
+	"github.com/{{ $AppNameToPackageName }}/features/{{ .PackageName }}"
+{{- end }}
 )
 
 type Resolver struct {
-	users        user.UserGraphQL
-	products     product.ProductGraphQL
-	roles        role.RoleGraphQL
-	authMutation auth.AuthGraphQL
+	authGraphQL	auth.AuthGraphQL
+
+{{- range .Features }}
+	{{ .FeatureNameLowerCamel }}GraphQL	{{ .PackageName }}.{{ .GoTypeName }}GraphQL
+{{- end }}
 }
 
 func NewResolver(controllers controllers.Controllers) Resolver {
-	uq := user.NewUserGraphQL(controllers.User())
-	am := auth.NewAuthGraphQL(controllers.Auth())
-	pq := product.NewProductGraphQL(controllers.Product())
-	rq := role.NewroleGraphql(controllers.Role())
+	authGraphQL := auth.NewAuthGraphQL(controllers.Auth())
+	
+{{- range .Features }}
+	{{ .FeatureNameLowerCamel }}GraphQL := {{ .PackageName}}.New{{ .GoTypeName }}GraphQL(controllers.{{ .GoTypeName }}())
+{{- end }}
+
 
 	resolver := Resolver{
-		users:        uq,
-		products:     pq,
-		authMutation: am,
-		roles:        rq,
+		authGraphQL:	authGraphQL,
+{{- range .Features }}
+		{{ .FeatureNameLowerCamel }}GraphQL: {{ .FeatureNameLowerCamel }}GraphQL,
+{{- end }}
 	}
 
 	return resolver
 }
 
-func (r Resolver) Users() (user.UserGraphQL, error) {
-	return r.users, nil
-}
-
 func (r Resolver) Authentication() (auth.AuthGraphQL, error) {
-	return r.authMutation, nil
+	return r.authGraphQL, nil
 }
 
-func (r Resolver) Products() (product.ProductGraphQL, error) {
-	return r.products, nil
+{{- range .Features }}
+func (r Resolver) {{ .GoTypeName }}s() ({{ .PackageName }}.{{ .GoTypeName }}GraphQL, error) {
+	return r.{{ .FeatureNameLowerCamel }}GraphQL, nil
 }
-
-func (r Resolver) Roles() (role.RoleGraphQL, error) {
-	return r.roles, nil
-}
+{{- end }}

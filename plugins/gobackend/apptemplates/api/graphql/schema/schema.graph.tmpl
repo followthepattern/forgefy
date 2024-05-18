@@ -77,13 +77,13 @@ schema {
 
 type Query {
 {{- range .Features }}
-	{{ .FeatureNameLowerCamel }}Query: {{ .GoTypeName }}Query!
+	{{ .FeatureNameLowerCamel }}s: {{ .GoTypeName }}Query!
 {{- end }}
 }
 
 type Mutation {
 	authentication: AuthMutation!
 {{- range .Features }}
-	{{ .FeatureNameLowerCamel }}Mutation: {{ .GoTypeName }}Mutation!
+	{{ .FeatureNameLowerCamel }}s: {{ .GoTypeName }}Mutation!
 {{- end }}
 }
