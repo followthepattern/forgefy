@@ -27,7 +27,12 @@ func (a App) AppNameToPackageName() string {
 func (a App) Features() []Feature {
 	features := make([]Feature, len(a.App.Features))
 	for i, feature := range a.App.Features {
-		features[i] = Feature{feature}
+
+		fields := make([]Field, len(feature.Fields))
+		for j, field := range feature.Fields {
+			fields[j] = Field{field}
+		}
+		features[i] = Feature{Feature: feature, Fields: fields}
 	}
 	return features
 }
@@ -83,17 +88,16 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product speci
 			return pm.Insert(dirName, file)
 		}
 
-		for _, feature := range goApp.App.Features {
-			feat := Feature{feature}
+		for _, feature := range goApp.Features() {
 
-			newFilePath := strings.ReplaceAll(filepath, "[feature]", feat.PackageName())
+			newFilePath := strings.ReplaceAll(filepath, "[feature]", feature.PackageName())
 
 			dirName, fileName := path.Split(newFilePath)
 			file := productmap.NewFile(
 				fileName,
 				string(content),
 			).WithData(FeatureTemplateModel{
-				Feature: feat,
+				Feature: feature,
 				App:     goApp,
 			})
 
