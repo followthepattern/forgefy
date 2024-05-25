@@ -143,3 +143,7 @@ func GetActivationMailTemplate(cfg config.Config, userID types.String, email typ
 
 	return m
 }
+
+func (service AuthenticationService) ActivateUser(ctx context.Context, userID string) error {
+	return service.authDatabase.ActivateUser(userID)
+}

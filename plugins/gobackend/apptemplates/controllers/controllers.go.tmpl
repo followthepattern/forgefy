@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/{{ .AppNameToPackageName }}/container"
 	"github.com/{{ .AppNameToPackageName }}/features/auth"
+
 {{- $AppNameToPackageName := .AppNameToPackageName }}
 {{- range .Features }}
 	"github.com/{{ $AppNameToPackageName }}/features/{{ .FeatureName }}"

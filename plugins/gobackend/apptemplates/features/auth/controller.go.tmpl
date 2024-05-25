@@ -6,6 +6,8 @@ import (
 
 	"github.com/{{ .AppNameToPackageName }}/config"
 	"github.com/{{ .AppNameToPackageName }}/container"
+	"github.com/{{ .AppNameToPackageName }}/types"
+	validation "github.com/go-ozzo/ozzo-validation"
 )
 
 type AuthController struct {
@@ -39,4 +41,12 @@ func (ctrl AuthController) Register(ctx context.Context, register RegisterReques
 	}
 
 	return ctrl.authService.Register(ctx, register)
+}
+
+func (ctrl AuthController) ActivateUser(ctx context.Context, userID string) error {
+	if err := validation.Validate(userID, types.Required("userID")); err != nil {
+		return err
+	}
+
+	return ctrl.authService.ActivateUser(ctx, userID)
 }

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/{{ .AppNameToPackageName }}/api"
+	"github.com/{{ .AppNameToPackageName }}/api/httpresponses"
 )
 
 type {{ .GoTypeName }}Rest struct {
@@ -21,15 +21,15 @@ func (service {{ .GoTypeName }}Rest) Create(w http.ResponseWriter, r *http.Reque
 	var value {{ .GoTypeName }}Model
 	err := json.NewDecoder(r.Body).Decode(&value)
 	if err != nil {
-		api.BadRequest(w, api.FailedToDecodeRequestBody)
+		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
 		return
 	}
 
 	err = service.{{ .FeatureNameLowerCamel }}.Create(r.Context(), value)
 	if err != nil {
-		api.BadRequest(w, err.Error())
+		httpresponses.BadRequest(w, err.Error())
 		return
 	}
 
-	api.Created(w)
+	httpresponses.Created(w)
 }

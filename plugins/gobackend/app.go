@@ -74,8 +74,11 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product speci
 			return err
 		}
 
-		filepath = strings.TrimSuffix(filepath, ".tmpl")
+		if strings.Contains(filepath, "(appName)") {
+			filepath = strings.ReplaceAll(filepath, "(appName)", app.AppName)
+		}
 
+		filepath = strings.TrimSuffix(filepath, ".tmpl")
 		filepath = path.Join(apps.Directory(), goApp.AppName, filepath)
 
 		if !strings.Contains(filepath, "[feature]") {
