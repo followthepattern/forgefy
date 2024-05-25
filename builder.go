@@ -9,16 +9,16 @@ import (
 )
 
 type Builder struct {
-	fs      specification.Product
-	plugins []plugins.Plugin
-	apps    map[string][]plugins.App
+	productSpecification specification.Product
+	plugins              []plugins.Plugin
+	apps                 map[string][]plugins.App
 }
 
-func newBuilder(fs specification.Product) Builder {
+func newBuilder(productSpecification specification.Product) Builder {
 	return Builder{
-		fs:      fs,
-		plugins: make([]plugins.Plugin, 0),
-		apps:    make(map[string][]plugins.App),
+		productSpecification: productSpecification,
+		plugins:              make([]plugins.Plugin, 0),
+		apps:                 make(map[string][]plugins.App),
 	}
 }
 
@@ -41,14 +41,15 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 	}
 
 	for _, plugin := range builder.plugins {
-		err = plugin.Build(pm, builder.fs)
+		err = plugin.Build(pm, builder.productSpecification)
 		if err != nil {
 			return pm, err
 		}
 	}
 
-	for _, app := range builder.fs.Apps {
-		err = builder.appBuilders(pm, builder.fs, app)
+	for _, app := range builder.productSpecification.Apps {
+		app.Product = builder.productSpecification
+		err = builder.appBuilders(pm, builder.productSpecification, app)
 		if err != nil {
 			return pm, err
 		}

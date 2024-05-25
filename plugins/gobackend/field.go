@@ -15,16 +15,23 @@ func (f Field) SchemaVarName() string {
 }
 
 func (f Field) SchemaType() string {
-	return strings.ToLower(f.Type)
+	switch f.Type {
+	case "string":
+		return "String"
+	case "int":
+		return "Int64"
+	}
+	return specification.CapitalizeFirst(f.Type)
 }
 
 func (f Field) GoType() string {
 	switch f.Type {
 	case "string":
 		return "types.String"
-	default:
-		return f.Type
+	case "int":
+		return "types.Int64"
 	}
+	return f.Type
 }
 
 func (f Field) VariableName() string {

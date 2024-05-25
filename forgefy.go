@@ -19,23 +19,23 @@ func New() Forgefy {
 }
 
 func (f Forgefy) Forge(yaml string, fw forgeio.Writer) (string, error) {
-	fs, err := specification.UnmarshalYaml([]byte(yaml))
+	productSpecification, err := specification.UnmarshalYaml([]byte(yaml))
 	if err != nil {
 		return "", err
 	}
 
-	builder := newBuilder(fs).withPlugins(f.plugins...).withApps(f.apps)
+	builder := newBuilder(productSpecification).withPlugins(f.plugins...).withApps(f.apps)
 
 	product, err := builder.Build()
 	if err != nil {
-		return fs.ProductName, err
+		return productSpecification.ProductName, err
 	}
 
 	err = product.Walk(func(folderName string, file productmap.File) error {
 		return fw.Write(folderName, file.FileName(), file.Write)
 	})
 
-	return fs.ProductName, err
+	return productSpecification.ProductName, err
 }
 
 func (f Forgefy) verifyPlugins(_ []plugins.Plugin) error { return nil }

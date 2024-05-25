@@ -25,6 +25,17 @@ type AuthMutation {
 	register(email: String!, firstName: String!, lastName: String!, password: String!): RegisterResponse
 }
 
+type LoginResponse {
+	jwt: String!
+	expires_at: Time!
+}
+
+type RegisterResponse {
+	email: String!
+	first_name: String!
+	last_name: String!
+}
+
 {{- range .Features }}
 
 type {{ .GoTypeName }} {
@@ -59,7 +70,6 @@ type {{ .GoTypeName }}ListResponse {
 type {{ .GoTypeName }}Query {
 	single(id: String!): {{ .GoTypeName }}
 	list(pagination: Pagination, filter: ListFilter, orderBy: [OrderBy!]): {{ .GoTypeName }}ListResponse
-	profile: {{ .GoTypeName }}
 }
 
 type {{ .GoTypeName }}Mutation {

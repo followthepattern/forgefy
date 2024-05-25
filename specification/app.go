@@ -9,6 +9,7 @@ import (
 type AppType string
 
 type App struct {
+	Product
 	AppName  string    `yaml:"name"`
 	AppType  AppType   `yaml:"type"`
 	Features []Feature `yaml:"features"`

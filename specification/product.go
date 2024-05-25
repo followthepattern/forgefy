@@ -5,9 +5,14 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	defaultEmail = "app@product.io"
+)
+
 type Product struct {
 	ForgeVersion string    `yaml:"forge_version"`
 	ProductName  string    `yaml:"product_name"`
+	Email        string    `yaml:"email"`
 	Apps         []App     `yaml:"apps"`
 	Features     []Feature `yaml:"features"`
 }
@@ -18,12 +23,21 @@ func (fs Product) Validate() error {
 	)
 }
 
-func UnmarshalYaml(data []byte) (fs Product, err error) {
-	err = yaml.Unmarshal(data, &fs)
+func UnmarshalYaml(data []byte) (p Product, err error) {
+	err = yaml.Unmarshal(data, &p)
 	if err != nil {
 		return
 	}
 
-	err = fs.Validate()
+	p = setDefault(p)
+
+	err = p.Validate()
 	return
+}
+
+func setDefault(p Product) Product {
+	if p.Email == "" {
+		p.Email = defaultEmail
+	}
+	return p
 }
