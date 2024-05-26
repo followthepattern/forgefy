@@ -55,7 +55,7 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, product speci
 
 		filepath = path.Join(apps.Directory(), app.AppName, filepath)
 
-		if !strings.Contains(filepath, "[feature]") {
+		if !strings.Contains(filepath, "(feature)") {
 			dirName, fileName := path.Split(filepath)
 			file := productmap.NewFile(
 				fileName,
@@ -66,7 +66,7 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, product speci
 		}
 
 		for _, feature := range features {
-			newFilePath := strings.ReplaceAll(filepath, "[feature]", feature.ToDirName())
+			newFilePath := strings.ReplaceAll(filepath, "(feature)", feature.ToDirName())
 
 			dirName, fileName := path.Split(newFilePath)
 			file := productmap.NewFile(
