@@ -27,3 +27,11 @@ func (f Field) FieldTypeName() string {
 	}
 	return f.Type
 }
+
+func (f Field) FieldTypeHTML() string {
+	switch f.Type {
+	case "string":
+		return "text"
+	}
+	return "input"
+}

@@ -41,3 +41,11 @@ func (f Field) Validate() error {
 func (f Field) FieldNameGraphQL() string {
 	return strings.ToLower(f.Name)
 }
+
+func (f Field) FieldNameCamelCase() string {
+	return strings.ToLower(f.Name)
+}
+
+func (f Field) FieldNameHumanReadable() string {
+	return f.Name
+}
