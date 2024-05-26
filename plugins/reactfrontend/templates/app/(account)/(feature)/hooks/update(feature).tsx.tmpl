@@ -1,11 +1,11 @@
-import { updateProduct as graphQL } from "@/graphql/products/mutation";
-import { MutationResponse, UpdateMutationResult } from "@/graphql/mutation";
-import { Product } from "@/models/product";
+import { update{{ .FeatureTypeName }} as graphQL } from "../graphql/mutation";
+import { UpdateMutationResult } from "@/graphql/mutation";
+import { {{ .FeatureTypeName }}, MutationResponse } from "../model";
 import useUpdate from "@/graphql/hooks/useUpdate";
 
-export default function useUpdateProduct(): UpdateMutationResult<Product,number | undefined> {
+export default function useUpdate{{ .FeatureTypeName }}(): UpdateMutationResult<{{ .FeatureTypeName }},number | undefined> {
 const parseResult = (data?: MutationResponse | null) : number | undefined  => {
-        return data?.products?.update?.code;
+        return data?.{{ .FeatureNameLowerCamel }}s?.update?.code;
     }
 
     return useUpdate({parseResult, graphQL})
