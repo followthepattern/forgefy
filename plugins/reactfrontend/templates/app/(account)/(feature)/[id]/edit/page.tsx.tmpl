@@ -101,7 +101,7 @@ export default function {{ .FeatureTypeName }}Edit() {
                         <PrimaryButton onClick={onSave}>Save</PrimaryButton>
                         <SecondaryButton onClick={onCancel}>Cancel</SecondaryButton>
                     </div>
-                    <ConfirmModal onConfirm={onDelete} title="Delete products" body={`Are you sure you want to delete ${data?.id}?`}>
+                    <ConfirmModal onConfirm={onDelete} title="Delete {{ .FeatureHumanReadableName }}" body={`Are you sure you want to delete ${data?.id}?`}>
                         Delete
                     </ConfirmModal>
                 </SingleLayout.Footer>
