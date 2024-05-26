@@ -1,0 +1,27 @@
+export const update{{ .FeatureTypeName }} = `
+mutation Update{{ .FeatureTypeName }}($id: String!, $model: {{ .FeatureTypeName }}Input!) {
+	products {
+		update(id: $id, model: $model) {
+			code
+		}
+	}
+}`
+
+export const create{{ .FeatureTypeName }} = `
+mutation Create{{ .FeatureTypeName }}($model: {{ .FeatureTypeName }}Input!) {
+	products {
+		create(model: $model) {
+			code
+		}
+	}
+}`
+
+
+export const delete{{ .FeatureTypeName }} = `
+mutation Delete{{ .FeatureTypeName }}($id: String!) {
+	products {
+		delete(id: $id) {
+			code
+		}
+	}
+}`

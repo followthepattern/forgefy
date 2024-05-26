@@ -1,6 +1,8 @@
 package specification
 
 import (
+	"strings"
+
 	"github.com/followthepattern/forgefy/datagenerator"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
@@ -34,4 +36,8 @@ func (f Field) Validate() error {
 		validation.Field(&f.Name, validation.Required),
 		validation.Field(&f.Type, validation.Required),
 	)
+}
+
+func (f Field) FieldNameGraphQL() string {
+	return strings.ToLower(f.Name)
 }

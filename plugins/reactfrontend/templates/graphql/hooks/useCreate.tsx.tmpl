@@ -1,13 +1,13 @@
 import { gql, useMutation } from "@apollo/client";
-import { CreateMutationResult, MutationResponse } from "@/graphql/mutation";
+import { CreateMutationResult } from "@/graphql/mutation";
 
 interface CreateProperties {
-    parseResult: (data?: MutationResponse | null) => number | undefined
+    parseResult: (data?: any) => number | undefined
     graphQL: string
 }
 
-export default function useCreate<T>({parseResult, graphQL}: CreateProperties): CreateMutationResult<T, number> {
-    const [executeMutation, { data, loading, error }] = useMutation<MutationResponse>(gql(graphQL));
+export default function useCreate<T>({ parseResult, graphQL }: CreateProperties): CreateMutationResult<T, number> {
+    const [executeMutation, { data, loading, error }] = useMutation(gql(graphQL));
 
     const execute = (model: T) => {
         executeMutation({

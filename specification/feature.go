@@ -30,6 +30,10 @@ func (f Feature) TemplateIterator() []int {
 	return make([]int, count)
 }
 
+func (f Feature) FeatureGraphQLName() string {
+	return CapitalizeFirst(f.FeatureName)
+}
+
 func (f Feature) Validate() error {
 	return validation.ValidateStruct(&f,
 		validation.Field(&f.FeatureName, validation.Required),

@@ -1,0 +1,35 @@
+export const getSingle{{ .FeatureGraphQLName }} = `
+query GetSingle{{ .FeatureGraphQLName }}($id: String!) {
+	{{ .FeatureNameLowerCamel }}s {
+		single (id: $id) {
+		{{- range .Fields }}
+			{{ .FieldNameGraphQL }}
+		{{- end }}
+		}
+	}
+}`
+
+export const get{{ .FeatureGraphQLName }}s = `
+query Get{{ .FeatureGraphQLName }}s(
+	$pageSize: Uint
+	$page: Uint
+	$search: String
+	$orderBy: [OrderBy!]
+) {
+	{{ .FeatureNameLowerCamel }}s {
+		list(
+			pagination: { pageSize: $pageSize, page: $page }
+			filter: { search: $search }
+			orderBy: $orderBy
+		) {
+			count
+			data {
+			{{- range .Fields }}
+				{{ .FieldNameGraphQL }}
+			{{- end }}
+			}
+			page
+			pageSize
+		}
+	}
+}`

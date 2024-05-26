@@ -4,10 +4,10 @@ import { ListPageComponentProperties } from '../components/listPage/listPageWrap
 import { SortLabel, SetPageParams, SetSearchPatternParams, SetSortPatternParrams } from '../components/listPage/listPageWrapper/listingFunctions';
 import useListProduct from './hooks/listProduct';
 import CreateTable, { CreateTableProperties } from '../components/listPage/table/table';
-import { Product } from '@/models/product';
+import { {{ .FeatureTypeName }} } from './model';
 
-export const RESOURCE_NAME = "Products"
-export const RESOURCE_URL = "/products"
+export const RESOURCE_NAME = "{{ .FeatureHumanReadableName }}"
+export const RESOURCE_URL = "/{{ .FeatureURL }}s"
 
 const sortByLables: SortLabel[] = [
   {

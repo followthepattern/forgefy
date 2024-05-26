@@ -1,0 +1,5 @@
+export interface {{ .FeatureTypeName }} {
+{{- range .Fields }}
+	{{ .FieldName }}?: {{ .FieldTypeName }}
+{{- end}}
+}
