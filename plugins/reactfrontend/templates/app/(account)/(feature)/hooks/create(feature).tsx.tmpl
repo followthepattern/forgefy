@@ -1,5 +1,5 @@
 import { CreateMutationResult, MutationResourceResponse } from "@/graphql/mutation";
-import { {{ .FeatureTypeName }}  } from "../model";
+import { {{ .FeatureTypeName }}, MutationResponse  } from "../model";
 import useCreate from "@/graphql/hooks/useCreate";
 import { create{{ .FeatureTypeName }} as graphQL } from "../graphql/mutation";
 
@@ -9,8 +9,4 @@ export default function useCreate{{ .FeatureTypeName }}(): CreateMutationResult<
     }
 
     return useCreate<{{ .FeatureTypeName }}>({parseResult, graphQL})
-}
-
-export interface MutationResponse {
-    {{ .FeatureNameLowerCamel }}s: MutationResourceResponse
 }

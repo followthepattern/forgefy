@@ -1,13 +1,12 @@
-import { getProducts as graphQL } from "@/graphql/products/query";
+import { get{{ .FeatureTypeName }}s as graphQL } from "../graphql/query";
 import { ListResponse, ListQueryResult } from "@/graphql/utils/list";
-import { QueryResponse } from "@/graphql/query";
-import { Product } from "@/models/product";
+import { {{ .FeatureTypeName }}, QueryResponse } from "../model";
 import useList from "@/graphql/hooks/useList";
 
-export default function useListProduct(): ListQueryResult<ListResponse<Product>> {
-    const parseResult = (data?: QueryResponse): ListResponse<Product> | undefined => {
-        return data?.products?.list;
+export default function useList{{ .FeatureTypeName }}(): ListQueryResult<ListResponse<{{ .FeatureTypeName }}>> {
+    const parseResult = (data?: QueryResponse): ListResponse<{{ .FeatureTypeName }}> | undefined => {
+        return data?.{{ .FeatureNameLowerCamel }}s?.list;
     }
 
-    return useList<Product>({parseResult, graphQL})
+    return useList<{{ .FeatureTypeName }}>({parseResult, graphQL})
 }

@@ -1,5 +1,16 @@
+import { MutationResourceResponse } from "@/graphql/mutation";
+import { QueryResourceResponse } from "@/graphql/query";
+
 export interface {{ .FeatureTypeName }} {
 {{- range .Fields }}
 	{{ .FieldName }}?: {{ .FieldTypeName }}
 {{- end}}
+}
+
+export interface MutationResponse {
+    {{ .FeatureNameLowerCamel }}s: MutationResourceResponse
+}
+
+export interface QueryResponse {
+	{{ .FeatureNameLowerCamel }}s?: QueryResourceResponse<{{ .FeatureTypeName }}>
 }

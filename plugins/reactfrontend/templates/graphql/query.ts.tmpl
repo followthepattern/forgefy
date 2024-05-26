@@ -1,5 +1,3 @@
-import { User } from "@/models/user";
-import { Product } from "@/models/product";
 import { ListResponse } from "./utils/list";
 
 export interface SingleQueryResult<Data = any> {
@@ -13,9 +11,4 @@ export interface QueryResourceResponse<T> {
 	profile?: T
 	single?: T
 	list?: ListResponse<T>
-}
-
-export interface QueryResponse {
-	users?: QueryResourceResponse<User>
-	products?: QueryResourceResponse<Product>
 }

@@ -1,5 +1,6 @@
 import { delete{{ .FeatureTypeName }} as graphQL } from "../graphql/mutation";
 import { DeleteMutationResult, MutationResourceResponse } from "@/graphql/mutation";
+import { MutationResponse  } from "../model";
 import useDelete from "@/graphql/hooks/useDelete";
 
 export default function useDelete{{ .FeatureTypeName }}(): DeleteMutationResult<string,number | undefined> {
@@ -8,8 +9,4 @@ export default function useDelete{{ .FeatureTypeName }}(): DeleteMutationResult<
     }
 
     return useDelete({parseResult, graphQL})
-}
-
-export interface MutationResponse {
-    {{ .FeatureNameLowerCamel }}s: MutationResourceResponse
 }
