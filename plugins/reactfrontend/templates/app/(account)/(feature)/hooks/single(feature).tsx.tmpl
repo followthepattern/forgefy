@@ -1,12 +1,12 @@
 import useSingle from "@/graphql/hooks/useSingle";
-import { getSingleProduct as graphQL } from "@/graphql/products/query";
-import { QueryResponse, SingleQueryResult } from "@/graphql/query";
-import { Product } from "@/models/product";
+import { getSingle{{ .FeatureTypeName }} as graphQL } from "../graphql/query";
+import { SingleQueryResult } from "@/graphql/query";
+import { {{ .FeatureTypeName }}, QueryResponse } from "../model";
 
-export default function useSingleProduct(id: string): SingleQueryResult<Product> {
-    const parseResult = (data?: QueryResponse): Product | undefined => {
-        return data?.products?.single
+export default function useSingle{{ .FeatureTypeName }}(id: string): SingleQueryResult<{{ .FeatureTypeName }}> {
+    const parseResult = (data?: QueryResponse): {{ .FeatureTypeName }} | undefined => {
+        return data?.{{ .FeatureNameLowerCamel }}s?.single
     }
 
-    return useSingle<Product>({id, parseResult, graphQL})
+    return useSingle<{{ .FeatureTypeName }}>({id, parseResult, graphQL})
 }
