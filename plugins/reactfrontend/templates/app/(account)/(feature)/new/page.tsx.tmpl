@@ -1,19 +1,18 @@
 import { useForm } from "react-hook-form";
-import useCreateProduct from "../hooks/createProduct";
+import useCreate{{ .FeatureTypeName }} from "../hooks/create{{ .FeatureTypeName }}";
 import { useNavigate } from "react-router-dom";
 import { RESOURCE_URL } from "../page";
 import { useEffect } from "react";
-import { Product } from "@/models/product";
+import { {{ .FeatureTypeName }} } from "../model";
 import SingleLayout from "../../components/singleView/layout";
 import GridFields from "../../components/singleView/gridFields/gridFields";
 import Label from "../../components/labels/label";
 import Input from "../../components/inputFields/input";
-import TextArea from "../../components/inputFields/textarea";
 import SecondaryButton from "../../components/buttons/secondaryButton";
 import PrimaryButton from "../../components/buttons/primaryButton";
 
-export default function ProductNew() {
-    const [executeMutation, { createLoading, createError, createResult }] = useCreateProduct();
+export default function {{ .FeatureTypeName }}New() {
+    const [executeMutation, { createLoading, createError, createResult }] = useCreate{{ .FeatureTypeName }}();
 
     const navigate = useNavigate();
 
@@ -24,15 +23,15 @@ export default function ProductNew() {
 
     }, [createResult])
 
-    const { register, getValues } = useForm<Product>();
+    const { register, getValues } = useForm<{{ .FeatureTypeName }}>();
 
     const onCreate = () => {
         const values = getValues();
 
         executeMutation({
-            id: "",
-            title: values.title,
-            description: values.description,
+        {{- range .Fields }}
+            {{ .FieldNameCamelCase }}: values.{{ .FieldNameCamelCase }},
+        {{- end }}
         })
     }
 
@@ -42,28 +41,21 @@ export default function ProductNew() {
 
     return (
         <SingleLayout>
-            <SingleLayout.Title>New Product</SingleLayout.Title>
+            <SingleLayout.Title>New {{ .FeatureTypeName }}</SingleLayout.Title>
             <form>
                 <GridFields className="py-6">
+                {{- range .Fields }}
                     <div className="sm:col-span-2">
                         <Label htmlFor="title">
-                            Title
+                            {{ .FieldNameHumanReadable }}
                         </Label>
                         <Input
-                            {...register("title")}
-                            type="text"
-                            id="title"
+                            {...register("{{ .FieldNameCamelCase }}")}
+                            type="{{ .FieldTypeHTML }}"
+                            id="{{ .FieldNameCamelCase }}"
                         />
                     </div>
-                    <div className="sm:col-span-2">
-                        <Label htmlFor="description">
-                            Description
-                        </Label>
-                        <TextArea
-                            id="description"
-                            {...register("description")}
-                        />
-                    </div>
+                {{- end }}
                 </GridFields>
                 <SingleLayout.Footer className="justify-end">
                     <SecondaryButton onClick={onCancel}>Cancel</SecondaryButton>
