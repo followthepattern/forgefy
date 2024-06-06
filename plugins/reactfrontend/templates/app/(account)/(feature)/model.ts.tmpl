@@ -3,7 +3,7 @@ import { QueryResourceResponse } from "@/graphql/query";
 
 export interface {{ .FeatureTypeName }} {
 {{- range .Fields }}
-	{{ .FieldName }}?: {{ .FieldTypeName }}
+	{{ .FieldNameCamelCase }}?: {{ .FieldTypeName }}
 {{- end}}
 }
 

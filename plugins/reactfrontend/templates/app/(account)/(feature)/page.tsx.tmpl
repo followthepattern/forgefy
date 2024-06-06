@@ -2,44 +2,40 @@ import SectionHeader from '../components/listPage/sectionHeader/sectionHeader';
 import List from '../components/listPage/listPage';
 import { ListPageComponentProperties } from '../components/listPage/listPageWrapper/listPageWrapper';
 import { SortLabel, SetPageParams, SetSearchPatternParams, SetSortPatternParrams } from '../components/listPage/listPageWrapper/listingFunctions';
-import useListProduct from './hooks/listProduct';
+import useList{{ .FeatureTypeName }} from './hooks/list{{ .FeatureTypeName }}';
 import CreateTable, { CreateTableProperties } from '../components/listPage/table/table';
 import { {{ .FeatureTypeName }} } from './model';
 
 export const RESOURCE_NAME = "{{ .FeatureHumanReadableName }}"
 export const RESOURCE_URL = "/{{ .FeatureURL }}s"
 
-const sortByLables: SortLabel[] = [
+const sortByLables: SortLabel[] = [{{- range .Fields }}
   {
-    code: "id",
-    name: "ID",
+    code: "{{ .Name }}",
+    name: "{{ .FieldNameCamelCase }}",
     asc: true,
   },
-  {
-    code: "title",
-    name: "Title",
-    asc: true,
-  }
+{{- end }}
 ];
 
-function productViewLink(product: Product): string {
-  return `/products/${product.id}`
+function {{ .FeatureNameLowerCamel }}ViewLink(value: {{ .FeatureTypeName }}): string {
+  return `/{{ .FeatureURL }}s/${value.id}`
 }
 
-function productEditLink(product: Product): string {
-  return `/products/${product.id}/edit`
+function {{ .FeatureNameLowerCamel }}EditLink(value: {{ .FeatureTypeName }}): string {
+  return `/{{ .FeatureURL }}s/${value.id}/edit`
 }
 
-function getCreateTableProperties(): CreateTableProperties<Product> {
+function getCreateTableProperties(): CreateTableProperties<{{ .FeatureTypeName }}> {
   return {
-    headerColumns: ["Title", "Description"],
-    getViewLink: productViewLink,
-    getEditLink: productEditLink,
-    getCells: (entity) => [entity.title ?? "", entity.description ?? ""]
+    headerColumns: [{{- range .Fields }}"{{ .FieldNameHumanReadable }}", {{- end }}],
+    getViewLink: {{ .FeatureNameLowerCamel }}ViewLink,
+    getEditLink: {{ .FeatureNameLowerCamel }}EditLink,
+    getCells: (entity) => [{{- range .Fields }}entity.{{ .FieldNameCamelCase }} ?? "", {{- end }}]
   }
 }
 
-export default function Products(props: ListPageComponentProperties) {
+export default function {{ .FeatureTypeName }}s(props: ListPageComponentProperties) {
   const sortOnChange = (sortLabel: SortLabel) => {
     SetSortPatternParrams(props.searchParams, props.setSearchParams, sortLabel);
   }
@@ -56,7 +52,7 @@ export default function Products(props: ListPageComponentProperties) {
 
   const createTableProperties = getCreateTableProperties();
 
-  const productTable = CreateTable(createTableProperties);
+  const entityTable = CreateTable(createTableProperties);
 
   return (
     <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -73,8 +69,8 @@ export default function Products(props: ListPageComponentProperties) {
         <List {...props}
           sortProps={{ "{{" }}sortLabel: selectedSortLabel {{ "}}" }}
           onPageChange={pageOnChange}
-          useList={useListProduct}
-          tableComponent={productTable}
+          useList={useList{{ .FeatureTypeName }}}
+          tableComponent={entityTable}
         />
       </div>
     </div>
