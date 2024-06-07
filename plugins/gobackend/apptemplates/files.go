@@ -12,6 +12,6 @@ func Directory(appName string) string {
 }
 
 var (
-	//go:embed *
+	//go:embed * policies/.cerbos.yaml.tmpl
 	EntireDir embed.FS
 )

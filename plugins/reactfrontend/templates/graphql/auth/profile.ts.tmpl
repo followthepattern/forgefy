@@ -1,0 +1,25 @@
+import { QueryResourceResponse } from "../query"
+
+export const getProfile = `
+query {
+	users {
+		profile {
+			id
+			email
+			firstName
+			lastName
+		}
+	}
+}`
+
+export interface User {
+	id?: string
+	email?: string
+	firstname?: string
+	lastname?: string
+	age?: number
+}
+
+export interface QueryResponse {
+	users?: QueryResourceResponse<User>
+}

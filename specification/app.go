@@ -13,10 +13,15 @@ type App struct {
 	AppName  string    `yaml:"name"`
 	AppType  AppType   `yaml:"type"`
 	Features []Feature `yaml:"features"`
+	AppPort  int       `yaml:"port"`
 }
 
 func (a App) AppNameToFolderName() string {
 	return strings.ToLower(a.AppName)
+}
+
+func (a App) AppNameCamelCase() string {
+	return a.AppName
 }
 
 func (a App) Validate() error {

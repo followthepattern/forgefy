@@ -14,6 +14,8 @@ import (
 
 type App struct {
 	specification.App
+	DbPort     int
+	CerbosPort int
 }
 
 func (a App) AppNameCapital() string {
@@ -39,7 +41,11 @@ func (a App) Features() []Feature {
 
 var _ plugins.App = &GoBackendPluginApp{}
 
-type GoBackendPluginApp struct{}
+type GoBackendPluginApp struct {
+	port       int
+	dbPort     int
+	cerbosPort int
+}
 
 func (GoBackendPluginApp) Name() string {
 	return "Go Back-end application"
@@ -49,16 +55,45 @@ func (GoBackendPluginApp) Type() string {
 	return "go-backend"
 }
 
-func (plugin GoBackendPluginApp) Build(pm productmap.ProductMap, product specification.Product, app specification.App) error {
-	dir := apptemplates.EntireDir
+func (plugin *GoBackendPluginApp) GetNextPortNumber() int {
+	port := plugin.port
 
-	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, product, app))
+	plugin.port++
+
+	return port
 }
 
-func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product specification.Product, app specification.App) func(filepath string, d fs.DirEntry, err error) error {
+func (plugin *GoBackendPluginApp) GetNextDBPort() int {
+	port := plugin.dbPort
+
+	plugin.dbPort++
+
+	return port
+}
+
+func (plugin *GoBackendPluginApp) GetNextCerbosPort() int {
+	port := plugin.cerbosPort
+
+	plugin.cerbosPort++
+
+	return port
+}
+
+func (plugin *GoBackendPluginApp) Build(pm productmap.ProductMap, product specification.Product, app specification.App) error {
 	dir := apptemplates.EntireDir
-	goApp := App{app}
-	goApp.App.Features = append(product.Features, app.Features...)
+
+	goApp := App{app, plugin.dbPort, plugin.cerbosPort}
+
+	goApp.App.AppPort = plugin.GetNextPortNumber()
+	goApp.DbPort = plugin.GetNextDBPort()
+	goApp.CerbosPort = plugin.GetNextCerbosPort()
+
+	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, product, goApp))
+}
+
+func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product specification.Product, goApp App) func(filepath string, d fs.DirEntry, err error) error {
+	dir := apptemplates.EntireDir
+	goApp.App.Features = append(product.Features, goApp.App.Features...)
 
 	return func(filepath string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -75,7 +110,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product speci
 		}
 
 		if strings.Contains(filepath, "(appName)") {
-			filepath = strings.ReplaceAll(filepath, "(appName)", app.AppName)
+			filepath = strings.ReplaceAll(filepath, "(appName)", goApp.AppName)
 		}
 
 		filepath = strings.TrimSuffix(filepath, ".tmpl")

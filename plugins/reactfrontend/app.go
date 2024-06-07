@@ -14,7 +14,10 @@ import (
 
 var _ plugins.App = &ReactFrontend{}
 
-type ReactFrontend struct{}
+type ReactFrontend struct {
+	port         int
+	tailwindPort int
+}
 
 func (ReactFrontend) Name() string {
 	return "React Front-end application"
@@ -24,8 +27,25 @@ func (ReactFrontend) Type() string {
 	return "react-frontend"
 }
 
+func (plugin *ReactFrontend) GetNextPortNumber() int {
+	port := plugin.port
+
+	plugin.port++
+
+	return port
+}
+
+func (plugin *ReactFrontend) GetNextTailwindPortNumber() int {
+	port := plugin.tailwindPort
+
+	plugin.tailwindPort--
+
+	return port
+}
+
 type App struct {
 	specification.App
+	TailwindPort int
 }
 
 func (a App) AppNameCapital() string {
@@ -53,15 +73,19 @@ func (ReactFrontend) AddDefaultFiles(pm productmap.ProductMap, fs specification.
 	return nil
 }
 
-func (plugin ReactFrontend) Build(pm productmap.ProductMap, product specification.Product, app specification.App) error {
+func (plugin *ReactFrontend) Build(pm productmap.ProductMap, product specification.Product, app specification.App) error {
 	dir := templates.Files
 
-	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, product, app))
+	reactApp := App{app, 9999}
+
+	reactApp.App.AppPort = plugin.GetNextPortNumber()
+	reactApp.TailwindPort = plugin.GetNextTailwindPortNumber()
+
+	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, product, reactApp))
 }
 
-func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, product specification.Product, app specification.App) func(filepath string, d fs.DirEntry, err error) error {
-	reactApp := App{app}
-	reactApp.App.Features = append(product.Features, app.Features...)
+func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, product specification.Product, reactApp App) func(filepath string, d fs.DirEntry, err error) error {
+	reactApp.App.Features = append(product.Features, reactApp.App.Features...)
 
 	return func(filepath string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -79,7 +103,7 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, product speci
 
 		filepath = strings.TrimSuffix(filepath, ".tmpl")
 
-		filepath = path.Join(apps.Directory(), app.AppName, filepath)
+		filepath = path.Join(apps.Directory(), reactApp.AppName, filepath)
 
 		if !strings.Contains(filepath, "(feature)") {
 			dirName, fileName := path.Split(filepath)

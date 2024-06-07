@@ -1,6 +1,8 @@
 package specification
 
 import (
+	"strings"
+
 	validation "github.com/go-ozzo/ozzo-validation"
 	"gopkg.in/yaml.v3"
 )
@@ -21,6 +23,10 @@ func (fs Product) Validate() error {
 	return validation.ValidateStruct(&fs,
 		validation.Field(&fs.ProductName, validation.Required),
 	)
+}
+
+func (p Product) ProductNameAsLower() string {
+	return strings.ToLower(p.ProductName)
 }
 
 func UnmarshalYaml(data []byte) (p Product, err error) {

@@ -1,17 +1,17 @@
-import { getUserProfile } from "@/graphql/users/query";
+import { QueryResponse, getProfile } from "@/graphql/auth/profile";
 import { ApolloError, gql, useLazyQuery } from "@apollo/client";
 import { useEffect } from "react";
 import UserContext from "./userContext";
 import { useTokenStore } from "@/lib/store";
-import { QueryResponse } from "@/graphql/query";
 import LoginExpired from "@/app/(auth)/login/components/loginLoggedOut";
+
 
 interface WithUserContextProperties {
     children?: any;
 }
 
 const WithUserContext = (props: WithUserContextProperties) => {
-    const [executeGetUserProfile, { data, called, loading, error }] = useLazyQuery<QueryResponse>(gql(getUserProfile), { errorPolicy: "all"})
+    const [executeGetUserProfile, { data, called, loading, error }] = useLazyQuery<QueryResponse>(gql(getProfile), { errorPolicy: "all" })
 
     const { removeToken } = useTokenStore();
 
