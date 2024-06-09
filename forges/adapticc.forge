@@ -1,0 +1,47 @@
+
+version: 0
+product_name: "Adapticc"
+apps:
+  - name: backend1
+    type: go-backend
+  - name: frontend1
+    type: react-frontend
+features:
+  - name: user
+    fields:
+      - name: ID
+        type: string
+      - name: email
+        type: string
+      - name: FirstName
+        type: string
+      - name: LastName
+        type: string
+      - name: Age
+        type: int
+  - name: product
+    fields:
+      - name: ID
+        type: string
+      - name: Name
+        type: string
+      - name: Type
+        type: string
+      - name: Price
+        type: int
+  - name: task
+    fields:
+      - name: ID
+        type: string
+      - name: Name
+        type: string
+      - name: Description
+        type: string
+  - name: image
+    fields:
+      - name: ID
+        type: string
+      - name: Type
+        type: string
+      - name: Extension
+        type: string

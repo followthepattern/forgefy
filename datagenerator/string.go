@@ -22,3 +22,11 @@ func StringWithCharset(length int, charset string) string {
 func String(length int) string {
 	return StringWithCharset(length, charset)
 }
+
+func RandomAge() int {
+	return seededRand.Intn(90) + 10
+}
+
+func RandomInt() int {
+	return seededRand.Intn(100)
+}

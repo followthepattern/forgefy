@@ -1,6 +1,7 @@
 package specification
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/followthepattern/forgefy/datagenerator"
@@ -8,25 +9,26 @@ import (
 	"github.com/google/uuid"
 )
 
+const IDFieldName = "ID"
+
 type Field struct {
-	Name string `yaml:"name"`
-	Type string `yaml:"type"`
+	Name     string `yaml:"name"`
+	Type     string `yaml:"type"`
+	Nullable bool   `yaml:"nullable" default:"true"`
 }
 
 func (f Field) RandomValue() string {
+	if f.Name == IDFieldName {
+		return uuid.NewString()
+	}
+
 	switch f.Type {
 	case "string":
 		return datagenerator.String(10)
 	case "uuid":
 		return uuid.NewString()
-	}
-	return ""
-}
-
-func (f Field) DBType() string {
-	switch f.Type {
-	case "string":
-		return "VARCHAR"
+	case "int":
+		return fmt.Sprint(datagenerator.RandomInt())
 	}
 	return ""
 }

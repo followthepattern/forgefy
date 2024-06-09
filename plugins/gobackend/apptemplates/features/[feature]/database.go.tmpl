@@ -11,7 +11,7 @@ import (
 	. "github.com/followthepattern/goqu/v9"
 )
 
-var {{ .GoTypeName }}Table = S("usr").Table("{{ .FeatureTableName }}")
+var {{ .GoTypeName }}Table = S("app").Table("{{ .FeatureTableName }}")
 
 type {{ .GoTypeName }}Database struct {
 	db *Database

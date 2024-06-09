@@ -23,12 +23,12 @@ func getFromLoginResponseModel(m LoginResponse) *loginResponse {
 }
 
 type AuthGraphQL struct {
-	auth AuthController
+	ctrl AuthController
 }
 
 func NewAuthGraphQL(ctrl AuthController) AuthGraphQL {
 	return AuthGraphQL{
-		auth: ctrl,
+		ctrl: ctrl,
 	}
 }
 
@@ -41,7 +41,7 @@ func (r AuthGraphQL) Login(ctx context.Context, args struct {
 		Password: args.Password,
 	}
 
-	loginResponse, err := r.auth.Login(ctx, loginRequest)
+	loginResponse, err := r.ctrl.Login(ctx, loginRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -62,10 +62,14 @@ func (r AuthGraphQL) Register(ctx context.Context, args struct {
 		Password:  args.Password,
 	}
 
-	registerResponse, err := r.auth.Register(ctx, registerRequest)
+	registerResponse, err := r.ctrl.Register(ctx, registerRequest)
 	if err != nil {
 		return nil, err
 	}
 
 	return registerResponse, nil
+}
+
+func (graphQL AuthGraphQL) Profile(ctx context.Context) (*AuthUser, error) {
+	return graphQL.ctrl.Profile(ctx)
 }

@@ -50,3 +50,12 @@ func (ctrl AuthController) ActivateUser(ctx context.Context, userID string) erro
 
 	return ctrl.authService.ActivateUser(ctx, userID)
 }
+
+func (ctrl AuthController) Profile(ctx context.Context) (*AuthUser, error) {
+	user, err := ctrl.authService.Profile(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}

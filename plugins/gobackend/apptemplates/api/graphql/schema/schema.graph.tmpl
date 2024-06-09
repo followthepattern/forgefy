@@ -20,11 +20,6 @@ input ListFilter {
 	search: String
 }
 
-type AuthMutation {
-	login(email: String!, password: String!): LoginResponse
-	register(email: String!, firstName: String!, lastName: String!, password: String!): RegisterResponse
-}
-
 type LoginResponse {
 	jwt: String!
 	expires_at: Time!
@@ -34,6 +29,27 @@ type RegisterResponse {
 	email: String!
 	first_name: String!
 	last_name: String!
+}
+
+type AuthUser {
+	id: String!
+	email: String!
+	firstName: String!
+	lastName: String!
+	active: Boolean!
+	creationUserID: String!
+	updateUserID: String!
+	createdAt: Time!
+	updatedAt: Time!
+}
+
+type AuthQuery {
+	profile: AuthUser
+}
+
+type AuthMutation {
+	login(email: String!, password: String!): LoginResponse
+	register(email: String!, firstName: String!, lastName: String!, password: String!): RegisterResponse
 }
 
 {{- range .Features }}
@@ -86,6 +102,7 @@ schema {
 }
 
 type Query {
+	auth: AuthQuery!
 {{- range .Features }}
 	{{ .FeatureNameLowerCamel }}s: {{ .GoTypeName }}Query!
 {{- end }}

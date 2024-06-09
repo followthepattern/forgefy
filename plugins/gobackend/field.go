@@ -24,6 +24,30 @@ func (f Field) SchemaType() string {
 	return specification.CapitalizeFirst(f.Type)
 }
 
+func (f Field) DBType() string {
+	switch f.Type {
+	case "string":
+		return "varchar"
+	case "bool":
+		return "boolean"
+	case "int":
+		return "integer"
+	}
+	return ""
+}
+
+func (f Field) DBColumnName() string {
+	return specification.LowerFirst(f.Name)
+}
+
+func (f Field) Nullable() string {
+	if f.Field.Nullable || f.Name != specification.IDFieldName {
+		return ""
+	}
+
+	return "NOT NULL"
+}
+
 func (f Field) GoType() string {
 	switch f.Type {
 	case "string":

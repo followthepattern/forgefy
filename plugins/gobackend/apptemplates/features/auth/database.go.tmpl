@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	AuthUserTable = S("usr").Table("users")
+	AuthUserTable = S("auth").Table("user")
 )
 
 type AuthDatabase struct {
@@ -87,4 +87,17 @@ func (repo AuthDatabase) ActivateUser(userID string) error {
 	}
 
 	return nil
+}
+
+func (repo AuthDatabase) GetAuthUser(id types.String) (*AuthUser, error) {
+	user := AuthUser{}
+
+	query := repo.db.From(AuthUserTable).Where(Ex{"id": id})
+
+	_, err := query.ScanStruct(&user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, err
 }

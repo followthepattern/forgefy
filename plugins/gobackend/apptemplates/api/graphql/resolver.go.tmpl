@@ -39,6 +39,10 @@ func (r Resolver) Authentication() (auth.AuthGraphQL, error) {
 	return r.authGraphQL, nil
 }
 
+func (r Resolver) Auth() (auth.AuthGraphQL, error) {
+	return r.authGraphQL, nil
+}
+
 {{- range .Features }}
 func (r Resolver) {{ .GoTypeName }}s() ({{ .PackageName }}.{{ .GoTypeName }}GraphQL, error) {
 	return r.{{ .FeatureNameLowerCamel }}GraphQL, nil
