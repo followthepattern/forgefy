@@ -2,7 +2,7 @@ import { QueryResourceResponse } from "../query"
 
 export const getProfile = `
 query {
-	users {
+	auth {
 		profile {
 			id
 			email
@@ -21,5 +21,5 @@ export interface User {
 }
 
 export interface QueryResponse {
-	users?: QueryResourceResponse<User>
+	auth?: QueryResourceResponse<User>
 }
