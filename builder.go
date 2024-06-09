@@ -49,6 +49,8 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 
 	for _, app := range builder.productSpecification.Apps {
 		app.Product = builder.productSpecification
+		app.Features = append(builder.productSpecification.Features, app.Features...)
+		app.Init()
 		err = builder.appBuilders(pm, builder.productSpecification, app)
 		if err != nil {
 			return pm, err

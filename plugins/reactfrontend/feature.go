@@ -3,12 +3,13 @@ package reactfrontend
 import (
 	"strings"
 
+	"github.com/followthepattern/forgefy/plugins/reactfrontend/models"
 	"github.com/followthepattern/forgefy/specification"
 )
 
 type Feature struct {
 	specification.Feature
-	Fields []Field
+	Fields []models.Field
 }
 
 func (f Feature) FeatureTypeName() string {

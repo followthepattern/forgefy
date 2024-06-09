@@ -1,4 +1,4 @@
-package specification
+package models
 
 import (
 	"fmt"
@@ -14,6 +14,7 @@ const IDFieldName = "ID"
 type Field struct {
 	Name     string `yaml:"name"`
 	Type     string `yaml:"type"`
+	Value    string `yaml:"value"`
 	Nullable bool   `yaml:"nullable" default:"true"`
 }
 

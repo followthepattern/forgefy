@@ -7,6 +7,7 @@ import (
 
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
+	"github.com/followthepattern/forgefy/plugins/reactfrontend/models"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend/templates"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
@@ -60,9 +61,9 @@ func (a App) Features() []Feature {
 	features := make([]Feature, len(a.App.Features))
 	for i, feature := range a.App.Features {
 
-		fields := make([]Field, len(feature.Fields))
+		fields := make([]models.Field, len(feature.Fields))
 		for j, field := range feature.Fields {
-			fields[j] = Field{field}
+			fields[j] = models.Field{field}
 		}
 		features[i] = Feature{Feature: feature, Fields: fields}
 	}
@@ -85,8 +86,6 @@ func (plugin *ReactFrontend) Build(pm productmap.ProductMap, product specificati
 }
 
 func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, product specification.Product, reactApp App) func(filepath string, d fs.DirEntry, err error) error {
-	reactApp.App.Features = append(product.Features, reactApp.App.Features...)
-
 	return func(filepath string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err

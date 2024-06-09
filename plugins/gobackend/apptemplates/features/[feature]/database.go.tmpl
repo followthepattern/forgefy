@@ -3,7 +3,6 @@ package {{ .PackageName }}
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/{{ .AppNameToPackageName }}/repositories/database/sqlbuilder"
 	"github.com/{{ .AppNameToPackageName }}/types"
@@ -56,14 +55,14 @@ func (repo {{ .GoTypeName }}Database) Get(request {{ .GoTypeName }}ListRequestPa
 
 	query := repo.db.From({{ .GoTypeName }}Table)
 
-	if request.Filter.Search.IsValid() {
-		pattern := fmt.Sprintf("%%%s%%", request.Filter.Search)
-		query = query.Where(
-			Or(
-				I("id").Like(pattern),
-				I("title").Like(pattern),
-			))
-	}
+	// if request.Filter.Search.IsValid() {
+	// pattern := fmt.Sprintf("%%%s%%", request.Filter.Search)
+	// query = query.Where(
+	// Or(
+	// 	I("id").Like(pattern),
+	// 	I("title").Like(pattern),
+	// ))
+	// }
 
 	count, err := query.Count()
 	if err != nil {

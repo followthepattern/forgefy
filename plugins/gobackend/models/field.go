@@ -1,13 +1,14 @@
-package gobackend
+package models
 
 import (
 	"strings"
 
 	"github.com/followthepattern/forgefy/specification"
+	"github.com/followthepattern/forgefy/specification/models"
 )
 
 type Field struct {
-	specification.Field
+	models.Field
 }
 
 func (f Field) SchemaVarName() string {
@@ -40,8 +41,12 @@ func (f Field) DBColumnName() string {
 	return specification.LowerFirst(f.Name)
 }
 
+func (f Field) DBValue() string {
+	return f.Value
+}
+
 func (f Field) Nullable() string {
-	if f.Field.Nullable || f.Name != specification.IDFieldName {
+	if f.Field.Nullable || f.Name != models.IDFieldName {
 		return ""
 	}
 

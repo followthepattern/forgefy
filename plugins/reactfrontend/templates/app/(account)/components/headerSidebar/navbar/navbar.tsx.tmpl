@@ -10,8 +10,9 @@ export interface NavigationItem {
 }
 
 export const navigationItems: NavigationItem[] = [
-    { name: 'Users', href: '/users', icon: FolderIcon },
-    { name: 'Products', href: '/products', icon: FolderIcon },
+{{- range .Features }}
+    { name: '{{ .FeatureHumanReadableName }}s', href: '/{{ .FeatureURL}}s', icon: FolderIcon },
+{{- end }}
 ]
 
 export function IsSelected(location: string, path: string): boolean {

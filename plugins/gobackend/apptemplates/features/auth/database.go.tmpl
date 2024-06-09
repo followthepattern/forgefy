@@ -54,8 +54,8 @@ func (db AuthDatabase) VerifyLogin(email types.String) (AuthUser, error) {
 func (repo AuthDatabase) GetRoleIDs(userID string) ([]string, error) {
 	roleIDs := []string{}
 
-	err := repo.db.From(S("usr").Table("user_role").As("ur")).
-		Join(S("usr").Table("roles").As("r"),
+	err := repo.db.From(S("auth").Table("user_role").As("ur")).
+		Join(S("auth").Table("role").As("r"),
 			On(Ex{"r.id": I("ur.role_id")})).
 		Where(Ex{"user_id": userID}).
 		Select(T("r").Col("code")).

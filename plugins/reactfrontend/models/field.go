@@ -1,13 +1,13 @@
-package reactfrontend
+package models
 
 import (
 	"strings"
 
-	"github.com/followthepattern/forgefy/specification"
+	"github.com/followthepattern/forgefy/specification/models"
 )
 
 type Field struct {
-	specification.Field
+	models.Field
 }
 
 func (f Field) VariableName() string {

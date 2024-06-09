@@ -3,13 +3,13 @@ package specification
 import (
 	"strings"
 
+	"github.com/followthepattern/forgefy/specification/models"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
 type Feature struct {
-	FeatureName         string  `yaml:"name"`
-	Fields              []Field `yaml:"fields"`
-	CountOfRandomValues int
+	FeatureName string         `yaml:"name"`
+	Fields      []models.Field `yaml:"fields"`
 }
 
 func (f Feature) FeatureNameLowerCamel() string {
@@ -18,16 +18,6 @@ func (f Feature) FeatureNameLowerCamel() string {
 
 func (f Feature) ToDirName() string {
 	return strings.ToLower(f.FeatureName)
-}
-
-func (f Feature) TemplateIterator() []int {
-	count := 10
-
-	if f.CountOfRandomValues != 0 {
-		count = f.CountOfRandomValues
-	}
-
-	return make([]int, count)
 }
 
 func (f Feature) FeatureGraphQLName() string {

@@ -3,12 +3,13 @@ package gobackend
 import (
 	"strings"
 
+	"github.com/followthepattern/forgefy/plugins/gobackend/models"
 	"github.com/followthepattern/forgefy/specification"
 )
 
 type Feature struct {
 	specification.Feature
-	Fields []Field
+	Fields []models.Field
 }
 
 func (f Feature) GoTypeName() string {
