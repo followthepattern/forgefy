@@ -38,7 +38,7 @@ func (f Field) DBType() string {
 }
 
 func (f Field) DBColumnName() string {
-	return specification.LowerFirst(f.Name)
+	return strings.ToLower(f.Name)
 }
 
 func (f Field) DBValue() string {

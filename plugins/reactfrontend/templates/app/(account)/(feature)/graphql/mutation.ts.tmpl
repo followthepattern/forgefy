@@ -1,6 +1,6 @@
 export const update{{ .FeatureTypeName }} = `
 mutation Update{{ .FeatureTypeName }}($id: String!, $model: {{ .FeatureTypeName }}Input!) {
-	products {
+	{{ .FeatureNameLowerCamel }}s {
 		update(id: $id, model: $model) {
 			code
 		}
@@ -9,7 +9,7 @@ mutation Update{{ .FeatureTypeName }}($id: String!, $model: {{ .FeatureTypeName 
 
 export const create{{ .FeatureTypeName }} = `
 mutation Create{{ .FeatureTypeName }}($model: {{ .FeatureTypeName }}Input!) {
-	products {
+	{{ .FeatureNameLowerCamel }}s {
 		create(model: $model) {
 			code
 		}
@@ -19,7 +19,7 @@ mutation Create{{ .FeatureTypeName }}($model: {{ .FeatureTypeName }}Input!) {
 
 export const delete{{ .FeatureTypeName }} = `
 mutation Delete{{ .FeatureTypeName }}($id: String!) {
-	products {
+	{{ .FeatureNameLowerCamel }}s {
 		delete(id: $id) {
 			code
 		}

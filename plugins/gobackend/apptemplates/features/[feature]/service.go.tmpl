@@ -14,18 +14,18 @@ import (
 type {{ .GoTypeName }}Service struct {
 	authorizationService auth.AuthorizationService
 	logger               *slog.Logger
-	productRepository    {{ .GoTypeName }}Database
+	{{ .FeatureNameLowerCamel }}Repository	{{ .GoTypeName }}Database
 }
 
 func New{{ .GoTypeName }}Service(cont container.Container, authorizationService auth.AuthorizationService) {{ .GoTypeName }}Service {
-	productRepository := New{{ .GoTypeName }}Database(cont.GetDB())
-	product := {{ .GoTypeName }}Service{
+	repository := New{{ .GoTypeName }}Database(cont.GetDB())
+	service := {{ .GoTypeName }}Service{
 		authorizationService: authorizationService,
-		productRepository:    productRepository,
-		logger:               cont.GetLogger(),
+		{{ .FeatureNameLowerCamel }}Repository:    repository,
+		logger:	cont.GetLogger(),
 	}
 
-	return product
+	return service
 }
 
 func (service {{ .GoTypeName }}Service) GetByID(ctx context.Context, id string) (*{{ .GoTypeName }}Model, error) {
@@ -34,7 +34,7 @@ func (service {{ .GoTypeName }}Service) GetByID(ctx context.Context, id string) 
 		return nil, err
 	}
 
-	return service.productRepository.GetByID(id)
+	return service.{{ .FeatureNameLowerCamel }}Repository.GetByID(id)
 }
 
 func (service {{ .GoTypeName }}Service) Get(ctx context.Context, request {{ .GoTypeName }}ListRequestParams) (*{{ .GoTypeName }}ListResponse, error) {
@@ -45,7 +45,7 @@ func (service {{ .GoTypeName }}Service) Get(ctx context.Context, request {{ .GoT
 
 	request.Pagination.SetDefaultIfEmpty()
 
-	return service.productRepository.Get(request)
+	return service.{{ .FeatureNameLowerCamel }}Repository.Get(request)
 }
 
 func (service {{ .GoTypeName }}Service) Create(ctx context.Context, value {{ .GoTypeName }}Model) error {
@@ -57,7 +57,7 @@ func (service {{ .GoTypeName }}Service) Create(ctx context.Context, value {{ .Go
 	value.ID = types.StringFrom(uuid.NewString())
 	value.Userlog.CreationUserID = types.StringFrom(userID)
 
-	return service.productRepository.Create([]{{ .GoTypeName }}Model{value})
+	return service.{{ .FeatureNameLowerCamel }}Repository.Create([]{{ .GoTypeName }}Model{value})
 }
 
 func (service {{ .GoTypeName }}Service) Update(ctx context.Context, value {{ .GoTypeName }}Model) error {
@@ -68,7 +68,7 @@ func (service {{ .GoTypeName }}Service) Update(ctx context.Context, value {{ .Go
 
 	value.UpdateUserID = types.StringFrom(userID)
 
-	return service.productRepository.Update(value)
+	return service.{{ .FeatureNameLowerCamel }}Repository.Update(value)
 }
 
 func (service {{ .GoTypeName }}Service) Delete(ctx context.Context, id string) error {
@@ -77,5 +77,5 @@ func (service {{ .GoTypeName }}Service) Delete(ctx context.Context, id string) e
 		return err
 	}
 
-	return service.productRepository.Delete(id)
+	return service.{{ .FeatureNameLowerCamel }}Repository.Delete(id)
 }

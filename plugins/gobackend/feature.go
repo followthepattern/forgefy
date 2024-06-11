@@ -23,3 +23,7 @@ func (f Feature) PackageName() string {
 func (f Feature) FeatureTableName() string {
 	return strings.ToLower(f.FeatureName)
 }
+
+func (f Feature) IDField() models.Field {
+	return f.Fields[0]
+}

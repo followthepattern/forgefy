@@ -16,12 +16,20 @@ func (f Feature) FeatureNameLowerCamel() string {
 	return LowerFirst(f.FeatureName)
 }
 
+func (f Feature) IDField() models.Field {
+	return f.Fields[0]
+}
+
 func (f Feature) ToDirName() string {
 	return strings.ToLower(f.FeatureName)
 }
 
 func (f Feature) FeatureGraphQLName() string {
 	return CapitalizeFirst(f.FeatureName)
+}
+
+func (f Feature) FeatureAsDirName() string {
+	return strings.ToLower(f.FeatureName)
 }
 
 func (f Feature) Validate() error {

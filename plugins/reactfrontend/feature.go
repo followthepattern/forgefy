@@ -27,7 +27,3 @@ func (f Feature) FeatureURL() string {
 func (f Feature) FeatureToFileSuffix() string {
 	return specification.CapitalizeFirst(f.FeatureName)
 }
-
-func (f Feature) FeatureAsDirName() string {
-	return strings.ToLower(f.FeatureName)
-}
