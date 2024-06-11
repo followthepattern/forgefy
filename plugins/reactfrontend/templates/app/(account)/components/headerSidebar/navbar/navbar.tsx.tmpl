@@ -9,17 +9,13 @@ export interface NavigationItem {
     icon: React.ComponentType<{className:string}>
 }
 
-export const navigationItems: NavigationItem[] = [
-{{- range .Features }}
-    { name: '{{ .FeatureHumanReadableName }}s', href: '/{{ .FeatureURL}}s', icon: FolderIcon },
-{{- end }}
-]
-
 export function IsSelected(location: string, path: string): boolean {
     return location.split("/")[1] === path.split("/")[1]
 }
 
-interface NavbarProperties { }
+interface NavbarProperties {
+    navigationItems: NavigationItem[]
+}
 
 export default function Navbar(props: NavbarProperties) {
     const pathname = useLocation().pathname;
@@ -30,7 +26,7 @@ export default function Navbar(props: NavbarProperties) {
             <ul role="list" className="flex flex-col flex-1">
                 <li>
                     <ul role="list" className="-mx-2 space-y-2">
-                        {navigationItems.map((item) => {
+                        {props.navigationItems.map((item) => {
                             const current = IsSelected(pathname, item.href)
                             return (
                                 <li key={item.name}>

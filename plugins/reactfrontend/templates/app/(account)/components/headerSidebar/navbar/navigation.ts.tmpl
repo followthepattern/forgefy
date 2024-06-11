@@ -1,21 +1,16 @@
-import {
-    GiftTopIcon,
-    UsersIcon,
-} from '@heroicons/react/24/outline'
+import FolderIcon from '@/app/icons/folder';
 import { ForwardRefExoticComponent, SVGProps } from 'react'
 
 export interface NavigationItem {
     name: string
     href: string
-    icon: ForwardRefExoticComponent<Omit<SVGProps<SVGSVGElement>, "ref"> & {
-        title?: string | undefined;
-        titleId?: string | undefined;
-    } & React.RefAttributes<SVGSVGElement>>
+    icon: (props: any) => JSX.Element
 }
 
 export const navigationItems: NavigationItem[] = [
-    { name: 'Users', href: '/users', icon: UsersIcon },
-    { name: 'Products', href: '/products', icon: GiftTopIcon },
+    {{- range .Features }}
+    { name: '{{ .FeatureHumanReadableName }}s', href: '/{{ .FeatureURL}}s', icon: FolderIcon },
+    {{- end }}
 ]
 
 export function IsSelected(location: string, path: string): boolean {
