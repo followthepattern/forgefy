@@ -64,13 +64,13 @@ type {{ .GoTypeName }} {
 	updatedAt: Time!
 }
 
-input Create{{ .GoTypeName }}Input {
+input Create{{ .GoTypeName }} {
 	{{- range .Fields }}
 	{{ .SchemaVarName }}: {{ .SchemaType }}!
 	{{- end }}
 }
 
-input Update{{ .GoTypeName }}Input {
+input Update{{ .GoTypeName }} {
 	{{- range .Fields }}
 	{{ .SchemaVarName }}: {{ .SchemaType }}!
 	{{- end }}
@@ -89,8 +89,8 @@ type {{ .GoTypeName }}Query {
 }
 
 type {{ .GoTypeName }}Mutation {
-	create(model: Create{{ .GoTypeName }}Input!): ResponseStatus
-	update(id: String!, model: Update{{ .GoTypeName }}Input!): ResponseStatus
+	create(model: Create{{ .GoTypeName }}!): ResponseStatus
+	update(id: String!, model: Update{{ .GoTypeName }}!): ResponseStatus
 	delete(id: String!): ResponseStatus
 }
 

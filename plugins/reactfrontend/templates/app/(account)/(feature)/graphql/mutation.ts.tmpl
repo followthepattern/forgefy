@@ -1,5 +1,5 @@
 export const update{{ .FeatureTypeName }} = `
-mutation Update{{ .FeatureTypeName }}($id: String!, $model: {{ .FeatureTypeName }}Input!) {
+mutation Update{{ .FeatureTypeName }}($id: String!, $model: Update{{ .FeatureTypeName }}!) {
 	{{ .FeatureNameLowerCamel }}s {
 		update(id: $id, model: $model) {
 			code
@@ -8,7 +8,7 @@ mutation Update{{ .FeatureTypeName }}($id: String!, $model: {{ .FeatureTypeName 
 }`
 
 export const create{{ .FeatureTypeName }} = `
-mutation Create{{ .FeatureTypeName }}($model: {{ .FeatureTypeName }}Input!) {
+mutation Create{{ .FeatureTypeName }}($model: Create{{ .FeatureTypeName }}!) {
 	{{ .FeatureNameLowerCamel }}s {
 		create(model: $model) {
 			code
