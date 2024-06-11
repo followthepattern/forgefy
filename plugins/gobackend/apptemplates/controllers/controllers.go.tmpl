@@ -6,7 +6,7 @@ import (
 
 {{- $AppNameToPackageName := .AppNameToPackageName }}
 {{- range .Features }}
-	"github.com/{{ $AppNameToPackageName }}/features/{{ .FeatureName }}"
+	"github.com/{{ $AppNameToPackageName }}/features/{{ .PackageName }}"
 {{- end }}
 )
 

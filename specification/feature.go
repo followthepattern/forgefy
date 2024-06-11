@@ -32,6 +32,10 @@ func (f Feature) FeatureAsDirName() string {
 	return strings.ToLower(f.FeatureName)
 }
 
+func (f Feature) FeatureURL() string {
+	return strings.ToLower(f.FeatureName)
+}
+
 func (f Feature) Validate() error {
 	return validation.ValidateStruct(&f,
 		validation.Field(&f.FeatureName, validation.Required),
