@@ -1,0 +1,50 @@
+package graphql
+
+import (
+	"github.com/{{ .AppNameToPackageName }}/controllers"
+	"github.com/{{ .AppNameToPackageName }}/features/auth"
+	{{ $AppNameToPackageName := .AppNameToPackageName }}
+{{- range .Features }}
+	"github.com/{{ $AppNameToPackageName }}/features/{{ .PackageName }}"
+{{- end }}
+)
+
+type Resolver struct {
+	authGraphQL	auth.AuthGraphQL
+
+{{- range .Features }}
+	{{ .FeatureNameLowerCamel }}GraphQL	{{ .PackageName }}.{{ .GoTypeName }}GraphQL
+{{- end }}
+}
+
+func NewResolver(controllers controllers.Controllers) Resolver {
+	authGraphQL := auth.NewAuthGraphQL(controllers.Auth())
+	
+{{- range .Features }}
+	{{ .FeatureNameLowerCamel }}GraphQL := {{ .PackageName}}.New{{ .GoTypeName }}GraphQL(controllers.{{ .GoTypeName }}())
+{{- end }}
+
+
+	resolver := Resolver{
+		authGraphQL:	authGraphQL,
+{{- range .Features }}
+		{{ .FeatureNameLowerCamel }}GraphQL: {{ .FeatureNameLowerCamel }}GraphQL,
+{{- end }}
+	}
+
+	return resolver
+}
+
+func (r Resolver) Authentication() (auth.AuthGraphQL, error) {
+	return r.authGraphQL, nil
+}
+
+func (r Resolver) Auth() (auth.AuthGraphQL, error) {
+	return r.authGraphQL, nil
+}
+
+{{- range .Features }}
+func (r Resolver) {{ .GoTypeName }}s() ({{ .PackageName }}.{{ .GoTypeName }}GraphQL, error) {
+	return r.{{ .FeatureNameLowerCamel }}GraphQL, nil
+}
+{{- end }}

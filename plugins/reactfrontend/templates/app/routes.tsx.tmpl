@@ -1,0 +1,64 @@
+import { RouteObject } from "react-router-dom"
+import Login from "./(auth)/login/page"
+import AuthLayout from "./(auth)/layout"
+import AccountLayout from "./(account)/layout"
+{{- range .Features }}
+import {{ .FeatureTypeName }}s from "./(account)/{{ .FeatureAsDirName }}/page"
+import {{ .FeatureTypeName }} from "./(account)/{{ .FeatureAsDirName }}/[id]/page"
+import {{ .FeatureTypeName }}Edit from "./(account)/{{ .FeatureAsDirName }}/[id]/edit/page"
+import {{ .FeatureTypeName }}New from "./(account)/{{ .FeatureAsDirName }}/new/page"
+{{- end }}
+
+import Profile from "./(account)/profile/page"
+
+import { ListPageWrapper } from "./(account)/components/listPage/listPageWrapper/listPageWrapper"
+
+export const Routes: RouteObject[] = [
+    {
+        path: "/",
+        element: <AuthLayout />,
+        children: [{
+            path: "/",
+            element: <Login />,
+
+    }]
+    },
+    {
+        path: "/",
+        element: <AuthLayout />,
+        children: [
+            {
+                path: "/login",
+                element: <Login />
+            }
+        ]
+    },
+    {
+        path: "/",
+        element: <AccountLayout />,
+        children: [
+            {
+                path: "/profile",
+                element: <Profile />
+            },
+{{- range .Features }}
+            {
+                path: "{{ .FeatureURL }}s",
+                element: <ListPageWrapper Component={{ "{" }}{{ .FeatureTypeName }}s} />,
+            },
+            {
+                path: "{{ .FeatureURL }}s/:id",
+                element: <{{ .FeatureTypeName }} />
+            },
+            {
+                path: "{{ .FeatureURL }}s/new",
+                element: <{{ .FeatureTypeName }}New />
+            },
+            {
+                path: "{{ .FeatureURL }}s/:id/edit",
+                element: <{{ .FeatureTypeName }}Edit />
+            },
+{{- end }}
+        ]
+    }
+]

@@ -1,0 +1,44 @@
+services:
+  {{ .App.AppNameCamelCase }}_db:
+    image: postgres:latest
+    restart: unless-stopped
+    hostname: {{ .App.AppNameCamelCase }}_db
+    container_name: {{ .App.AppNameCamelCase }}_db
+    ports:
+      - {{ .DbPort }}:5432
+    environment:
+      POSTGRES_DB: {{ .App.AppNameCamelCase }}
+      POSTGRES_USER: {{ .App.AppNameCamelCase }}user
+      POSTGRES_PASSWORD: dbpass
+    volumes:
+      - ./tests/integration/testdata/database.sql:/docker-entrypoint-initdb.d/database.sql
+
+  {{ .App.AppNameCamelCase }}_cerbos:
+    image: ghcr.io/cerbos/cerbos:latest
+    restart: unless-stopped
+    hostname: {{ .App.AppNameCamelCase }}_cerbos
+    container_name: {{ .App.AppNameCamelCase }}_cerbos
+    command: ["server", "--config=/policies/.cerbos.yaml"]
+    ports:
+      - {{ .CerbosPort }}:3592
+    volumes:
+      - ./policies:/policies:rw
+      - shared-volume:/sock
+
+  {{ .App.AppNameCamelCase }}_backend:
+    image: golang:1.22
+    hostname: {{ .App.AppNameCamelCase }}_backend
+    container_name: {{ .App.AppNameCamelCase }}_backend
+    command: bash -c "go run ./cmd/{{ .App.AppNameCamelCase }}"
+    working_dir: /backend
+    depends_on:
+      - {{ .App.AppNameCamelCase }}_db
+      - {{ .App.AppNameCamelCase }}_cerbos
+    ports:
+      - {{ .App.AppPort }}:8080
+    volumes:
+      - ./:/backend:rw
+      - shared-volume:/sock
+
+volumes:
+  shared-volume:

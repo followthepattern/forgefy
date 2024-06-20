@@ -1,0 +1,12 @@
+import useSingle from "@/graphql/hooks/useSingle";
+import { getSingle{{ .FeatureTypeName }} as graphQL } from "../graphql/query";
+import { SingleQueryResult } from "@/graphql/query";
+import { {{ .FeatureTypeName }}, QueryResponse } from "../model";
+
+export default function useSingle{{ .FeatureTypeName }}(id: string): SingleQueryResult<{{ .FeatureTypeName }}> {
+    const parseResult = (data?: QueryResponse): {{ .FeatureTypeName }} | undefined => {
+        return data?.{{ .FeatureNameLowerCamel }}s?.single
+    }
+
+    return useSingle<{{ .FeatureTypeName }}>({id, parseResult, graphQL})
+}

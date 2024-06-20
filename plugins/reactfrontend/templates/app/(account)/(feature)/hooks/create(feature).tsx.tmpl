@@ -1,0 +1,12 @@
+import { CreateMutationResult, MutationResourceResponse } from "@/graphql/mutation";
+import { {{ .FeatureTypeName }}, MutationResponse  } from "../model";
+import useCreate from "@/graphql/hooks/useCreate";
+import { create{{ .FeatureTypeName }} as graphQL } from "../graphql/mutation";
+
+export default function useCreate{{ .FeatureTypeName }}(): CreateMutationResult<{{ .FeatureTypeName }}, number> {
+    const parseResult = (data?: MutationResponse | null) : number | undefined  => {
+        return data?.{{ .FeatureNameLowerCamel }}s?.create?.code;
+    }
+
+    return useCreate<{{ .FeatureTypeName }}>({parseResult, graphQL})
+}

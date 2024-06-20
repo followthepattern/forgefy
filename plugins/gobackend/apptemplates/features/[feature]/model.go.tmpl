@@ -1,14 +1,14 @@
 package {{ .PackageName }}
 
 import (
-	"forgefy/{{.AppName}}/models"
-	"forgefy/{{.AppName}}/types"
+	"github.com/{{ .AppNameToPackageName }}/models"
+	"github.com/{{ .AppNameToPackageName }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
 type {{ .GoTypeName }}Model struct {
 	{{- range .Fields }}
-	{{ .Name }} {{ .Type }} `db:"{{ .Name }}" goqu:"omitempty"`
+	{{ .FieldName }} {{ .GoType }} `db:"{{ .TagName }}" goqu:"omitempty"`
 	{{- end }}
 	models.Userlog
 }
@@ -20,7 +20,7 @@ func (m {{ .GoTypeName }}Model) IsDefault() bool {
 func (m {{ .GoTypeName }}Model) CreateValidate() error {
 	return validation.ValidateStruct(&m,
 		{{- range .Fields }}
-		validation.Field(&m.{{ .Name }}, validation.Required),
+		validation.Field(&m.{{ .FieldName }}, validation.Required),
 		{{- end }}
 	)
 }

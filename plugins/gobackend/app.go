@@ -7,14 +7,46 @@ import (
 
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates"
+	"github.com/followthepattern/forgefy/plugins/gobackend/models"
 	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
 )
 
+type App struct {
+	specification.App
+	DbPort     int
+	CerbosPort int
+}
+
+func (a App) AppNameCapital() string {
+	return strings.ToUpper(a.AppName)
+}
+
+func (a App) AppNameToPackageName() string {
+	return strings.ToLower(a.AppName)
+}
+
+func (a App) Features() []Feature {
+	features := make([]Feature, len(a.App.Features))
+	for i, feature := range a.App.Features {
+
+		fields := make([]models.Field, len(feature.Fields))
+		for j, field := range feature.Fields {
+			fields[j] = models.Field{field}
+		}
+		features[i] = Feature{Feature: feature, Fields: fields}
+	}
+	return features
+}
+
 var _ plugins.App = &GoBackendPluginApp{}
 
-type GoBackendPluginApp struct{}
+type GoBackendPluginApp struct {
+	port       int
+	dbPort     int
+	cerbosPort int
+}
 
 func (GoBackendPluginApp) Name() string {
 	return "Go Back-end application"
@@ -24,15 +56,44 @@ func (GoBackendPluginApp) Type() string {
 	return "go-backend"
 }
 
-func (plugin GoBackendPluginApp) Build(pm productmap.ProductMap, product specification.Product, app specification.App) error {
-	dir := apptemplates.EntireDir
+func (plugin *GoBackendPluginApp) GetNextPortNumber() int {
+	port := plugin.port
 
-	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, product, app))
+	plugin.port++
+
+	return port
 }
 
-func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product specification.Product, app specification.App) func(filepath string, d fs.DirEntry, err error) error {
+func (plugin *GoBackendPluginApp) GetNextDBPort() int {
+	port := plugin.dbPort
+
+	plugin.dbPort++
+
+	return port
+}
+
+func (plugin *GoBackendPluginApp) GetNextCerbosPort() int {
+	port := plugin.cerbosPort
+
+	plugin.cerbosPort++
+
+	return port
+}
+
+func (plugin *GoBackendPluginApp) Build(pm productmap.ProductMap, product specification.Product, app specification.App) error {
 	dir := apptemplates.EntireDir
-	features := append(product.Features, app.Features...)
+
+	goApp := App{app, plugin.dbPort, plugin.cerbosPort}
+
+	goApp.App.AppPort = plugin.GetNextPortNumber()
+	goApp.DbPort = plugin.GetNextDBPort()
+	goApp.CerbosPort = plugin.GetNextCerbosPort()
+
+	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, product, goApp))
+}
+
+func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product specification.Product, goApp App) func(filepath string, d fs.DirEntry, err error) error {
+	dir := apptemplates.EntireDir
 
 	return func(filepath string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -48,32 +109,34 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product speci
 			return err
 		}
 
-		filepath = strings.TrimSuffix(filepath, ".tmpl")
+		if strings.Contains(filepath, "(appName)") {
+			filepath = strings.ReplaceAll(filepath, "(appName)", goApp.AppName)
+		}
 
-		filepath = path.Join(apps.Directory(), app.AppName, filepath)
+		filepath = strings.TrimSuffix(filepath, ".tmpl")
+		filepath = path.Join(apps.Directory(), goApp.AppName, filepath)
 
 		if !strings.Contains(filepath, "[feature]") {
 			dirName, fileName := path.Split(filepath)
 			file := productmap.NewFile(
 				fileName,
 				string(content),
-			).WithData(app)
+			).WithData(goApp)
 
 			return pm.Insert(dirName, file)
 		}
 
-		for _, feature := range features {
-			feat := Feature(feature)
+		for _, feature := range goApp.Features() {
 
-			newFilePath := strings.ReplaceAll(filepath, "[feature]", feat.PackageName())
+			newFilePath := strings.ReplaceAll(filepath, "[feature]", feature.PackageName())
 
 			dirName, fileName := path.Split(newFilePath)
 			file := productmap.NewFile(
 				fileName,
 				string(content),
 			).WithData(FeatureTemplateModel{
-				Feature: feat,
-				App:     app,
+				Feature: feature,
+				App:     goApp,
 			})
 
 			err = pm.Insert(dirName, file)

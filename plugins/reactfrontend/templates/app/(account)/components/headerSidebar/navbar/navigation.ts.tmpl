@@ -1,0 +1,18 @@
+import FolderIcon from '@/app/icons/folder';
+import { ForwardRefExoticComponent, SVGProps } from 'react'
+
+export interface NavigationItem {
+    name: string
+    href: string
+    icon: (props: any) => JSX.Element
+}
+
+export const navigationItems: NavigationItem[] = [
+    {{- range .Features }}
+    { name: '{{ .FeatureHumanReadableName }}s', href: '/{{ .FeatureURL}}s', icon: FolderIcon },
+    {{- end }}
+]
+
+export function IsSelected(location: string, path: string): boolean {
+    return location.split("/")[1] === path.split("/")[1]
+}

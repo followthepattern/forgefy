@@ -1,35 +1,90 @@
-package product
+package {{ .PackageName }}
 
 import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/followthepattern/adapticc/api"
+	"github.com/{{ .AppNameToPackageName }}/api/httpresponses"
+	"github.com/{{ .AppNameToPackageName }}/models"
+	"github.com/{{ .AppNameToPackageName }}/types"
+
+	"github.com/go-chi/chi"
 )
 
-type ProductRest struct {
-	product ProductController
+type {{ .GoTypeName }}Rest struct {
+	{{ .FeatureNameLowerCamel }} {{ .GoTypeName }}Controller
 }
 
-func NewProductRest(ctrl ProductController) ProductRest {
-	return ProductRest{
-		product: ctrl,
+func New{{ .GoTypeName }}Rest(ctrl {{ .GoTypeName }}Controller) {{ .GoTypeName }}Rest {
+	return {{ .GoTypeName }}Rest{
+		{{ .FeatureNameLowerCamel }}: ctrl,
 	}
 }
 
-func (service ProductRest) Create(w http.ResponseWriter, r *http.Request) {
-	var product ProductModel
-	err := json.NewDecoder(r.Body).Decode(&product)
+func (service {{ .GoTypeName }}Rest) GetByID(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	result, err := service.{{ .FeatureNameLowerCamel }}.GetByID(r.Context(), id)
 	if err != nil {
-		api.BadRequest(w, api.FailedToDecodeRequestBody)
+		httpresponses.BadRequest(w, err.Error())
 		return
 	}
 
-	err = service.product.Create(r.Context(), product)
+	httpresponses.Write(w, http.StatusOK, result)
+}
+
+func (service {{ .GoTypeName }}Rest) Get(w http.ResponseWriter, r *http.Request) {
+	search := chi.URLParam(r, "search")
+
+	filter := {{ .GoTypeName }}ListRequestParams{
+		Filter: models.ListFilter{
+			Search: types.StringFrom(search),
+		},
+	}
+
+	results, err := service.{{ .FeatureNameLowerCamel }}.Get(r.Context(), filter)
+
 	if err != nil {
-		api.BadRequest(w, err.Error())
+		httpresponses.BadRequest(w, err.Error())
 		return
 	}
 
-	api.Created(w)
+	httpresponses.Write(w, http.StatusOK, results)
+}
+
+func (service {{ .GoTypeName }}Rest) Create(w http.ResponseWriter, r *http.Request) {
+	var value {{ .GoTypeName }}Model
+	err := json.NewDecoder(r.Body).Decode(&value)
+	if err != nil {
+		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
+		return
+	}
+
+	err = service.{{ .FeatureNameLowerCamel }}.Create(r.Context(), value)
+	if err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
+	httpresponses.Created(w)
+}
+
+func (service {{ .GoTypeName }}Rest) Update(w http.ResponseWriter, r *http.Request) {
+	var value {{ .GoTypeName }}Model
+	err := json.NewDecoder(r.Body).Decode(&value)
+	if err != nil {
+		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
+		return
+	}
+
+	id := r.URL.Query().Get("id")
+	value.ID = types.StringFrom(id)
+
+	err = service.{{ .FeatureNameLowerCamel }}.Update(r.Context(), value)
+	if err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
+	httpresponses.Success(w)
 }

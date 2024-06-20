@@ -1,43 +1,43 @@
-package product
+package {{ .PackageName }}
 
 import (
 	"context"
 	"log/slog"
 
-	"github.com/followthepattern/adapticc/accesscontrol"
-	"github.com/followthepattern/adapticc/container"
-	"github.com/followthepattern/adapticc/features/auth"
-	"github.com/followthepattern/adapticc/types"
+	"github.com/{{ .AppNameToPackageName }}/accesscontrol"
+	"github.com/{{ .AppNameToPackageName }}/container"
+	"github.com/{{ .AppNameToPackageName }}/features/auth"
+	"github.com/{{ .AppNameToPackageName }}/types"
 	"github.com/google/uuid"
 )
 
-type ProductService struct {
+type {{ .GoTypeName }}Service struct {
 	authorizationService auth.AuthorizationService
 	logger               *slog.Logger
-	productRepository    ProductDatabase
+	{{ .FeatureNameLowerCamel }}Repository	{{ .GoTypeName }}Database
 }
 
-func NewProductService(cont container.Container, authorizationService auth.AuthorizationService) ProductService {
-	productRepository := NewProductDatabase(cont.GetDB())
-	product := ProductService{
+func New{{ .GoTypeName }}Service(cont container.Container, authorizationService auth.AuthorizationService) {{ .GoTypeName }}Service {
+	repository := New{{ .GoTypeName }}Database(cont.GetDB())
+	service := {{ .GoTypeName }}Service{
 		authorizationService: authorizationService,
-		productRepository:    productRepository,
-		logger:               cont.GetLogger(),
+		{{ .FeatureNameLowerCamel }}Repository:    repository,
+		logger:	cont.GetLogger(),
 	}
 
-	return product
+	return service
 }
 
-func (service ProductService) GetByID(ctx context.Context, id string) (*ProductModel, error) {
+func (service {{ .GoTypeName }}Service) GetByID(ctx context.Context, id string) (*{{ .GoTypeName }}Model, error) {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return service.productRepository.GetByID(id)
+	return service.{{ .FeatureNameLowerCamel }}Repository.GetByID(id)
 }
 
-func (service ProductService) Get(ctx context.Context, request ProductListRequestParams) (*ProductListResponse, error) {
+func (service {{ .GoTypeName }}Service) Get(ctx context.Context, request {{ .GoTypeName }}ListRequestParams) (*{{ .GoTypeName }}ListResponse, error) {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, accesscontrol.ALLRESOURCE)
 	if err != nil {
 		return nil, err
@@ -45,10 +45,10 @@ func (service ProductService) Get(ctx context.Context, request ProductListReques
 
 	request.Pagination.SetDefaultIfEmpty()
 
-	return service.productRepository.Get(request)
+	return service.{{ .FeatureNameLowerCamel }}Repository.Get(request)
 }
 
-func (service ProductService) Create(ctx context.Context, value ProductModel) error {
+func (service {{ .GoTypeName }}Service) Create(ctx context.Context, value {{ .GoTypeName }}Model) error {
 	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.CREATE, accesscontrol.NEW)
 	if err != nil {
 		return err
@@ -57,10 +57,10 @@ func (service ProductService) Create(ctx context.Context, value ProductModel) er
 	value.ID = types.StringFrom(uuid.NewString())
 	value.Userlog.CreationUserID = types.StringFrom(userID)
 
-	return service.productRepository.Create([]ProductModel{value})
+	return service.{{ .FeatureNameLowerCamel }}Repository.Create([]{{ .GoTypeName }}Model{value})
 }
 
-func (service ProductService) Update(ctx context.Context, value ProductModel) error {
+func (service {{ .GoTypeName }}Service) Update(ctx context.Context, value {{ .GoTypeName }}Model) error {
 	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.UPDATE, value.ID.Data)
 	if err != nil {
 		return err
@@ -68,14 +68,14 @@ func (service ProductService) Update(ctx context.Context, value ProductModel) er
 
 	value.UpdateUserID = types.StringFrom(userID)
 
-	return service.productRepository.Update(value)
+	return service.{{ .FeatureNameLowerCamel }}Repository.Update(value)
 }
 
-func (service ProductService) Delete(ctx context.Context, id string) error {
+func (service {{ .GoTypeName }}Service) Delete(ctx context.Context, id string) error {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.DELETE, id)
 	if err != nil {
 		return err
 	}
 
-	return service.productRepository.Delete(id)
+	return service.{{ .FeatureNameLowerCamel }}Repository.Delete(id)
 }

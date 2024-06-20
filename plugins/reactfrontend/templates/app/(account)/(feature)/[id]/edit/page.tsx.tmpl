@@ -1,0 +1,111 @@
+import useSingle{{ .FeatureTypeName }} from "../../hooks/single{{ .FeatureTypeName }}";
+import useUpdate{{ .FeatureTypeName }} from "../../hooks/update{{ .FeatureTypeName }}";
+import { useForm } from "react-hook-form";
+import useDelete{{ .FeatureTypeName }} from "../../hooks/delete{{ .FeatureTypeName }}";
+import { useNavigate, useParams } from "react-router-dom";
+import { RESOURCE_URL } from "../../page";
+import React, { useEffect } from "react";
+import { {{ .FeatureTypeName }} } from "../../model";
+import SingleLayout from "@/app/(account)/components/singleView/layout";
+import SecondaryButton from "@/app/(account)/components/buttons/secondaryButton";
+import PrimaryButton from "@/app/(account)/components/buttons/primaryButton";
+import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
+import Label from "@/app/(account)/components/labels/label";
+import Input from "@/app/(account)/components/inputFields/input";
+import { Id, toast } from "react-toastify";
+import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
+
+export default function {{ .FeatureTypeName }}Edit() {
+    const { id } = useParams();
+
+    const { loading, data, error, itemNotFound } = useSingle{{ .FeatureTypeName }}(id ?? "");
+
+    const [executeUpdateMutation, { updateError, updateResult }] = useUpdate{{ .FeatureTypeName }}();
+
+    const [executeDeleteMutation, { deleteError, deleteResult }] = useDelete{{ .FeatureTypeName }}();
+
+    const navigate = useNavigate();
+
+    const toastId = React.useRef<Id | null>(null);
+
+    useEffect(() => {
+        if (updateResult && updateResult > 0) {
+            if (toastId.current) {
+                toast.update(toastId.current, {
+                    render: "Success!",
+                    type: toast.TYPE.SUCCESS,
+                    autoClose: 3000,
+                })
+            }
+            navigate(RESOURCE_URL);
+        }
+    }, [updateResult])
+
+    useEffect(() => {
+        if (deleteResult && deleteResult > 0) {
+            navigate(RESOURCE_URL);
+        }
+    }, [deleteResult])
+
+    const { register, getValues } = useForm<{{ .FeatureTypeName }}>();
+
+    if (loading) {
+        return (<div>Loading...</div>)
+    }
+
+    if (itemNotFound) {
+        // notFound();
+    }
+
+    if (error) {
+        return <div>{JSON.stringify(error)}</div>
+    }
+
+    const onSave = () => {
+        const values = getValues();
+
+        toastId.current = toast("Saving...", { autoClose: false })
+
+        executeUpdateMutation(id ?? "", values)
+    }
+
+    const onDelete = () => {
+        executeDeleteMutation(id ?? "")
+    }
+
+    const onCancel = () => {
+        navigate(RESOURCE_URL)
+    }
+
+    return (
+        <SingleLayout>
+            <SingleLayout.Title>{{ .FeatureTypeName }}: {data?.id}</SingleLayout.Title>
+            <form action="">
+                <GridFields className="py-6">
+                {{- range .Fields }}
+                    <div className="sm:col-span-2">
+                        <Label htmlFor="{{ .FieldNameCamelCase }}">
+                            {{ .FieldNameHumanReadable }}
+                        </Label>
+                        <Input
+                            {...register("{{ .FieldNameCamelCase }}")}
+                            type="{{ .FieldTypeHTML }}"
+                            id="{{ .FieldNameCamelCase }}"
+                            defaultValue={data?.{{ .FieldNameCamelCase }}}
+                        />
+                    </div>
+                {{- end }}
+                </GridFields>
+                <SingleLayout.Footer className="justify-between">
+                    <div className="flex gap-x-2">
+                        <PrimaryButton onClick={onSave}>Save</PrimaryButton>
+                        <SecondaryButton onClick={onCancel}>Cancel</SecondaryButton>
+                    </div>
+                    <ConfirmModal onConfirm={onDelete} title="Delete {{ .FeatureHumanReadableName }}" body={`Are you sure you want to delete ${data?.id}?`}>
+                        Delete
+                    </ConfirmModal>
+                </SingleLayout.Footer>
+            </form>
+        </SingleLayout>
+    )
+}

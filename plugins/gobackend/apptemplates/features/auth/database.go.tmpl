@@ -1,0 +1,103 @@
+package auth
+
+import (
+	"database/sql"
+	"fmt"
+
+	"github.com/{{ .AppNameToPackageName }}/models"
+	"github.com/{{ .AppNameToPackageName }}/types"
+	. "github.com/followthepattern/goqu/v9"
+)
+
+var (
+	AuthUserTable = S("auth").Table("user")
+)
+
+type AuthDatabase struct {
+	db *Database
+}
+
+func NewAuthDatabase(database *sql.DB) AuthDatabase {
+	db := New("postgres", database)
+
+	return AuthDatabase{
+		db: db,
+	}
+}
+
+func (db AuthDatabase) VerifyEmail(email types.String) (bool, error) {
+	count, err := db.db.From(AuthUserTable).Where(Ex{"email": email}).Count()
+
+	return count == 0, err
+}
+
+func (db AuthDatabase) RegisterUser(registerUser AuthUser) error {
+	registerUser.Userlog = models.Userlog{
+		CreatedAt: types.TimeNow(),
+	}
+
+	_, err := db.db.Insert(AuthUserTable).Rows(registerUser).Executor().Exec()
+	return err
+}
+
+func (db AuthDatabase) VerifyLogin(email types.String) (AuthUser, error) {
+	authUser := AuthUser{}
+
+	_, err := db.db.From(AuthUserTable).Where(Ex{"email": email}).ScanStruct(&authUser)
+	if err != nil {
+		return authUser, err
+	}
+
+	return authUser, err
+}
+
+func (repo AuthDatabase) GetRoleIDs(userID string) ([]string, error) {
+	roleIDs := []string{}
+
+	err := repo.db.From(S("auth").Table("user_role").As("ur")).
+		Join(S("auth").Table("role").As("r"),
+			On(Ex{"r.id": I("ur.role_id")})).
+		Where(Ex{"user_id": userID}).
+		Select(T("r").Col("code")).
+		ScanVals(&roleIDs)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return roleIDs, nil
+}
+
+func (repo AuthDatabase) ActivateUser(userID string) error {
+	result, err := repo.db.Update(AuthUserTable).
+		Set(Record{"active": true}).
+		Where(Ex{"id": userID, "active": false}).
+		Executor().Exec()
+	if err != nil {
+		return err
+	}
+
+	effectedRows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if effectedRows == 0 {
+		return fmt.Errorf("there is no existing inactive user with ID: %s", userID)
+	}
+
+	return nil
+}
+
+func (repo AuthDatabase) GetAuthUser(id types.String) (*AuthUser, error) {
+	user := AuthUser{}
+
+	query := repo.db.From(AuthUserTable).Where(Ex{"id": id})
+
+	_, err := query.ScanStruct(&user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, err
+}

@@ -1,0 +1,116 @@
+scalar Time
+scalar Int64
+scalar Uint
+
+type ResponseStatus {
+	code: Int!
+}
+
+input Pagination {
+	pageSize: Uint
+	page: Uint
+}
+
+input OrderBy {
+	name: String!
+	desc: Boolean
+}
+
+input ListFilter {
+	search: String
+}
+
+type LoginResponse {
+	jwt: String!
+	expires_at: Time!
+}
+
+type RegisterResponse {
+	email: String!
+	first_name: String!
+	last_name: String!
+}
+
+type AuthUser {
+	id: String!
+	email: String!
+	firstName: String!
+	lastName: String!
+	active: Boolean!
+	creationUserID: String!
+	updateUserID: String!
+	createdAt: Time!
+	updatedAt: Time!
+}
+
+type AuthQuery {
+	profile: AuthUser
+}
+
+type AuthMutation {
+	login(email: String!, password: String!): LoginResponse
+	register(email: String!, firstName: String!, lastName: String!, password: String!): RegisterResponse
+}
+
+{{- range .Features }}
+
+type {{ .GoTypeName }} {
+	{{- range .Fields }}
+	{{ .SchemaVarName }}: {{ .SchemaType }}!
+	{{- end }}
+	creationUserID: String!
+	updateUserID: String!
+	createdAt: Time!
+	updatedAt: Time!
+}
+
+input Create{{ .GoTypeName }} {
+	{{- range .Fields }}
+	{{ .SchemaVarName }}: {{ .SchemaType }}!
+	{{- end }}
+}
+
+input Update{{ .GoTypeName }} {
+	{{- range .Fields }}
+	{{ .SchemaVarName }}: {{ .SchemaType }}!
+	{{- end }}
+}
+
+type {{ .GoTypeName }}ListResponse {
+	count: Int64!
+	pageSize: Uint!
+	page: Uint!
+	data: [{{ .GoTypeName }}!]!
+}
+
+type {{ .GoTypeName }}Query {
+	single(id: String!): {{ .GoTypeName }}
+	list(pagination: Pagination, filter: ListFilter, orderBy: [OrderBy!]): {{ .GoTypeName }}ListResponse
+}
+
+type {{ .GoTypeName }}Mutation {
+	create(model: Create{{ .GoTypeName }}!): ResponseStatus
+	update(id: String!, model: Update{{ .GoTypeName }}!): ResponseStatus
+	delete(id: String!): ResponseStatus
+}
+
+{{- end }}
+
+schema {
+	query: Query
+	mutation: Mutation
+}
+
+type Query {
+	auth: AuthQuery!
+{{- range .Features }}
+	{{ .FeatureNameLowerCamel }}s: {{ .GoTypeName }}Query!
+{{- end }}
+}
+
+type Mutation {
+	authentication: AuthMutation!
+{{- range .Features }}
+	{{ .FeatureNameLowerCamel }}s: {{ .GoTypeName }}Mutation!
+{{- end }}
+}

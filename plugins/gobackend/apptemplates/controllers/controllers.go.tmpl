@@ -1,0 +1,38 @@
+package controllers
+
+import (
+	"github.com/{{ .AppNameToPackageName }}/container"
+	"github.com/{{ .AppNameToPackageName }}/features/auth"
+
+{{- $AppNameToPackageName := .AppNameToPackageName }}
+{{- range .Features }}
+	"github.com/{{ $AppNameToPackageName }}/features/{{ .PackageName }}"
+{{- end }}
+)
+
+type Controllers struct {
+	auth    auth.AuthController
+{{- range .Features }}
+	{{ .FeatureNameLowerCamel }}    {{ .PackageName }}.{{ .GoTypeName }}Controller
+{{- end }}
+}
+
+func New(cont container.Container) Controllers {
+	return Controllers{
+		auth:    auth.NewAuthController(cont),
+{{- range .Features }}
+		{{ .FeatureNameLowerCamel }}:    {{ .PackageName }}.New{{ .GoTypeName }}Controller(cont),
+{{- end }}
+	}
+}
+
+func (c Controllers) Auth() auth.AuthController {
+	return c.auth
+}
+
+{{- range .Features }}
+func (c Controllers) {{ .GoTypeName }}() {{ .PackageName }}.{{ .GoTypeName }}Controller {
+	return c.{{ .FeatureNameLowerCamel }}
+}
+
+{{- end }}

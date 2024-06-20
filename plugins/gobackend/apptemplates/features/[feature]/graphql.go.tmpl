@@ -1,35 +1,35 @@
-package product
+package {{ .PackageName }}
 
 import (
 	"context"
 	"net/http"
 
-	"github.com/followthepattern/adapticc/models"
-	"github.com/followthepattern/adapticc/types"
+	"github.com/{{ .AppNameToPackageName }}/models"
+	"github.com/{{ .AppNameToPackageName }}/types"
 )
 
-type ProductGraphQL struct {
-	ctrl ProductController
+type {{ .GoTypeName }}GraphQL struct {
+	ctrl {{ .GoTypeName }}Controller
 }
 
-func NewProductGraphQL(ctrl ProductController) ProductGraphQL {
-	return ProductGraphQL{ctrl: ctrl}
+func New{{ .GoTypeName }}GraphQL(ctrl {{ .GoTypeName }}Controller) {{ .GoTypeName }}GraphQL {
+	return {{ .GoTypeName }}GraphQL{ctrl: ctrl}
 }
 
-func (graphQL ProductGraphQL) Single(ctx context.Context, args struct{ Id string }) (*ProductModel, error) {
-	product, err := graphQL.ctrl.GetByID(ctx, args.Id)
+func (graphQL {{ .GoTypeName }}GraphQL) Single(ctx context.Context, args struct{ Id string }) (*{{ .GoTypeName }}Model, error) {
+	value, err := graphQL.ctrl.GetByID(ctx, args.Id)
 	if err != nil {
 		return nil, err
 	}
-	return product, nil
+	return value, nil
 }
 
-func (graphQL ProductGraphQL) List(ctx context.Context, args struct {
+func (graphQL {{ .GoTypeName }}GraphQL) List(ctx context.Context, args struct {
 	Pagination *models.Pagination
 	Filter     *models.ListFilter
 	OrderBy    *[]models.OrderBy
-}) (*models.ListResponse[ProductModel], error) {
-	request := ProductListRequestParams{}
+}) (*models.ListResponse[{{ .GoTypeName }}Model], error) {
+	request := {{ .GoTypeName }}ListRequestParams{}
 
 	if args.Pagination != nil {
 		request.Pagination = models.Pagination{
@@ -46,16 +46,16 @@ func (graphQL ProductGraphQL) List(ctx context.Context, args struct {
 		request.OrderBy = *args.OrderBy
 	}
 
-	products, err := graphQL.ctrl.Get(ctx, request)
+	results, err := graphQL.ctrl.Get(ctx, request)
 	if err != nil {
 		return nil, err
 	}
 
-	return products, err
+	return results, err
 }
 
-func (graphQL ProductGraphQL) Create(ctx context.Context, args struct {
-	Model ProductModel
+func (graphQL {{ .GoTypeName }}GraphQL) Create(ctx context.Context, args struct {
+	Model {{ .GoTypeName }}Model
 }) (*models.ResponseStatus, error) {
 	err := graphQL.ctrl.Create(ctx, args.Model)
 	if err != nil {
@@ -66,9 +66,9 @@ func (graphQL ProductGraphQL) Create(ctx context.Context, args struct {
 	}, nil
 }
 
-func (graphQL ProductGraphQL) Update(ctx context.Context, args struct {
+func (graphQL {{ .GoTypeName }}GraphQL) Update(ctx context.Context, args struct {
 	Id    types.String
-	Model ProductModel
+	Model {{ .GoTypeName }}Model
 }) (*models.ResponseStatus, error) {
 	args.Model.ID = args.Id
 	err := graphQL.ctrl.Update(ctx, args.Model)
@@ -80,7 +80,7 @@ func (graphQL ProductGraphQL) Update(ctx context.Context, args struct {
 	}, nil
 }
 
-func (graphQL ProductGraphQL) Delete(ctx context.Context, args struct {
+func (graphQL {{ .GoTypeName }}GraphQL) Delete(ctx context.Context, args struct {
 	Id string
 }) (*models.ResponseStatus, error) {
 	err := graphQL.ctrl.Delete(ctx, args.Id)

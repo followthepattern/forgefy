@@ -1,67 +1,68 @@
-package product
+package {{ .PackageName }}
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
 
-	"github.com/followthepattern/adapticc/repositories/database/sqlbuilder"
-	"github.com/followthepattern/adapticc/types"
+	"github.com/{{ .AppNameToPackageName }}/repositories/database/sqlbuilder"
+	"github.com/{{ .AppNameToPackageName }}/types"
 
 	. "github.com/followthepattern/goqu/v9"
 )
 
-var ProductTable = S("usr").Table("products")
+var {{ .GoTypeName }}Table = S("app").Table("{{ .FeatureTableName }}")
 
-type ProductDatabase struct {
+type {{ .GoTypeName }}Database struct {
 	db *Database
 }
 
-func NewProductDatabase(database *sql.DB) ProductDatabase {
+func New{{ .GoTypeName }}Database(database *sql.DB) {{ .GoTypeName }}Database {
 	db := New("postgres", database)
 
-	return ProductDatabase{
+	return {{ .GoTypeName }}Database{
 		db: db,
 	}
 }
 
-func (repo ProductDatabase) Create(products []ProductModel) (err error) {
-	for i, _ := range products {
-		products[i].Userlog.CreatedAt = types.TimeNow()
+func (repo {{ .GoTypeName }}Database) Create(values []{{ .GoTypeName }}Model) (err error) {
+	for i, _ := range values {
+		values[i].Userlog.CreatedAt = types.TimeNow()
 	}
 
-	insertion := repo.db.Insert(ProductTable)
+	insertion := repo.db.Insert({{ .GoTypeName }}Table)
 
-	_, err = insertion.Rows(products).Executor().Exec()
+	_, err = insertion.Rows(values).Executor().Exec()
 	return
 }
 
-func (repo ProductDatabase) GetByID(id string) (*ProductModel, error) {
-	product := ProductModel{}
+func (repo {{ .GoTypeName }}Database) GetByID(id string) (*{{ .GoTypeName }}Model, error) {
+	value := {{ .GoTypeName }}Model{}
 
-	query := repo.db.From(ProductTable).
+	query := repo.db.From({{ .GoTypeName }}Table).
 		Where(Ex{
 			"id": id})
 
-	_, err := query.ScanStruct(&product)
+	_, err := query.ScanStruct(&value)
 	if err != nil {
 		return nil, err
 	}
 
-	return &product, nil
+	return &value, nil
 }
 
-func (repo ProductDatabase) Get(request ProductListRequestParams) (*ProductListResponse, error) {
-	data := []ProductModel{}
+func (repo {{ .GoTypeName }}Database) Get(request {{ .GoTypeName }}ListRequestParams) (*{{ .GoTypeName }}ListResponse, error) {
+	data := []{{ .GoTypeName }}Model{}
 
-	query := repo.db.From(ProductTable)
+	query := repo.db.From({{ .GoTypeName }}Table)
 
 	if request.Filter.Search.IsValid() {
 		pattern := fmt.Sprintf("%%%s%%", request.Filter.Search)
 		query = query.Where(
 			Or(
-				I("id").Like(pattern),
-				I("title").Like(pattern),
+			{{- range .Fields }}{{- if eq .Type "string" }}
+				I("{{ .DBColumnName }}").Like(pattern),
+			{{- end }}{{- end }}
 			))
 	}
 
@@ -79,7 +80,7 @@ func (repo ProductDatabase) Get(request ProductListRequestParams) (*ProductListR
 		return nil, err
 	}
 
-	result := ProductListResponse{
+	result := {{ .GoTypeName }}ListResponse{
 		Count:    types.Int64From(count),
 		PageSize: request.Pagination.PageSize,
 		Page:     request.Pagination.Page,
@@ -89,10 +90,10 @@ func (repo ProductDatabase) Get(request ProductListRequestParams) (*ProductListR
 	return &result, nil
 }
 
-func (repo ProductDatabase) Update(model ProductModel) error {
+func (repo {{ .GoTypeName }}Database) Update(model {{ .GoTypeName }}Model) error {
 	model.Userlog.UpdatedAt = types.TimeNow()
 
-	_, err := repo.db.Update(ProductTable).
+	_, err := repo.db.Update({{ .GoTypeName }}Table).
 		Set(model).
 		Where(I("id").Eq(model.ID)).
 		Executor().
@@ -101,10 +102,10 @@ func (repo ProductDatabase) Update(model ProductModel) error {
 	return err
 }
 
-func (repo ProductDatabase) Delete(id string) error {
+func (repo {{ .GoTypeName }}Database) Delete(id string) error {
 	res, err := repo.db.
-		Delete(ProductTable).
-		Where(C("id").Eq(id)).
+		Delete({{ .GoTypeName }}Table).
+		Where(C("{{ .IDField.DBColumnName }}").Eq(id)).
 		Executor().
 		Exec()
 
