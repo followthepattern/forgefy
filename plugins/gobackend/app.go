@@ -33,7 +33,7 @@ func (a App) Features() []Feature {
 
 		fields := make([]models.Field, len(feature.Fields))
 		for j, field := range feature.Fields {
-			fields[j] = models.Field{field}
+			fields[j] = models.Field{Field: field}
 		}
 		features[i] = Feature{Feature: feature, Fields: fields}
 	}
@@ -89,10 +89,10 @@ func (plugin *GoBackendPluginApp) Build(pm productmap.ProductMap, product specif
 	goApp.DbPort = plugin.GetNextDBPort()
 	goApp.CerbosPort = plugin.GetNextCerbosPort()
 
-	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, product, goApp))
+	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, goApp))
 }
 
-func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product specification.Product, goApp App) func(filepath string, d fs.DirEntry, err error) error {
+func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) func(filepath string, d fs.DirEntry, err error) error {
 	dir := apptemplates.EntireDir
 
 	return func(filepath string, d fs.DirEntry, err error) error {
@@ -117,29 +117,27 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, product speci
 		filepath = path.Join(apps.Directory(), goApp.AppName, filepath)
 
 		if !strings.Contains(filepath, "[feature]") {
-			dirName, fileName := path.Split(filepath)
 			file := productmap.NewFile(
-				fileName,
+				filepath,
 				string(content),
 			).WithData(goApp)
 
-			return pm.Insert(dirName, file)
+			return pm.Insert(file)
 		}
 
 		for _, feature := range goApp.Features() {
 
 			newFilePath := strings.ReplaceAll(filepath, "[feature]", feature.PackageName())
 
-			dirName, fileName := path.Split(newFilePath)
 			file := productmap.NewFile(
-				fileName,
+				newFilePath,
 				string(content),
 			).WithData(FeatureTemplateModel{
 				Feature: feature,
 				App:     goApp,
 			})
 
-			err = pm.Insert(dirName, file)
+			err = pm.Insert(file)
 			if err != nil {
 				return err
 			}

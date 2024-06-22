@@ -32,7 +32,7 @@ func (f Forgefy) Forge(yaml string, fw forgeio.Writer) (string, error) {
 	}
 
 	err = product.Walk(func(folderName string, file productmap.File) error {
-		return fw.Write(folderName, file.FileName(), file.Write)
+		return fw.Write(file.FilePath(), file.Write)
 	})
 
 	return productSpecification.ProductName, err

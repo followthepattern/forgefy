@@ -39,7 +39,7 @@ func (matcher *DummyWriterMatcher) FailureMessage(actual interface{}) (message s
 
 	have := make([]string, 0, len(dummyWriter.files))
 
-	for key, _ := range dummyWriter.files {
+	for key := range dummyWriter.files {
 		have = append(have, key)
 	}
 
@@ -54,7 +54,7 @@ func (matcher *DummyWriterMatcher) NegatedFailureMessage(actual interface{}) (me
 
 	have := make([]string, 0, len(dummyWriter.files))
 
-	for key, _ := range dummyWriter.files {
+	for key := range dummyWriter.files {
 		have = append(have, key)
 	}
 
