@@ -13,15 +13,16 @@ type FileWriter struct {
 	outputFolder string
 }
 
-func (fw FileWriter) Write(folderName string, fileName string, writerFn func(io.Writer) error) error {
-	destDir := path.Join(fw.outputFolder, folderName)
+func (fw FileWriter) Write(filePath string, writerFn func(io.Writer) error) error {
+	dir, _ := path.Split(filePath)
+	destDir := path.Join(fw.outputFolder, dir)
 
 	err := os.MkdirAll(destDir, os.ModePerm)
 	if err != nil {
 		slog.Error(err.Error())
 	}
 
-	file, err := os.Create(path.Join(destDir, fileName))
+	file, err := os.Create(filePath)
 	if err != nil {
 		return err
 	}

@@ -8,14 +8,14 @@ import (
 )
 
 type File struct {
-	fileName string
+	filePath string
 	template string
 	data     any
 }
 
-func NewFile(fileName string, template string) File {
+func NewFile(filePath string, template string) File {
 	return File{
-		fileName: fileName,
+		filePath: filePath,
 		template: template,
 	}
 }
@@ -25,8 +25,8 @@ func (f File) WithData(data any) File {
 	return f
 }
 
-func (f File) FileName() string {
-	return f.fileName
+func (f File) FilePath() string {
+	return f.filePath
 }
 
 func (f File) Template() string {
@@ -54,7 +54,7 @@ func (f File) Write(w io.Writer) error {
 		return err
 	}
 
-	tmpl, err := template.New(f.fileName).Parse(f.template)
+	tmpl, err := template.New(f.filePath).Parse(f.template)
 	if err != nil {
 		return err
 	}

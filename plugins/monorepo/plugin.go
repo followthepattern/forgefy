@@ -42,12 +42,11 @@ func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specificatio
 
 		filepath = path.Join(templates.RootDirectory(), filepath)
 
-		dirName, fileName := path.Split(filepath)
 		file := productmap.NewFile(
-			fileName,
+			filepath,
 			string(content),
 		).WithData(productSpec)
 
-		return pm.Insert(dirName, file)
+		return pm.Insert(file)
 	})
 }

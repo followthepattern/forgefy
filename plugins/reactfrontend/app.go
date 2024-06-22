@@ -63,7 +63,7 @@ func (a App) Features() []Feature {
 
 		fields := make([]models.Field, len(feature.Fields))
 		for j, field := range feature.Fields {
-			fields[j] = models.Field{field}
+			fields[j] = models.Field{Field: field}
 		}
 		features[i] = Feature{Feature: feature, Fields: fields}
 	}
@@ -82,10 +82,10 @@ func (plugin *ReactFrontend) Build(pm productmap.ProductMap, product specificati
 	reactApp.App.AppPort = plugin.GetNextPortNumber()
 	reactApp.TailwindPort = plugin.GetNextTailwindPortNumber()
 
-	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, product, reactApp))
+	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, reactApp))
 }
 
-func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, product specification.Product, reactApp App) func(filepath string, d fs.DirEntry, err error) error {
+func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App) func(filepath string, d fs.DirEntry, err error) error {
 	return func(filepath string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -105,29 +105,27 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, product speci
 		filepath = path.Join(apps.Directory(), reactApp.AppName, filepath)
 
 		if !strings.Contains(filepath, "(feature)") {
-			dirName, fileName := path.Split(filepath)
 			file := productmap.NewFile(
-				fileName,
+				filepath,
 				string(content),
 			).WithData(reactApp)
 
-			return pm.Insert(dirName, file)
+			return pm.Insert(file)
 		}
 
 		for _, feature := range reactApp.Features() {
 			newFilePath := strings.Replace(filepath, "(feature)", feature.ToDirName(), 1)
 			newFilePath = strings.Replace(newFilePath, "(feature)", feature.FeatureToFileSuffix(), 1)
 
-			dirName, fileName := path.Split(newFilePath)
 			file := productmap.NewFile(
-				fileName,
+				newFilePath,
 				string(content),
 			).WithData(FeatureTemplateModel{
 				Feature: feature,
 				App:     reactApp,
 			})
 
-			err = pm.Insert(dirName, file)
+			err = pm.Insert(file)
 			if err != nil {
 				return err
 			}

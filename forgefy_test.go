@@ -3,6 +3,7 @@ package forgefy_test
 import (
 	"github.com/followthepattern/forgefy"
 	"github.com/followthepattern/forgefy/forgeio"
+	"github.com/followthepattern/forgefy/plugins/monorepo"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -22,6 +23,8 @@ product_name: "test product"
 
 		It("forges files", func() {
 			f := forgefy.New()
+
+			f.InstallPlugins(monorepo.MonoRepo{})
 
 			productName, err := f.Forge(yaml, &dummyWriter)
 			Expect(err).ShouldNot(HaveOccurred())
