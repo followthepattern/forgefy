@@ -1,4 +1,4 @@
-package {{ .PackageName }}
+package {{ .FeatureNamePackage }}
 
 import (
 	"context"
@@ -12,29 +12,29 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
-type {{ .FieldTypeGoName }}Controller struct {
-	{{ .FeatureNameLowerCamel }} {{ .FieldTypeGoName }}Service
+type {{ .FeatureNameGo }}Controller struct {
+	{{ .FeatureNameCamelCase }} {{ .FeatureNameGo }}Service
 	logger  *slog.Logger
 	cfg     config.Config
 }
 
-func New{{ .FieldTypeGoName }}Controller(cont container.Container) {{ .FieldTypeGoName }}Controller {
-	authorizationService := auth.NewAuthorizationService(cont, "{{ .FeatureNameLowerCamel }}")
-	{{ .FeatureNameLowerCamel }}Service := New{{ .FieldTypeGoName }}Service(cont, authorizationService)
+func New{{ .FeatureNameGo }}Controller(cont container.Container) {{ .FeatureNameGo }}Controller {
+	authorizationService := auth.NewAuthorizationService(cont, "{{ .FeatureNameCamelCase }}")
+	{{ .FeatureNameCamelCase }}Service := New{{ .FeatureNameGo }}Service(cont, authorizationService)
 
-	return {{ .FieldTypeGoName }}Controller{
-		{{ .FeatureNameLowerCamel }}: {{ .FeatureNameLowerCamel }}Service,
+	return {{ .FeatureNameGo }}Controller{
+		{{ .FeatureNameCamelCase }}: {{ .FeatureNameCamelCase }}Service,
 		logger:  cont.GetLogger(),
 		cfg:     cont.GetConfig(),
 	}
 }
 
-func (ctrl {{ .FieldTypeGoName }}Controller) GetByID(ctx context.Context, id string) (*{{ .FieldTypeGoName }}Model, error) {
-	if err := validation.Validate(id, types.Required("{{ .FeatureNameLowerCamel }}ID")); err != nil {
+func (ctrl {{ .FeatureNameGo }}Controller) GetByID(ctx context.Context, id string) (*{{ .FeatureNameGo }}Model, error) {
+	if err := validation.Validate(id, types.Required("{{ .FeatureNameCamelCase }}ID")); err != nil {
 		return nil, err
 	}
 
-	result, err := ctrl.{{ .FeatureNameLowerCamel }}.GetByID(ctx, id)
+	result, err := ctrl.{{ .FeatureNameCamelCase }}.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -46,29 +46,29 @@ func (ctrl {{ .FieldTypeGoName }}Controller) GetByID(ctx context.Context, id str
 	return result, nil
 }
 
-func (ctrl {{ .FieldTypeGoName }}Controller) Get(ctx context.Context, filter {{ .FieldTypeGoName }}ListRequestParams) (*{{ .FieldTypeGoName }}ListResponse, error) {
-	return ctrl.{{ .FeatureNameLowerCamel }}.Get(ctx, filter)
+func (ctrl {{ .FeatureNameGo }}Controller) Get(ctx context.Context, filter {{ .FeatureNameGo }}ListRequestParams) (*{{ .FeatureNameGo }}ListResponse, error) {
+	return ctrl.{{ .FeatureNameCamelCase }}.Get(ctx, filter)
 }
 
-func (ctrl {{ .FieldTypeGoName }}Controller) Create(ctx context.Context, value {{ .FieldTypeGoName }}Model) error {
+func (ctrl {{ .FeatureNameGo }}Controller) Create(ctx context.Context, value {{ .FeatureNameGo }}Model) error {
 	if err := value.CreateValidate(); err != nil {
 		return err
 	}
-	return ctrl.{{ .FeatureNameLowerCamel }}.Create(ctx, value)
+	return ctrl.{{ .FeatureNameCamelCase }}.Create(ctx, value)
 }
 
-func (ctrl {{ .FieldTypeGoName }}Controller) Update(ctx context.Context, value {{ .FieldTypeGoName }}Model) error {
+func (ctrl {{ .FeatureNameGo }}Controller) Update(ctx context.Context, value {{ .FeatureNameGo }}Model) error {
 	if err := value.UpdateValidate(); err != nil {
 		return err
 	}
 
-	return ctrl.{{ .FeatureNameLowerCamel }}.Update(ctx, value)
+	return ctrl.{{ .FeatureNameCamelCase }}.Update(ctx, value)
 }
 
-func (ctrl {{ .FieldTypeGoName }}Controller) Delete(ctx context.Context, id string) error {
-	if err := validation.Validate(id, types.Required("{{ .FeatureNameLowerCamel }}ID")); err != nil {
+func (ctrl {{ .FeatureNameGo }}Controller) Delete(ctx context.Context, id string) error {
+	if err := validation.Validate(id, types.Required("{{ .FeatureNameCamelCase }}ID")); err != nil {
 		return err
 	}
 
-	return ctrl.{{ .FeatureNameLowerCamel }}.Delete(ctx, id)
+	return ctrl.{{ .FeatureNameCamelCase }}.Delete(ctx, id)
 }

@@ -5,7 +5,7 @@ import useDelete from "@/graphql/hooks/useDelete";
 
 export default function useDelete{{ .FeatureTypeName }}(): DeleteMutationResult<string,number | undefined> {
     const parseResult = (data?: MutationResponse | null): number | undefined => {
-        return data?.{{ .FeatureNameLowerCamel }}s?.delete?.code
+        return data?.{{ .FeatureNameCamelCase }}s?.delete?.code
     }
 
     return useDelete({parseResult, graphQL})

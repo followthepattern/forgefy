@@ -32,7 +32,7 @@ func (f Field) FieldValue() string {
 }
 
 func (f Field) FieldNameCamelCase() string {
-	return strings.ToLower(f.Name)
+	return naming.LowerFirst(f.Name)
 }
 
 func (f Field) FieldNameCamelCaseUpper() string {

@@ -13,15 +13,23 @@ type Feature struct {
 	Fields []models.Field
 }
 
-func (f Feature) FieldTypeGoName() string {
+func (f Feature) FeatureNameGo() string {
 	return naming.CapitalizeFirst(f.FeatureName)
 }
 
-func (f Feature) PackageName() string {
+func (f Feature) FeatureNameGraphQL() string {
+	return naming.CapitalizeFirst(f.FeatureName)
+}
+
+func (f Feature) FeatureNamePackage() string {
 	return strings.ToLower(f.FeatureName)
 }
 
-func (f Feature) FeatureTableName() string {
+func (f Feature) FeatureNameDBTable() string {
+	return strings.ToLower(f.FeatureName)
+}
+
+func (f Feature) FeatureNameURL() string {
 	return strings.ToLower(f.FeatureName)
 }
 

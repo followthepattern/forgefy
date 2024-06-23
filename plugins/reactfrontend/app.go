@@ -114,7 +114,7 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 		}
 
 		for _, feature := range reactApp.Features() {
-			newFilePath := strings.Replace(filepath, "(feature)", feature.ToDirName(), 1)
+			newFilePath := strings.Replace(filepath, "(feature)", feature.FeatureNameDir(), 1)
 			newFilePath = strings.Replace(newFilePath, "(feature)", feature.FeatureToFileSuffix(), 1)
 
 			file := productmap.NewFile(

@@ -9,7 +9,7 @@ export interface NavigationItem {
 
 export const navigationItems: NavigationItem[] = [
     {{- range .Features }}
-    { name: '{{ .FeatureHumanReadableName }}s', href: '/{{ .FeatureURL}}s', icon: FolderIcon },
+    { name: '{{ .FeatureHumanReadableName }}s', href: '/{{ .FeatureNameURL}}s', icon: FolderIcon },
     {{- end }}
 ]
 

@@ -54,7 +54,7 @@ type AuthMutation {
 
 {{- range .Features }}
 
-type {{ .FieldTypeGoName }} {
+type {{ .FeatureNameGraphQL }} {
 	{{- range .Fields }}
 	{{ .FieldNameGraphQL }}: {{ .FieldTypeGraphQL }}!
 	{{- end }}
@@ -64,33 +64,33 @@ type {{ .FieldTypeGoName }} {
 	updatedAt: Time!
 }
 
-input Create{{ .FieldTypeGoName }} {
+input Create{{ .FeatureNameGraphQL }} {
 	{{- range .Fields }}
 	{{ .FieldNameGraphQL }}: {{ .FieldTypeGraphQL }}!
 	{{- end }}
 }
 
-input Update{{ .FieldTypeGoName }} {
+input Update{{ .FeatureNameGraphQL }} {
 	{{- range .Fields }}
 	{{ .FieldNameGraphQL }}: {{ .FieldTypeGraphQL }}!
 	{{- end }}
 }
 
-type {{ .FieldTypeGoName }}ListResponse {
+type {{ .FeatureNameGraphQL }}ListResponse {
 	count: Int64!
 	pageSize: Uint!
 	page: Uint!
-	data: [{{ .FieldTypeGoName }}!]!
+	data: [{{ .FeatureNameGraphQL }}!]!
 }
 
-type {{ .FieldTypeGoName }}Query {
-	single(id: String!): {{ .FieldTypeGoName }}
-	list(pagination: Pagination, filter: ListFilter, orderBy: [OrderBy!]): {{ .FieldTypeGoName }}ListResponse
+type {{ .FeatureNameGraphQL }}Query {
+	single(id: String!): {{ .FeatureNameGraphQL }}
+	list(pagination: Pagination, filter: ListFilter, orderBy: [OrderBy!]): {{ .FeatureNameGraphQL }}ListResponse
 }
 
-type {{ .FieldTypeGoName }}Mutation {
-	create(model: Create{{ .FieldTypeGoName }}!): ResponseStatus
-	update(id: String!, model: Update{{ .FieldTypeGoName }}!): ResponseStatus
+type {{ .FeatureNameGraphQL }}Mutation {
+	create(model: Create{{ .FeatureNameGraphQL }}!): ResponseStatus
+	update(id: String!, model: Update{{ .FeatureNameGraphQL }}!): ResponseStatus
 	delete(id: String!): ResponseStatus
 }
 
@@ -104,13 +104,13 @@ schema {
 type Query {
 	auth: AuthQuery!
 {{- range .Features }}
-	{{ .FeatureNameLowerCamel }}s: {{ .FieldTypeGoName }}Query!
+	{{ .FeatureNameCamelCase }}s: {{ .FeatureNameGraphQL }}Query!
 {{- end }}
 }
 
 type Mutation {
 	authentication: AuthMutation!
 {{- range .Features }}
-	{{ .FeatureNameLowerCamel }}s: {{ .FieldTypeGoName }}Mutation!
+	{{ .FeatureNameCamelCase }}s: {{ .FeatureNameGraphQL }}Mutation!
 {{- end }}
 }

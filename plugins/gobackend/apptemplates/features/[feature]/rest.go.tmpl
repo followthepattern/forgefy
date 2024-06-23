@@ -1,4 +1,4 @@
-package {{ .PackageName }}
+package {{ .FeatureNamePackage }}
 
 import (
 	"encoding/json"
@@ -11,20 +11,20 @@ import (
 	"github.com/go-chi/chi"
 )
 
-type {{ .FieldTypeGoName }}Rest struct {
-	{{ .FeatureNameLowerCamel }} {{ .FieldTypeGoName }}Controller
+type {{ .FeatureNameGo }}Rest struct {
+	{{ .FeatureNameCamelCase }} {{ .FeatureNameGo }}Controller
 }
 
-func New{{ .FieldTypeGoName }}Rest(ctrl {{ .FieldTypeGoName }}Controller) {{ .FieldTypeGoName }}Rest {
-	return {{ .FieldTypeGoName }}Rest{
-		{{ .FeatureNameLowerCamel }}: ctrl,
+func New{{ .FeatureNameGo }}Rest(ctrl {{ .FeatureNameGo }}Controller) {{ .FeatureNameGo }}Rest {
+	return {{ .FeatureNameGo }}Rest{
+		{{ .FeatureNameCamelCase }}: ctrl,
 	}
 }
 
-func (service {{ .FieldTypeGoName }}Rest) GetByID(w http.ResponseWriter, r *http.Request) {
+func (service {{ .FeatureNameGo }}Rest) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	result, err := service.{{ .FeatureNameLowerCamel }}.GetByID(r.Context(), id)
+	result, err := service.{{ .FeatureNameCamelCase }}.GetByID(r.Context(), id)
 	if err != nil {
 		httpresponses.BadRequest(w, err.Error())
 		return
@@ -33,16 +33,16 @@ func (service {{ .FieldTypeGoName }}Rest) GetByID(w http.ResponseWriter, r *http
 	httpresponses.Write(w, http.StatusOK, result)
 }
 
-func (service {{ .FieldTypeGoName }}Rest) Get(w http.ResponseWriter, r *http.Request) {
+func (service {{ .FeatureNameGo }}Rest) Get(w http.ResponseWriter, r *http.Request) {
 	search := chi.URLParam(r, "search")
 
-	filter := {{ .FieldTypeGoName }}ListRequestParams{
+	filter := {{ .FeatureNameGo }}ListRequestParams{
 		Filter: models.ListFilter{
 			Search: types.StringFrom(search),
 		},
 	}
 
-	results, err := service.{{ .FeatureNameLowerCamel }}.Get(r.Context(), filter)
+	results, err := service.{{ .FeatureNameCamelCase }}.Get(r.Context(), filter)
 
 	if err != nil {
 		httpresponses.BadRequest(w, err.Error())
@@ -52,15 +52,15 @@ func (service {{ .FieldTypeGoName }}Rest) Get(w http.ResponseWriter, r *http.Req
 	httpresponses.Write(w, http.StatusOK, results)
 }
 
-func (service {{ .FieldTypeGoName }}Rest) Create(w http.ResponseWriter, r *http.Request) {
-	var value {{ .FieldTypeGoName }}Model
+func (service {{ .FeatureNameGo }}Rest) Create(w http.ResponseWriter, r *http.Request) {
+	var value {{ .FeatureNameGo }}Model
 	err := json.NewDecoder(r.Body).Decode(&value)
 	if err != nil {
 		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
 		return
 	}
 
-	err = service.{{ .FeatureNameLowerCamel }}.Create(r.Context(), value)
+	err = service.{{ .FeatureNameCamelCase }}.Create(r.Context(), value)
 	if err != nil {
 		httpresponses.BadRequest(w, err.Error())
 		return
@@ -69,8 +69,8 @@ func (service {{ .FieldTypeGoName }}Rest) Create(w http.ResponseWriter, r *http.
 	httpresponses.Created(w)
 }
 
-func (service {{ .FieldTypeGoName }}Rest) Update(w http.ResponseWriter, r *http.Request) {
-	var value {{ .FieldTypeGoName }}Model
+func (service {{ .FeatureNameGo }}Rest) Update(w http.ResponseWriter, r *http.Request) {
+	var value {{ .FeatureNameGo }}Model
 	err := json.NewDecoder(r.Body).Decode(&value)
 	if err != nil {
 		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
@@ -80,7 +80,7 @@ func (service {{ .FieldTypeGoName }}Rest) Update(w http.ResponseWriter, r *http.
 	id := r.URL.Query().Get("id")
 	value.ID = types.StringFrom(id)
 
-	err = service.{{ .FeatureNameLowerCamel }}.Update(r.Context(), value)
+	err = service.{{ .FeatureNameCamelCase }}.Update(r.Context(), value)
 	if err != nil {
 		httpresponses.BadRequest(w, err.Error())
 		return

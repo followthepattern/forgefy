@@ -5,7 +5,7 @@ import (
 	"github.com/{{ .AppNameToPackageName }}/features/auth"
 	{{ $AppNameToPackageName := .AppNameToPackageName }}
 {{- range .Features }}
-	"github.com/{{ $AppNameToPackageName }}/features/{{ .PackageName }}"
+	"github.com/{{ $AppNameToPackageName }}/features/{{ .FeatureNamePackage }}"
 {{- end }}
 )
 
@@ -13,7 +13,7 @@ type Resolver struct {
 	authGraphQL	auth.AuthGraphQL
 
 {{- range .Features }}
-	{{ .FeatureNameLowerCamel }}GraphQL	{{ .PackageName }}.{{ .FieldTypeGoName }}GraphQL
+	{{ .FeatureNameCamelCase }}GraphQL	{{ .FeatureNamePackage }}.{{ .FeatureNameGo }}GraphQL
 {{- end }}
 }
 
@@ -21,14 +21,14 @@ func NewResolver(controllers controllers.Controllers) Resolver {
 	authGraphQL := auth.NewAuthGraphQL(controllers.Auth())
 	
 {{- range .Features }}
-	{{ .FeatureNameLowerCamel }}GraphQL := {{ .PackageName}}.New{{ .FieldTypeGoName }}GraphQL(controllers.{{ .FieldTypeGoName }}())
+	{{ .FeatureNameCamelCase }}GraphQL := {{ .FeatureNamePackage}}.New{{ .FeatureNameGo }}GraphQL(controllers.{{ .FeatureNameGo }}())
 {{- end }}
 
 
 	resolver := Resolver{
 		authGraphQL:	authGraphQL,
 {{- range .Features }}
-		{{ .FeatureNameLowerCamel }}GraphQL: {{ .FeatureNameLowerCamel }}GraphQL,
+		{{ .FeatureNameCamelCase }}GraphQL: {{ .FeatureNameCamelCase }}GraphQL,
 {{- end }}
 	}
 
@@ -44,7 +44,7 @@ func (r Resolver) Auth() (auth.AuthGraphQL, error) {
 }
 
 {{- range .Features }}
-func (r Resolver) {{ .FieldTypeGoName }}s() ({{ .PackageName }}.{{ .FieldTypeGoName }}GraphQL, error) {
-	return r.{{ .FeatureNameLowerCamel }}GraphQL, nil
+func (r Resolver) {{ .FeatureNameGo }}s() ({{ .FeatureNamePackage }}.{{ .FeatureNameGo }}GraphQL, error) {
+	return r.{{ .FeatureNameCamelCase }}GraphQL, nil
 }
 {{- end }}
