@@ -23,7 +23,7 @@ func (a App) AppNameCapital() string {
 	return strings.ToUpper(a.AppName)
 }
 
-func (a App) AppNameToPackageName() string {
+func (a App) AppNamePackage() string {
 	return strings.ToLower(a.AppName)
 }
 

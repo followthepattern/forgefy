@@ -11,11 +11,11 @@ server:
   ed25519_private_key: ./configs/dev_private.pem
   ed25519_public_key: ./configs/dev_public.pem
 db:
-  host: {{ .AppNameToPackageName }}_db
+  host: {{ .AppNamePackage }}_db
   port: 5432
-  user: {{ .AppNameToPackageName }}user
+  user: {{ .AppNamePackage }}user
   password: dbpass
-  db_name: {{ .AppNameToPackageName }}
+  db_name: {{ .AppNamePackage }}
 mail:
   host: ""
   addr: ""

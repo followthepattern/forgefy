@@ -18,7 +18,7 @@ type App struct {
 	CountOfRandomValues int       `yaml:""`
 }
 
-func (a App) AppNameToFolderName() string {
+func (a App) AppNameDir() string {
 	return strings.ToLower(a.AppName)
 }
 

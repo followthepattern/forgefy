@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"github.com/{{ .AppNameToPackageName }}/container"
-	"github.com/{{ .AppNameToPackageName }}/features/auth"
+	"github.com/{{ .AppNamePackage }}/container"
+	"github.com/{{ .AppNamePackage }}/features/auth"
 
-{{- $AppNameToPackageName := .AppNameToPackageName }}
+{{- $AppNameToPackageName := .AppNamePackage }}
 {{- range .Features }}
 	"github.com/{{ $AppNameToPackageName }}/features/{{ .FeatureNamePackage }}"
 {{- end }}

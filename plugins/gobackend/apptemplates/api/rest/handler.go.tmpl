@@ -3,9 +3,9 @@ package rest
 import (
 	"net/http"
 
-	"github.com/{{ .AppNameToPackageName }}/controllers"
-	"github.com/{{ .AppNameToPackageName }}/features/auth"
-{{- $AppNameToPackageName := .AppNameToPackageName }}
+	"github.com/{{ .AppNamePackage }}/controllers"
+	"github.com/{{ .AppNamePackage }}/features/auth"
+{{- $AppNameToPackageName := .AppNamePackage }}
 {{- range .Features }}
 	"github.com/{{ $AppNameToPackageName }}/features/{{ .FeatureNamePackage }}"
 {{- end }}
