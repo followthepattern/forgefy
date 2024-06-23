@@ -2,13 +2,13 @@
 apiVersion: api.cerbos.dev/v1
 resourcePolicy:
   version: "default"
-  resource: "{{ .FeatureNameLowerCamel }}"
+  resource: "{{ .FeatureNameCamelCase }}"
   rules:
     - actions:
         - read
       effect: EFFECT_ALLOW
       roles:
-        - {{ .FeatureNameLowerCamel }}:viewer
+        - {{ .FeatureNameCamelCase }}:viewer
 
     - actions:
         - create
@@ -17,4 +17,4 @@ resourcePolicy:
         - delete
       effect: EFFECT_ALLOW
       roles:
-        - {{ .FeatureNameLowerCamel }}:editor
+        - {{ .FeatureNameCamelCase }}:editor

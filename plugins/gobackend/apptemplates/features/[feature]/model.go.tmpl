@@ -1,23 +1,23 @@
-package {{ .PackageName }}
+package {{ .FeatureNamePackage }}
 
 import (
-	"github.com/{{ .AppNameToPackageName }}/models"
-	"github.com/{{ .AppNameToPackageName }}/types"
+	"github.com/{{ .AppNamePackage }}/models"
+	"github.com/{{ .AppNamePackage }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
-type {{ .GoTypeName }}Model struct {
+type {{ .FeatureNameGo }}Model struct {
 	{{- range .Fields }}
-	{{ .FieldName }} {{ .GoType }} `db:"{{ .TagName }}" goqu:"omitempty"`
+	{{ .FieldName }} {{ .FieldTypeGo }} `db:"{{ .FieldNameAsTag }}" goqu:"omitempty"`
 	{{- end }}
 	models.Userlog
 }
 
-func (m {{ .GoTypeName }}Model) IsDefault() bool {
+func (m {{ .FeatureNameGo }}Model) IsDefault() bool {
 	return m.ID.Len() < 1
 }
 
-func (m {{ .GoTypeName }}Model) CreateValidate() error {
+func (m {{ .FeatureNameGo }}Model) CreateValidate() error {
 	return validation.ValidateStruct(&m,
 		{{- range .Fields }}
 		validation.Field(&m.{{ .FieldName }}, validation.Required),
@@ -25,12 +25,12 @@ func (m {{ .GoTypeName }}Model) CreateValidate() error {
 	)
 }
 
-func (m {{ .GoTypeName }}Model) UpdateValidate() error {
+func (m {{ .FeatureNameGo }}Model) UpdateValidate() error {
 	return validation.ValidateStruct(&m,
 		validation.Field(&m.ID, validation.Required),
 	)
 }
 
-type {{ .GoTypeName }}ListRequestParams = models.ListRequestParams[models.ListFilter]
+type {{ .FeatureNameGo }}ListRequestParams = models.ListRequestParams[models.ListFilter]
 
-type {{ .GoTypeName }}ListResponse = models.ListResponse[{{ .GoTypeName }}Model]
+type {{ .FeatureNameGo }}ListResponse = models.ListResponse[{{ .FeatureNameGo }}Model]

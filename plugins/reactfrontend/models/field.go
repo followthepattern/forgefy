@@ -10,11 +10,7 @@ type Field struct {
 	models.Field
 }
 
-func (f Field) VariableName() string {
-	return strings.ToLower(f.Name)
-}
-
-func (f Field) FieldName() string {
+func (f Field) FieldNameGraphQL() string {
 	return strings.ToLower(f.Name)
 }
 

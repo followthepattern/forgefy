@@ -1,4 +1,4 @@
-package specification
+package naming
 
 import "unicode"
 

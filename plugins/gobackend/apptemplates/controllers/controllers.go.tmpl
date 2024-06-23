@@ -1,19 +1,19 @@
 package controllers
 
 import (
-	"github.com/{{ .AppNameToPackageName }}/container"
-	"github.com/{{ .AppNameToPackageName }}/features/auth"
+	"github.com/{{ .AppNamePackage }}/container"
+	"github.com/{{ .AppNamePackage }}/features/auth"
 
-{{- $AppNameToPackageName := .AppNameToPackageName }}
+{{- $AppNameToPackageName := .AppNamePackage }}
 {{- range .Features }}
-	"github.com/{{ $AppNameToPackageName }}/features/{{ .PackageName }}"
+	"github.com/{{ $AppNameToPackageName }}/features/{{ .FeatureNamePackage }}"
 {{- end }}
 )
 
 type Controllers struct {
 	auth    auth.AuthController
 {{- range .Features }}
-	{{ .FeatureNameLowerCamel }}    {{ .PackageName }}.{{ .GoTypeName }}Controller
+	{{ .FeatureNameCamelCase }}    {{ .FeatureNamePackage }}.{{ .FeatureNameGo }}Controller
 {{- end }}
 }
 
@@ -21,7 +21,7 @@ func New(cont container.Container) Controllers {
 	return Controllers{
 		auth:    auth.NewAuthController(cont),
 {{- range .Features }}
-		{{ .FeatureNameLowerCamel }}:    {{ .PackageName }}.New{{ .GoTypeName }}Controller(cont),
+		{{ .FeatureNameCamelCase }}:    {{ .FeatureNamePackage }}.New{{ .FeatureNameGo }}Controller(cont),
 {{- end }}
 	}
 }
@@ -31,8 +31,8 @@ func (c Controllers) Auth() auth.AuthController {
 }
 
 {{- range .Features }}
-func (c Controllers) {{ .GoTypeName }}() {{ .PackageName }}.{{ .GoTypeName }}Controller {
-	return c.{{ .FeatureNameLowerCamel }}
+func (c Controllers) {{ .FeatureNameGo }}() {{ .FeatureNamePackage }}.{{ .FeatureNameGo }}Controller {
+	return c.{{ .FeatureNameCamelCase }}
 }
 
 {{- end }}

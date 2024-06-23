@@ -23,7 +23,7 @@ func (a App) AppNameCapital() string {
 	return strings.ToUpper(a.AppName)
 }
 
-func (a App) AppNameToPackageName() string {
+func (a App) AppNamePackage() string {
 	return strings.ToLower(a.AppName)
 }
 
@@ -80,7 +80,7 @@ func (plugin *GoBackendPluginApp) GetNextCerbosPort() int {
 	return port
 }
 
-func (plugin *GoBackendPluginApp) Build(pm productmap.ProductMap, product specification.Product, app specification.App) error {
+func (plugin *GoBackendPluginApp) Build(pm productmap.ProductMap, app specification.App) error {
 	dir := apptemplates.EntireDir
 
 	goApp := App{app, plugin.dbPort, plugin.cerbosPort}
@@ -127,7 +127,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 
 		for _, feature := range goApp.Features() {
 
-			newFilePath := strings.ReplaceAll(filepath, "[feature]", feature.PackageName())
+			newFilePath := strings.ReplaceAll(filepath, "[feature]", feature.FeatureNamePackage())
 
 			file := productmap.NewFile(
 				newFilePath,

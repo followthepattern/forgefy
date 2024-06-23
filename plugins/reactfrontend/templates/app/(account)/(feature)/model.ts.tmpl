@@ -8,9 +8,9 @@ export interface {{ .FeatureTypeName }} {
 }
 
 export interface MutationResponse {
-    {{ .FeatureNameLowerCamel }}s: MutationResourceResponse
+    {{ .FeatureNameCamelCase }}s: MutationResourceResponse
 }
 
 export interface QueryResponse {
-	{{ .FeatureNameLowerCamel }}s?: QueryResourceResponse<{{ .FeatureTypeName }}>
+	{{ .FeatureNameCamelCase }}s?: QueryResourceResponse<{{ .FeatureTypeName }}>
 }

@@ -5,7 +5,7 @@ import useList from "@/graphql/hooks/useList";
 
 export default function useList{{ .FeatureTypeName }}(): ListQueryResult<ListResponse<{{ .FeatureTypeName }}>> {
     const parseResult = (data?: QueryResponse): ListResponse<{{ .FeatureTypeName }}> | undefined => {
-        return data?.{{ .FeatureNameLowerCamel }}s?.list;
+        return data?.{{ .FeatureNameCamelCase }}s?.list;
     }
 
     return useList<{{ .FeatureTypeName }}>({parseResult, graphQL})

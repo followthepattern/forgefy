@@ -51,7 +51,7 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 		app.Product = builder.productSpecification
 		app.Features = append(builder.productSpecification.Features, app.Features...)
 		app.Init()
-		err = builder.appBuilders(pm, builder.productSpecification, app)
+		err = builder.appBuilders(pm, app)
 		if err != nil {
 			return pm, err
 		}
@@ -62,14 +62,14 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 
 func (builder Builder) addDefaultFiles(_ productmap.ProductMap) error { return nil }
 
-func (b Builder) appBuilders(pm productmap.ProductMap, fs specification.Product, app specification.App) error {
+func (b Builder) appBuilders(pm productmap.ProductMap, app specification.App) error {
 	apps, ok := b.apps[string(app.AppType)]
 	if !ok {
 		return fmt.Errorf("unknown app definition: %s", app.AppType)
 	}
 
 	for _, a := range apps {
-		err := a.Build(pm, fs, app)
+		err := a.Build(pm, app)
 
 		if err != nil {
 			return err

@@ -8,7 +8,7 @@ import { {{ .FeatureTypeName }} } from './model';
 import { ToStringOrDefault } from '@/lib/strings';
 
 export const RESOURCE_NAME = "{{ .FeatureHumanReadableName }}"
-export const RESOURCE_URL = "/{{ .FeatureURL }}s"
+export const RESOURCE_URL = "/{{ .FeatureNameURL }}s"
 
 const sortByLables: SortLabel[] = [{{- range .Fields }}
   {
@@ -19,19 +19,19 @@ const sortByLables: SortLabel[] = [{{- range .Fields }}
 {{- end }}
 ];
 
-function {{ .FeatureNameLowerCamel }}ViewLink(value: {{ .FeatureTypeName }}): string {
-  return `/{{ .FeatureURL }}s/${value.id}`
+function {{ .FeatureNameCamelCase }}ViewLink(value: {{ .FeatureTypeName }}): string {
+  return `/{{ .FeatureNameURL }}s/${value.id}`
 }
 
-function {{ .FeatureNameLowerCamel }}EditLink(value: {{ .FeatureTypeName }}): string {
-  return `/{{ .FeatureURL }}s/${value.id}/edit`
+function {{ .FeatureNameCamelCase }}EditLink(value: {{ .FeatureTypeName }}): string {
+  return `/{{ .FeatureNameURL }}s/${value.id}/edit`
 }
 
 function getCreateTableProperties(): CreateTableProperties<{{ .FeatureTypeName }}> {
   return {
     headerColumns: [{{- range .Fields }}"{{ .FieldNameHumanReadable }}", {{- end }}],
-    getViewLink: {{ .FeatureNameLowerCamel }}ViewLink,
-    getEditLink: {{ .FeatureNameLowerCamel }}EditLink,
+    getViewLink: {{ .FeatureNameCamelCase }}ViewLink,
+    getEditLink: {{ .FeatureNameCamelCase }}EditLink,
     getCells: (entity) => [{{- range .Fields }}ToStringOrDefault(entity.{{ .FieldNameCamelCase }}), {{- end }}]
   }
 }

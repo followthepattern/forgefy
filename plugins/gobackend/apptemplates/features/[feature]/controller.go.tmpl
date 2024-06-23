@@ -1,40 +1,40 @@
-package {{ .PackageName }}
+package {{ .FeatureNamePackage }}
 
 import (
 	"context"
 	"log/slog"
 
-	"github.com/{{ .AppNameToPackageName }}/config"
-	"github.com/{{ .AppNameToPackageName }}/container"
-	"github.com/{{ .AppNameToPackageName }}/features/auth"
-	"github.com/{{ .AppNameToPackageName }}/types"
+	"github.com/{{ .AppNamePackage }}/config"
+	"github.com/{{ .AppNamePackage }}/container"
+	"github.com/{{ .AppNamePackage }}/features/auth"
+	"github.com/{{ .AppNamePackage }}/types"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
-type {{ .GoTypeName }}Controller struct {
-	{{ .FeatureNameLowerCamel }} {{ .GoTypeName }}Service
+type {{ .FeatureNameGo }}Controller struct {
+	{{ .FeatureNameCamelCase }} {{ .FeatureNameGo }}Service
 	logger  *slog.Logger
 	cfg     config.Config
 }
 
-func New{{ .GoTypeName }}Controller(cont container.Container) {{ .GoTypeName }}Controller {
-	authorizationService := auth.NewAuthorizationService(cont, "{{ .FeatureNameLowerCamel }}")
-	{{ .FeatureNameLowerCamel }}Service := New{{ .GoTypeName }}Service(cont, authorizationService)
+func New{{ .FeatureNameGo }}Controller(cont container.Container) {{ .FeatureNameGo }}Controller {
+	authorizationService := auth.NewAuthorizationService(cont, "{{ .FeatureNameCamelCase }}")
+	{{ .FeatureNameCamelCase }}Service := New{{ .FeatureNameGo }}Service(cont, authorizationService)
 
-	return {{ .GoTypeName }}Controller{
-		{{ .FeatureNameLowerCamel }}: {{ .FeatureNameLowerCamel }}Service,
+	return {{ .FeatureNameGo }}Controller{
+		{{ .FeatureNameCamelCase }}: {{ .FeatureNameCamelCase }}Service,
 		logger:  cont.GetLogger(),
 		cfg:     cont.GetConfig(),
 	}
 }
 
-func (ctrl {{ .GoTypeName }}Controller) GetByID(ctx context.Context, id string) (*{{ .GoTypeName }}Model, error) {
-	if err := validation.Validate(id, types.Required("{{ .FeatureNameLowerCamel }}ID")); err != nil {
+func (ctrl {{ .FeatureNameGo }}Controller) GetByID(ctx context.Context, id string) (*{{ .FeatureNameGo }}Model, error) {
+	if err := validation.Validate(id, types.Required("{{ .FeatureNameCamelCase }}ID")); err != nil {
 		return nil, err
 	}
 
-	result, err := ctrl.{{ .FeatureNameLowerCamel }}.GetByID(ctx, id)
+	result, err := ctrl.{{ .FeatureNameCamelCase }}.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -46,29 +46,29 @@ func (ctrl {{ .GoTypeName }}Controller) GetByID(ctx context.Context, id string) 
 	return result, nil
 }
 
-func (ctrl {{ .GoTypeName }}Controller) Get(ctx context.Context, filter {{ .GoTypeName }}ListRequestParams) (*{{ .GoTypeName }}ListResponse, error) {
-	return ctrl.{{ .FeatureNameLowerCamel }}.Get(ctx, filter)
+func (ctrl {{ .FeatureNameGo }}Controller) Get(ctx context.Context, filter {{ .FeatureNameGo }}ListRequestParams) (*{{ .FeatureNameGo }}ListResponse, error) {
+	return ctrl.{{ .FeatureNameCamelCase }}.Get(ctx, filter)
 }
 
-func (ctrl {{ .GoTypeName }}Controller) Create(ctx context.Context, value {{ .GoTypeName }}Model) error {
+func (ctrl {{ .FeatureNameGo }}Controller) Create(ctx context.Context, value {{ .FeatureNameGo }}Model) error {
 	if err := value.CreateValidate(); err != nil {
 		return err
 	}
-	return ctrl.{{ .FeatureNameLowerCamel }}.Create(ctx, value)
+	return ctrl.{{ .FeatureNameCamelCase }}.Create(ctx, value)
 }
 
-func (ctrl {{ .GoTypeName }}Controller) Update(ctx context.Context, value {{ .GoTypeName }}Model) error {
+func (ctrl {{ .FeatureNameGo }}Controller) Update(ctx context.Context, value {{ .FeatureNameGo }}Model) error {
 	if err := value.UpdateValidate(); err != nil {
 		return err
 	}
 
-	return ctrl.{{ .FeatureNameLowerCamel }}.Update(ctx, value)
+	return ctrl.{{ .FeatureNameCamelCase }}.Update(ctx, value)
 }
 
-func (ctrl {{ .GoTypeName }}Controller) Delete(ctx context.Context, id string) error {
-	if err := validation.Validate(id, types.Required("{{ .FeatureNameLowerCamel }}ID")); err != nil {
+func (ctrl {{ .FeatureNameGo }}Controller) Delete(ctx context.Context, id string) error {
+	if err := validation.Validate(id, types.Required("{{ .FeatureNameCamelCase }}ID")); err != nil {
 		return err
 	}
 
-	return ctrl.{{ .FeatureNameLowerCamel }}.Delete(ctx, id)
+	return ctrl.{{ .FeatureNameCamelCase }}.Delete(ctx, id)
 }

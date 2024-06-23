@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/followthepattern/forgefy/specification/models"
+	"github.com/followthepattern/forgefy/specification/naming"
 	"github.com/google/uuid"
 )
 
@@ -26,7 +27,7 @@ func (d *DefaultValues) generateRoles(features []Feature) {
 			},
 			Code: models.Field{
 				Name:     "Code",
-				Value:    fmt.Sprintf("%s:editor", LowerFirst(feature.FeatureName)),
+				Value:    fmt.Sprintf("%s:editor", naming.LowerFirst(feature.FeatureName)),
 				Nullable: false,
 			},
 			Name: models.Field{

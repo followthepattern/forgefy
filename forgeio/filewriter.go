@@ -22,7 +22,7 @@ func (fw FileWriter) Write(filePath string, writerFn func(io.Writer) error) erro
 		slog.Error(err.Error())
 	}
 
-	file, err := os.Create(filePath)
+	file, err := os.Create(path.Join(fw.outputFolder, filePath))
 	if err != nil {
 		return err
 	}

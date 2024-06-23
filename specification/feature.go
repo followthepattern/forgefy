@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/followthepattern/forgefy/specification/models"
+	"github.com/followthepattern/forgefy/specification/naming"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
@@ -12,27 +13,27 @@ type Feature struct {
 	Fields      []models.Field `yaml:"fields"`
 }
 
-func (f Feature) FeatureNameLowerCamel() string {
-	return LowerFirst(f.FeatureName)
+func (f Feature) FeatureNameCamelCase() string {
+	return naming.LowerFirst(f.FeatureName)
+}
+
+func (f Feature) FeatureTypeName() string {
+	return naming.CapitalizeFirst(f.FeatureName)
+}
+
+func (f Feature) FeatureHumanReadableName() string {
+	return naming.CapitalizeFirst(f.FeatureName)
+}
+
+func (f Feature) FeatureNameCamelCaseUpper() string {
+	return naming.CapitalizeFirst(f.FeatureName)
 }
 
 func (f Feature) IDField() models.Field {
 	return f.Fields[0]
 }
 
-func (f Feature) ToDirName() string {
-	return strings.ToLower(f.FeatureName)
-}
-
-func (f Feature) FeatureGraphQLName() string {
-	return CapitalizeFirst(f.FeatureName)
-}
-
-func (f Feature) FeatureAsDirName() string {
-	return strings.ToLower(f.FeatureName)
-}
-
-func (f Feature) FeatureURL() string {
+func (f Feature) FeatureNameDir() string {
 	return strings.ToLower(f.FeatureName)
 }
 

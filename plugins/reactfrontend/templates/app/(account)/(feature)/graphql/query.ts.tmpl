@@ -1,6 +1,6 @@
-export const getSingle{{ .FeatureGraphQLName }} = `
-query GetSingle{{ .FeatureGraphQLName }}($id: String!) {
-	{{ .FeatureNameLowerCamel }}s {
+export const getSingle{{ .FeatureNameGraphQL }} = `
+query GetSingle{{ .FeatureNameGraphQL }}($id: String!) {
+	{{ .FeatureNameCamelCase }}s {
 		single (id: $id) {
 		{{- range .Fields }}
 			{{ .FieldNameGraphQL }}
@@ -9,14 +9,14 @@ query GetSingle{{ .FeatureGraphQLName }}($id: String!) {
 	}
 }`
 
-export const get{{ .FeatureGraphQLName }}s = `
-query Get{{ .FeatureGraphQLName }}s(
+export const get{{ .FeatureNameGraphQL }}s = `
+query Get{{ .FeatureNameGraphQL }}s(
 	$pageSize: Uint
 	$page: Uint
 	$search: String
 	$orderBy: [OrderBy!]
 ) {
-	{{ .FeatureNameLowerCamel }}s {
+	{{ .FeatureNameCamelCase }}s {
 		list(
 			pagination: { pageSize: $pageSize, page: $page }
 			filter: { search: $search }

@@ -5,7 +5,7 @@ import { {{ .FeatureTypeName }}, QueryResponse } from "../model";
 
 export default function useSingle{{ .FeatureTypeName }}(id: string): SingleQueryResult<{{ .FeatureTypeName }}> {
     const parseResult = (data?: QueryResponse): {{ .FeatureTypeName }} | undefined => {
-        return data?.{{ .FeatureNameLowerCamel }}s?.single
+        return data?.{{ .FeatureNameCamelCase }}s?.single
     }
 
     return useSingle<{{ .FeatureTypeName }}>({id, parseResult, graphQL})

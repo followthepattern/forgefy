@@ -1,45 +1,45 @@
-package {{ .PackageName }}
+package {{ .FeatureNamePackage }}
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
 
-	"github.com/{{ .AppNameToPackageName }}/repositories/database/sqlbuilder"
-	"github.com/{{ .AppNameToPackageName }}/types"
+	"github.com/{{ .AppNamePackage }}/repositories/database/sqlbuilder"
+	"github.com/{{ .AppNamePackage }}/types"
 
 	. "github.com/followthepattern/goqu/v9"
 )
 
-var {{ .GoTypeName }}Table = S("app").Table("{{ .FeatureTableName }}")
+var {{ .FeatureNameGo }}Table = S("app").Table("{{ .FeatureNameDBTable }}")
 
-type {{ .GoTypeName }}Database struct {
+type {{ .FeatureNameGo }}Database struct {
 	db *Database
 }
 
-func New{{ .GoTypeName }}Database(database *sql.DB) {{ .GoTypeName }}Database {
+func New{{ .FeatureNameGo }}Database(database *sql.DB) {{ .FeatureNameGo }}Database {
 	db := New("postgres", database)
 
-	return {{ .GoTypeName }}Database{
+	return {{ .FeatureNameGo }}Database{
 		db: db,
 	}
 }
 
-func (repo {{ .GoTypeName }}Database) Create(values []{{ .GoTypeName }}Model) (err error) {
+func (repo {{ .FeatureNameGo }}Database) Create(values []{{ .FeatureNameGo }}Model) (err error) {
 	for i, _ := range values {
 		values[i].Userlog.CreatedAt = types.TimeNow()
 	}
 
-	insertion := repo.db.Insert({{ .GoTypeName }}Table)
+	insertion := repo.db.Insert({{ .FeatureNameGo }}Table)
 
 	_, err = insertion.Rows(values).Executor().Exec()
 	return
 }
 
-func (repo {{ .GoTypeName }}Database) GetByID(id string) (*{{ .GoTypeName }}Model, error) {
-	value := {{ .GoTypeName }}Model{}
+func (repo {{ .FeatureNameGo }}Database) GetByID(id string) (*{{ .FeatureNameGo }}Model, error) {
+	value := {{ .FeatureNameGo }}Model{}
 
-	query := repo.db.From({{ .GoTypeName }}Table).
+	query := repo.db.From({{ .FeatureNameGo }}Table).
 		Where(Ex{
 			"id": id})
 
@@ -51,17 +51,17 @@ func (repo {{ .GoTypeName }}Database) GetByID(id string) (*{{ .GoTypeName }}Mode
 	return &value, nil
 }
 
-func (repo {{ .GoTypeName }}Database) Get(request {{ .GoTypeName }}ListRequestParams) (*{{ .GoTypeName }}ListResponse, error) {
-	data := []{{ .GoTypeName }}Model{}
+func (repo {{ .FeatureNameGo }}Database) Get(request {{ .FeatureNameGo }}ListRequestParams) (*{{ .FeatureNameGo }}ListResponse, error) {
+	data := []{{ .FeatureNameGo }}Model{}
 
-	query := repo.db.From({{ .GoTypeName }}Table)
+	query := repo.db.From({{ .FeatureNameGo }}Table)
 
 	if request.Filter.Search.IsValid() {
 		pattern := fmt.Sprintf("%%%s%%", request.Filter.Search)
 		query = query.Where(
 			Or(
 			{{- range .Fields }}{{- if eq .Type "string" }}
-				I("{{ .DBColumnName }}").Like(pattern),
+				I("{{ .FieldNameDB }}").Like(pattern),
 			{{- end }}{{- end }}
 			))
 	}
@@ -80,7 +80,7 @@ func (repo {{ .GoTypeName }}Database) Get(request {{ .GoTypeName }}ListRequestPa
 		return nil, err
 	}
 
-	result := {{ .GoTypeName }}ListResponse{
+	result := {{ .FeatureNameGo }}ListResponse{
 		Count:    types.Int64From(count),
 		PageSize: request.Pagination.PageSize,
 		Page:     request.Pagination.Page,
@@ -90,10 +90,10 @@ func (repo {{ .GoTypeName }}Database) Get(request {{ .GoTypeName }}ListRequestPa
 	return &result, nil
 }
 
-func (repo {{ .GoTypeName }}Database) Update(model {{ .GoTypeName }}Model) error {
+func (repo {{ .FeatureNameGo }}Database) Update(model {{ .FeatureNameGo }}Model) error {
 	model.Userlog.UpdatedAt = types.TimeNow()
 
-	_, err := repo.db.Update({{ .GoTypeName }}Table).
+	_, err := repo.db.Update({{ .FeatureNameGo }}Table).
 		Set(model).
 		Where(I("id").Eq(model.ID)).
 		Executor().
@@ -102,10 +102,10 @@ func (repo {{ .GoTypeName }}Database) Update(model {{ .GoTypeName }}Model) error
 	return err
 }
 
-func (repo {{ .GoTypeName }}Database) Delete(id string) error {
+func (repo {{ .FeatureNameGo }}Database) Delete(id string) error {
 	res, err := repo.db.
-		Delete({{ .GoTypeName }}Table).
-		Where(C("{{ .IDField.DBColumnName }}").Eq(id)).
+		Delete({{ .FeatureNameGo }}Table).
+		Where(C("{{ .IDField.FieldNameDB }}").Eq(id)).
 		Executor().
 		Exec()
 

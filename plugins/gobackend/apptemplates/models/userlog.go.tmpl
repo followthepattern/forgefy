@@ -1,6 +1,6 @@
 package models
 
-import "github.com/{{ .AppNameToPackageName }}/types"
+import "github.com/{{ .AppNamePackage }}/types"
 
 type Userlog struct {
 	CreationUserID types.String `db:"creation_user_id" goqu:"skipupdate,omitempty"`

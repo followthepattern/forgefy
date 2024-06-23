@@ -54,9 +54,9 @@ type AuthMutation {
 
 {{- range .Features }}
 
-type {{ .GoTypeName }} {
+type {{ .FeatureNameGraphQL }} {
 	{{- range .Fields }}
-	{{ .SchemaVarName }}: {{ .SchemaType }}!
+	{{ .FieldNameGraphQL }}: {{ .FieldTypeGraphQL }}!
 	{{- end }}
 	creationUserID: String!
 	updateUserID: String!
@@ -64,33 +64,33 @@ type {{ .GoTypeName }} {
 	updatedAt: Time!
 }
 
-input Create{{ .GoTypeName }} {
+input Create{{ .FeatureNameGraphQL }} {
 	{{- range .Fields }}
-	{{ .SchemaVarName }}: {{ .SchemaType }}!
+	{{ .FieldNameGraphQL }}: {{ .FieldTypeGraphQL }}!
 	{{- end }}
 }
 
-input Update{{ .GoTypeName }} {
+input Update{{ .FeatureNameGraphQL }} {
 	{{- range .Fields }}
-	{{ .SchemaVarName }}: {{ .SchemaType }}!
+	{{ .FieldNameGraphQL }}: {{ .FieldTypeGraphQL }}!
 	{{- end }}
 }
 
-type {{ .GoTypeName }}ListResponse {
+type {{ .FeatureNameGraphQL }}ListResponse {
 	count: Int64!
 	pageSize: Uint!
 	page: Uint!
-	data: [{{ .GoTypeName }}!]!
+	data: [{{ .FeatureNameGraphQL }}!]!
 }
 
-type {{ .GoTypeName }}Query {
-	single(id: String!): {{ .GoTypeName }}
-	list(pagination: Pagination, filter: ListFilter, orderBy: [OrderBy!]): {{ .GoTypeName }}ListResponse
+type {{ .FeatureNameGraphQL }}Query {
+	single(id: String!): {{ .FeatureNameGraphQL }}
+	list(pagination: Pagination, filter: ListFilter, orderBy: [OrderBy!]): {{ .FeatureNameGraphQL }}ListResponse
 }
 
-type {{ .GoTypeName }}Mutation {
-	create(model: Create{{ .GoTypeName }}!): ResponseStatus
-	update(id: String!, model: Update{{ .GoTypeName }}!): ResponseStatus
+type {{ .FeatureNameGraphQL }}Mutation {
+	create(model: Create{{ .FeatureNameGraphQL }}!): ResponseStatus
+	update(id: String!, model: Update{{ .FeatureNameGraphQL }}!): ResponseStatus
 	delete(id: String!): ResponseStatus
 }
 
@@ -104,13 +104,13 @@ schema {
 type Query {
 	auth: AuthQuery!
 {{- range .Features }}
-	{{ .FeatureNameLowerCamel }}s: {{ .GoTypeName }}Query!
+	{{ .FeatureNameCamelCase }}s: {{ .FeatureNameGraphQL }}Query!
 {{- end }}
 }
 
 type Mutation {
 	authentication: AuthMutation!
 {{- range .Features }}
-	{{ .FeatureNameLowerCamel }}s: {{ .GoTypeName }}Mutation!
+	{{ .FeatureNameCamelCase }}s: {{ .FeatureNameGraphQL }}Mutation!
 {{- end }}
 }
