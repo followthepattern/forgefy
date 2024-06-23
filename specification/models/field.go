@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/followthepattern/forgefy/datagenerator"
+	"github.com/followthepattern/forgefy/specification/naming"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 )
@@ -16,6 +17,38 @@ type Field struct {
 	Type     string `yaml:"type"`
 	Value    string `yaml:"value"`
 	Nullable bool   `yaml:"nullable" default:"true"`
+}
+
+func (f Field) FieldName() string {
+	return f.Name
+}
+
+func (f Field) FieldType() string {
+	return f.Type
+}
+
+func (f Field) FieldValue() string {
+	return f.Value
+}
+
+func (f Field) FieldNameCamelCase() string {
+	return strings.ToLower(f.Name)
+}
+
+func (f Field) FieldNameCamelCaseUpper() string {
+	return naming.CapitalizeFirst(f.Name)
+}
+
+func (f Field) FieldNameSnakeCase() string {
+	return strings.ToLower(f.Name)
+}
+
+func (f Field) FieldNameHumanReadable() string {
+	return f.Name
+}
+
+func (f Field) FieldNameVarName() string {
+	return strings.ToLower(f.Name)
 }
 
 func (f Field) RandomValue() string {
@@ -39,16 +72,4 @@ func (f Field) Validate() error {
 		validation.Field(&f.Name, validation.Required),
 		validation.Field(&f.Type, validation.Required),
 	)
-}
-
-func (f Field) FieldNameGraphQL() string {
-	return strings.ToLower(f.Name)
-}
-
-func (f Field) FieldNameCamelCase() string {
-	return strings.ToLower(f.Name)
-}
-
-func (f Field) FieldNameHumanReadable() string {
-	return f.Name
 }

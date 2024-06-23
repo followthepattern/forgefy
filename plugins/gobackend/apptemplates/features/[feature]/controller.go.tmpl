@@ -12,24 +12,24 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
-type {{ .GoTypeName }}Controller struct {
-	{{ .FeatureNameLowerCamel }} {{ .GoTypeName }}Service
+type {{ .FieldTypeGoName }}Controller struct {
+	{{ .FeatureNameLowerCamel }} {{ .FieldTypeGoName }}Service
 	logger  *slog.Logger
 	cfg     config.Config
 }
 
-func New{{ .GoTypeName }}Controller(cont container.Container) {{ .GoTypeName }}Controller {
+func New{{ .FieldTypeGoName }}Controller(cont container.Container) {{ .FieldTypeGoName }}Controller {
 	authorizationService := auth.NewAuthorizationService(cont, "{{ .FeatureNameLowerCamel }}")
-	{{ .FeatureNameLowerCamel }}Service := New{{ .GoTypeName }}Service(cont, authorizationService)
+	{{ .FeatureNameLowerCamel }}Service := New{{ .FieldTypeGoName }}Service(cont, authorizationService)
 
-	return {{ .GoTypeName }}Controller{
+	return {{ .FieldTypeGoName }}Controller{
 		{{ .FeatureNameLowerCamel }}: {{ .FeatureNameLowerCamel }}Service,
 		logger:  cont.GetLogger(),
 		cfg:     cont.GetConfig(),
 	}
 }
 
-func (ctrl {{ .GoTypeName }}Controller) GetByID(ctx context.Context, id string) (*{{ .GoTypeName }}Model, error) {
+func (ctrl {{ .FieldTypeGoName }}Controller) GetByID(ctx context.Context, id string) (*{{ .FieldTypeGoName }}Model, error) {
 	if err := validation.Validate(id, types.Required("{{ .FeatureNameLowerCamel }}ID")); err != nil {
 		return nil, err
 	}
@@ -46,18 +46,18 @@ func (ctrl {{ .GoTypeName }}Controller) GetByID(ctx context.Context, id string) 
 	return result, nil
 }
 
-func (ctrl {{ .GoTypeName }}Controller) Get(ctx context.Context, filter {{ .GoTypeName }}ListRequestParams) (*{{ .GoTypeName }}ListResponse, error) {
+func (ctrl {{ .FieldTypeGoName }}Controller) Get(ctx context.Context, filter {{ .FieldTypeGoName }}ListRequestParams) (*{{ .FieldTypeGoName }}ListResponse, error) {
 	return ctrl.{{ .FeatureNameLowerCamel }}.Get(ctx, filter)
 }
 
-func (ctrl {{ .GoTypeName }}Controller) Create(ctx context.Context, value {{ .GoTypeName }}Model) error {
+func (ctrl {{ .FieldTypeGoName }}Controller) Create(ctx context.Context, value {{ .FieldTypeGoName }}Model) error {
 	if err := value.CreateValidate(); err != nil {
 		return err
 	}
 	return ctrl.{{ .FeatureNameLowerCamel }}.Create(ctx, value)
 }
 
-func (ctrl {{ .GoTypeName }}Controller) Update(ctx context.Context, value {{ .GoTypeName }}Model) error {
+func (ctrl {{ .FieldTypeGoName }}Controller) Update(ctx context.Context, value {{ .FieldTypeGoName }}Model) error {
 	if err := value.UpdateValidate(); err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func (ctrl {{ .GoTypeName }}Controller) Update(ctx context.Context, value {{ .Go
 	return ctrl.{{ .FeatureNameLowerCamel }}.Update(ctx, value)
 }
 
-func (ctrl {{ .GoTypeName }}Controller) Delete(ctx context.Context, id string) error {
+func (ctrl {{ .FieldTypeGoName }}Controller) Delete(ctx context.Context, id string) error {
 	if err := validation.Validate(id, types.Required("{{ .FeatureNameLowerCamel }}ID")); err != nil {
 		return err
 	}

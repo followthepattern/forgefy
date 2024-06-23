@@ -5,6 +5,7 @@ import (
 
 	"github.com/followthepattern/forgefy/plugins/gobackend/models"
 	"github.com/followthepattern/forgefy/specification"
+	"github.com/followthepattern/forgefy/specification/naming"
 )
 
 type Feature struct {
@@ -12,8 +13,8 @@ type Feature struct {
 	Fields []models.Field
 }
 
-func (f Feature) GoTypeName() string {
-	return specification.CapitalizeFirst(f.FeatureName)
+func (f Feature) FieldTypeGoName() string {
+	return naming.CapitalizeFirst(f.FeatureName)
 }
 
 func (f Feature) PackageName() string {

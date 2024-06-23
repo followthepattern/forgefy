@@ -11,17 +11,17 @@ import (
 	"github.com/go-chi/chi"
 )
 
-type {{ .GoTypeName }}Rest struct {
-	{{ .FeatureNameLowerCamel }} {{ .GoTypeName }}Controller
+type {{ .FieldTypeGoName }}Rest struct {
+	{{ .FeatureNameLowerCamel }} {{ .FieldTypeGoName }}Controller
 }
 
-func New{{ .GoTypeName }}Rest(ctrl {{ .GoTypeName }}Controller) {{ .GoTypeName }}Rest {
-	return {{ .GoTypeName }}Rest{
+func New{{ .FieldTypeGoName }}Rest(ctrl {{ .FieldTypeGoName }}Controller) {{ .FieldTypeGoName }}Rest {
+	return {{ .FieldTypeGoName }}Rest{
 		{{ .FeatureNameLowerCamel }}: ctrl,
 	}
 }
 
-func (service {{ .GoTypeName }}Rest) GetByID(w http.ResponseWriter, r *http.Request) {
+func (service {{ .FieldTypeGoName }}Rest) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	result, err := service.{{ .FeatureNameLowerCamel }}.GetByID(r.Context(), id)
@@ -33,10 +33,10 @@ func (service {{ .GoTypeName }}Rest) GetByID(w http.ResponseWriter, r *http.Requ
 	httpresponses.Write(w, http.StatusOK, result)
 }
 
-func (service {{ .GoTypeName }}Rest) Get(w http.ResponseWriter, r *http.Request) {
+func (service {{ .FieldTypeGoName }}Rest) Get(w http.ResponseWriter, r *http.Request) {
 	search := chi.URLParam(r, "search")
 
-	filter := {{ .GoTypeName }}ListRequestParams{
+	filter := {{ .FieldTypeGoName }}ListRequestParams{
 		Filter: models.ListFilter{
 			Search: types.StringFrom(search),
 		},
@@ -52,8 +52,8 @@ func (service {{ .GoTypeName }}Rest) Get(w http.ResponseWriter, r *http.Request)
 	httpresponses.Write(w, http.StatusOK, results)
 }
 
-func (service {{ .GoTypeName }}Rest) Create(w http.ResponseWriter, r *http.Request) {
-	var value {{ .GoTypeName }}Model
+func (service {{ .FieldTypeGoName }}Rest) Create(w http.ResponseWriter, r *http.Request) {
+	var value {{ .FieldTypeGoName }}Model
 	err := json.NewDecoder(r.Body).Decode(&value)
 	if err != nil {
 		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
@@ -69,8 +69,8 @@ func (service {{ .GoTypeName }}Rest) Create(w http.ResponseWriter, r *http.Reque
 	httpresponses.Created(w)
 }
 
-func (service {{ .GoTypeName }}Rest) Update(w http.ResponseWriter, r *http.Request) {
-	var value {{ .GoTypeName }}Model
+func (service {{ .FieldTypeGoName }}Rest) Update(w http.ResponseWriter, r *http.Request) {
+	var value {{ .FieldTypeGoName }}Model
 	err := json.NewDecoder(r.Body).Decode(&value)
 	if err != nil {
 		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)

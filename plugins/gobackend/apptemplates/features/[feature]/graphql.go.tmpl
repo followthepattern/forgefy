@@ -8,15 +8,15 @@ import (
 	"github.com/{{ .AppNameToPackageName }}/types"
 )
 
-type {{ .GoTypeName }}GraphQL struct {
-	ctrl {{ .GoTypeName }}Controller
+type {{ .FieldTypeGoName }}GraphQL struct {
+	ctrl {{ .FieldTypeGoName }}Controller
 }
 
-func New{{ .GoTypeName }}GraphQL(ctrl {{ .GoTypeName }}Controller) {{ .GoTypeName }}GraphQL {
-	return {{ .GoTypeName }}GraphQL{ctrl: ctrl}
+func New{{ .FieldTypeGoName }}GraphQL(ctrl {{ .FieldTypeGoName }}Controller) {{ .FieldTypeGoName }}GraphQL {
+	return {{ .FieldTypeGoName }}GraphQL{ctrl: ctrl}
 }
 
-func (graphQL {{ .GoTypeName }}GraphQL) Single(ctx context.Context, args struct{ Id string }) (*{{ .GoTypeName }}Model, error) {
+func (graphQL {{ .FieldTypeGoName }}GraphQL) Single(ctx context.Context, args struct{ Id string }) (*{{ .FieldTypeGoName }}Model, error) {
 	value, err := graphQL.ctrl.GetByID(ctx, args.Id)
 	if err != nil {
 		return nil, err
@@ -24,12 +24,12 @@ func (graphQL {{ .GoTypeName }}GraphQL) Single(ctx context.Context, args struct{
 	return value, nil
 }
 
-func (graphQL {{ .GoTypeName }}GraphQL) List(ctx context.Context, args struct {
+func (graphQL {{ .FieldTypeGoName }}GraphQL) List(ctx context.Context, args struct {
 	Pagination *models.Pagination
 	Filter     *models.ListFilter
 	OrderBy    *[]models.OrderBy
-}) (*models.ListResponse[{{ .GoTypeName }}Model], error) {
-	request := {{ .GoTypeName }}ListRequestParams{}
+}) (*models.ListResponse[{{ .FieldTypeGoName }}Model], error) {
+	request := {{ .FieldTypeGoName }}ListRequestParams{}
 
 	if args.Pagination != nil {
 		request.Pagination = models.Pagination{
@@ -54,8 +54,8 @@ func (graphQL {{ .GoTypeName }}GraphQL) List(ctx context.Context, args struct {
 	return results, err
 }
 
-func (graphQL {{ .GoTypeName }}GraphQL) Create(ctx context.Context, args struct {
-	Model {{ .GoTypeName }}Model
+func (graphQL {{ .FieldTypeGoName }}GraphQL) Create(ctx context.Context, args struct {
+	Model {{ .FieldTypeGoName }}Model
 }) (*models.ResponseStatus, error) {
 	err := graphQL.ctrl.Create(ctx, args.Model)
 	if err != nil {
@@ -66,9 +66,9 @@ func (graphQL {{ .GoTypeName }}GraphQL) Create(ctx context.Context, args struct 
 	}, nil
 }
 
-func (graphQL {{ .GoTypeName }}GraphQL) Update(ctx context.Context, args struct {
+func (graphQL {{ .FieldTypeGoName }}GraphQL) Update(ctx context.Context, args struct {
 	Id    types.String
-	Model {{ .GoTypeName }}Model
+	Model {{ .FieldTypeGoName }}Model
 }) (*models.ResponseStatus, error) {
 	args.Model.ID = args.Id
 	err := graphQL.ctrl.Update(ctx, args.Model)
@@ -80,7 +80,7 @@ func (graphQL {{ .GoTypeName }}GraphQL) Update(ctx context.Context, args struct 
 	}, nil
 }
 
-func (graphQL {{ .GoTypeName }}GraphQL) Delete(ctx context.Context, args struct {
+func (graphQL {{ .FieldTypeGoName }}GraphQL) Delete(ctx context.Context, args struct {
 	Id string
 }) (*models.ResponseStatus, error) {
 	err := graphQL.ctrl.Delete(ctx, args.Id)

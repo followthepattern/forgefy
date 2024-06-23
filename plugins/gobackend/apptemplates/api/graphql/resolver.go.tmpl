@@ -13,7 +13,7 @@ type Resolver struct {
 	authGraphQL	auth.AuthGraphQL
 
 {{- range .Features }}
-	{{ .FeatureNameLowerCamel }}GraphQL	{{ .PackageName }}.{{ .GoTypeName }}GraphQL
+	{{ .FeatureNameLowerCamel }}GraphQL	{{ .PackageName }}.{{ .FieldTypeGoName }}GraphQL
 {{- end }}
 }
 
@@ -21,7 +21,7 @@ func NewResolver(controllers controllers.Controllers) Resolver {
 	authGraphQL := auth.NewAuthGraphQL(controllers.Auth())
 	
 {{- range .Features }}
-	{{ .FeatureNameLowerCamel }}GraphQL := {{ .PackageName}}.New{{ .GoTypeName }}GraphQL(controllers.{{ .GoTypeName }}())
+	{{ .FeatureNameLowerCamel }}GraphQL := {{ .PackageName}}.New{{ .FieldTypeGoName }}GraphQL(controllers.{{ .FieldTypeGoName }}())
 {{- end }}
 
 
@@ -44,7 +44,7 @@ func (r Resolver) Auth() (auth.AuthGraphQL, error) {
 }
 
 {{- range .Features }}
-func (r Resolver) {{ .GoTypeName }}s() ({{ .PackageName }}.{{ .GoTypeName }}GraphQL, error) {
+func (r Resolver) {{ .FieldTypeGoName }}s() ({{ .PackageName }}.{{ .FieldTypeGoName }}GraphQL, error) {
 	return r.{{ .FeatureNameLowerCamel }}GraphQL, nil
 }
 {{- end }}

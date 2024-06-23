@@ -11,35 +11,35 @@ import (
 	. "github.com/followthepattern/goqu/v9"
 )
 
-var {{ .GoTypeName }}Table = S("app").Table("{{ .FeatureTableName }}")
+var {{ .FieldTypeGoName }}Table = S("app").Table("{{ .FeatureTableName }}")
 
-type {{ .GoTypeName }}Database struct {
+type {{ .FieldTypeGoName }}Database struct {
 	db *Database
 }
 
-func New{{ .GoTypeName }}Database(database *sql.DB) {{ .GoTypeName }}Database {
+func New{{ .FieldTypeGoName }}Database(database *sql.DB) {{ .FieldTypeGoName }}Database {
 	db := New("postgres", database)
 
-	return {{ .GoTypeName }}Database{
+	return {{ .FieldTypeGoName }}Database{
 		db: db,
 	}
 }
 
-func (repo {{ .GoTypeName }}Database) Create(values []{{ .GoTypeName }}Model) (err error) {
+func (repo {{ .FieldTypeGoName }}Database) Create(values []{{ .FieldTypeGoName }}Model) (err error) {
 	for i, _ := range values {
 		values[i].Userlog.CreatedAt = types.TimeNow()
 	}
 
-	insertion := repo.db.Insert({{ .GoTypeName }}Table)
+	insertion := repo.db.Insert({{ .FieldTypeGoName }}Table)
 
 	_, err = insertion.Rows(values).Executor().Exec()
 	return
 }
 
-func (repo {{ .GoTypeName }}Database) GetByID(id string) (*{{ .GoTypeName }}Model, error) {
-	value := {{ .GoTypeName }}Model{}
+func (repo {{ .FieldTypeGoName }}Database) GetByID(id string) (*{{ .FieldTypeGoName }}Model, error) {
+	value := {{ .FieldTypeGoName }}Model{}
 
-	query := repo.db.From({{ .GoTypeName }}Table).
+	query := repo.db.From({{ .FieldTypeGoName }}Table).
 		Where(Ex{
 			"id": id})
 
@@ -51,17 +51,17 @@ func (repo {{ .GoTypeName }}Database) GetByID(id string) (*{{ .GoTypeName }}Mode
 	return &value, nil
 }
 
-func (repo {{ .GoTypeName }}Database) Get(request {{ .GoTypeName }}ListRequestParams) (*{{ .GoTypeName }}ListResponse, error) {
-	data := []{{ .GoTypeName }}Model{}
+func (repo {{ .FieldTypeGoName }}Database) Get(request {{ .FieldTypeGoName }}ListRequestParams) (*{{ .FieldTypeGoName }}ListResponse, error) {
+	data := []{{ .FieldTypeGoName }}Model{}
 
-	query := repo.db.From({{ .GoTypeName }}Table)
+	query := repo.db.From({{ .FieldTypeGoName }}Table)
 
 	if request.Filter.Search.IsValid() {
 		pattern := fmt.Sprintf("%%%s%%", request.Filter.Search)
 		query = query.Where(
 			Or(
 			{{- range .Fields }}{{- if eq .Type "string" }}
-				I("{{ .DBColumnName }}").Like(pattern),
+				I("{{ .FieldNameDB }}").Like(pattern),
 			{{- end }}{{- end }}
 			))
 	}
@@ -80,7 +80,7 @@ func (repo {{ .GoTypeName }}Database) Get(request {{ .GoTypeName }}ListRequestPa
 		return nil, err
 	}
 
-	result := {{ .GoTypeName }}ListResponse{
+	result := {{ .FieldTypeGoName }}ListResponse{
 		Count:    types.Int64From(count),
 		PageSize: request.Pagination.PageSize,
 		Page:     request.Pagination.Page,
@@ -90,10 +90,10 @@ func (repo {{ .GoTypeName }}Database) Get(request {{ .GoTypeName }}ListRequestPa
 	return &result, nil
 }
 
-func (repo {{ .GoTypeName }}Database) Update(model {{ .GoTypeName }}Model) error {
+func (repo {{ .FieldTypeGoName }}Database) Update(model {{ .FieldTypeGoName }}Model) error {
 	model.Userlog.UpdatedAt = types.TimeNow()
 
-	_, err := repo.db.Update({{ .GoTypeName }}Table).
+	_, err := repo.db.Update({{ .FieldTypeGoName }}Table).
 		Set(model).
 		Where(I("id").Eq(model.ID)).
 		Executor().
@@ -102,10 +102,10 @@ func (repo {{ .GoTypeName }}Database) Update(model {{ .GoTypeName }}Model) error
 	return err
 }
 
-func (repo {{ .GoTypeName }}Database) Delete(id string) error {
+func (repo {{ .FieldTypeGoName }}Database) Delete(id string) error {
 	res, err := repo.db.
-		Delete({{ .GoTypeName }}Table).
-		Where(C("{{ .IDField.DBColumnName }}").Eq(id)).
+		Delete({{ .FieldTypeGoName }}Table).
+		Where(C("{{ .IDField.FieldNameDB }}").Eq(id)).
 		Executor().
 		Exec()
 

@@ -17,7 +17,7 @@ func New(ctrls controllers.Controllers) http.Handler {
 
 	auth := auth.NewAuthRest(ctrls.Auth())
 	{{ range .Features }}
-	{{ .FeatureNameLowerCamel }} := {{ .PackageName }}.New{{ .GoTypeName }}Rest(ctrls.{{ .GoTypeName}}())
+	{{ .FeatureNameLowerCamel }} := {{ .PackageName }}.New{{ .FieldTypeGoName }}Rest(ctrls.{{ .FieldTypeGoName}}())
 	r.Route("/{{ .FeatureURL }}s", func(r chi.Router) {
 		r.Get("/", {{ .FeatureNameLowerCamel }}.Get)
 		r.Get("/id", {{ .FeatureNameLowerCamel }}.GetByID)
