@@ -74,7 +74,7 @@ func (ReactFrontend) AddDefaultFiles(pm productmap.ProductMap, fs specification.
 	return nil
 }
 
-func (plugin *ReactFrontend) Build(pm productmap.ProductMap, product specification.Product, app specification.App) error {
+func (plugin *ReactFrontend) Build(pm productmap.ProductMap, app specification.App) error {
 	dir := templates.Files
 
 	reactApp := App{app, 9999}

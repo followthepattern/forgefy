@@ -14,5 +14,5 @@ type Plugin interface {
 type App interface {
 	Name() string
 	Type() string
-	Build(productmap.ProductMap, specification.Product, specification.App) error
+	Build(productmap.ProductMap, specification.App) error
 }

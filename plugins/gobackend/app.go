@@ -80,7 +80,7 @@ func (plugin *GoBackendPluginApp) GetNextCerbosPort() int {
 	return port
 }
 
-func (plugin *GoBackendPluginApp) Build(pm productmap.ProductMap, product specification.Product, app specification.App) error {
+func (plugin *GoBackendPluginApp) Build(pm productmap.ProductMap, app specification.App) error {
 	dir := apptemplates.EntireDir
 
 	goApp := App{app, plugin.dbPort, plugin.cerbosPort}
