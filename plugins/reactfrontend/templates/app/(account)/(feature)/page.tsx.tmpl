@@ -20,11 +20,11 @@ const sortByLables: SortLabel[] = [{{- range .Fields }}
 ];
 
 function {{ .FeatureNameCamelCase }}ViewLink(value: {{ .FeatureTypeName }}): string {
-  return `/{{ .FeatureNameURL }}s/${value.id}`
+  return `/{{ .FeatureNameURL }}s/${value.{{ .IDField.FieldNameCamelCase }}}`
 }
 
 function {{ .FeatureNameCamelCase }}EditLink(value: {{ .FeatureTypeName }}): string {
-  return `/{{ .FeatureNameURL }}s/${value.id}/edit`
+  return `/{{ .FeatureNameURL }}s/${value.{{ .IDField.FieldNameCamelCase }}}/edit`
 }
 
 function getCreateTableProperties(): CreateTableProperties<{{ .FeatureTypeName }}> {

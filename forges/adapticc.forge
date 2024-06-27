@@ -9,9 +9,9 @@ apps:
 features:
   - name: user
     fields:
-      - name: ID
+      - name: Id
         type: string
-      - name: email
+      - name: Email
         type: string
       - name: FirstName
         type: string
@@ -21,7 +21,7 @@ features:
         type: int
   - name: product
     fields:
-      - name: ID
+      - name: Id
         type: string
       - name: Name
         type: string
@@ -31,7 +31,7 @@ features:
         type: int
   - name: task
     fields:
-      - name: ID
+      - name: Id
         type: string
       - name: Name
         type: string
@@ -39,7 +39,7 @@ features:
         type: string
   - name: image
     fields:
-      - name: ID
+      - name: Id
         type: string
       - name: Type
         type: string
