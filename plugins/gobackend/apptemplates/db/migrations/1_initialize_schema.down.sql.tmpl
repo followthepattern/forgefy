@@ -1,0 +1,14 @@
+{{ $appName := .App.AppNameCamelCase }}
+
+DROP TABLE auth.user;
+DROP TABLE auth.role;
+DROP TABLE auth.user_role;
+
+DROP SCHEMA auth;
+
+
+{{ range $feature := .Features }}
+DROP TABLE app.{{ $feature.FeatureName }};
+{{end}}
+
+DROP SCHEMA app;
