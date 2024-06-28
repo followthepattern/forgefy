@@ -97,13 +97,13 @@ export function GetSortLabel(searchParams: URLSearchParams): SortLabel | undefin
 
     const tags = strValue.split("_");
 
-    if (tags.length < 1) {
+    if (tags.length < 2) {
         return undefined;
     }
 
     const result: SortLabel = {
-        code: tags[0],
-        asc: tags[1] == "asc",
+        code: tags.slice(0, -1).join("_"),
+        asc: tags[tags.length - 1] == "asc",
         name: ""
     }
 

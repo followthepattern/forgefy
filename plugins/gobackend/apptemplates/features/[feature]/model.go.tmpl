@@ -8,7 +8,7 @@ import (
 
 type {{ .FeatureNameGo }}Model struct {
 	{{- range .Fields }}
-	{{ .FieldName }} {{ .FieldTypeGo }} `db:"{{ .FieldNameAsTag }}" goqu:"omitempty"`
+	{{ .FieldName }} {{ .FieldTypeGo }} `db:"{{ .FieldNameDB }}" goqu:"omitempty"`
 	{{- end }}
 	models.Userlog
 }
