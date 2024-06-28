@@ -1,12 +1,12 @@
-import { get{{ .FeatureTypeName }}s as graphQL } from "../graphql/query";
+import { get{{ .FeatureNameCamelCaseUpper }}s as graphQL } from "../graphql/query";
 import { ListResponse, ListQueryResult } from "@/graphql/utils/list";
-import { {{ .FeatureTypeName }}, QueryResponse } from "../model";
+import { {{ .FeatureNameCamelCaseUpper }}, QueryResponse } from "../model";
 import useList from "@/graphql/hooks/useList";
 
-export default function useList{{ .FeatureTypeName }}(): ListQueryResult<ListResponse<{{ .FeatureTypeName }}>> {
-    const parseResult = (data?: QueryResponse): ListResponse<{{ .FeatureTypeName }}> | undefined => {
+export default function useList{{ .FeatureNameCamelCaseUpper }}(): ListQueryResult<ListResponse<{{ .FeatureNameCamelCaseUpper }}>> {
+    const parseResult = (data?: QueryResponse): ListResponse<{{ .FeatureNameCamelCaseUpper }}> | undefined => {
         return data?.{{ .FeatureNameCamelCase }}s?.list;
     }
 
-    return useList<{{ .FeatureTypeName }}>({parseResult, graphQL})
+    return useList<{{ .FeatureNameCamelCaseUpper }}>({parseResult, graphQL})
 }

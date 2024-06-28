@@ -14,23 +14,23 @@ type Feature struct {
 }
 
 func (f Feature) FeatureNameGo() string {
-	return naming.CapitalizeFirst(f.FeatureName)
+	return naming.ToUpperCamelCase(f.FeatureName)
 }
 
 func (f Feature) FeatureNameGraphQL() string {
-	return naming.CapitalizeFirst(f.FeatureName)
+	return naming.ToUpperCamelCase(f.FeatureName)
 }
 
 func (f Feature) FeatureNamePackage() string {
-	return strings.ToLower(f.FeatureName)
+	return strings.ToLower(naming.ToSnakeCase(f.FeatureName))
 }
 
 func (f Feature) FeatureNameDBTable() string {
-	return strings.ToLower(f.FeatureName)
+	return strings.ToLower(naming.ToSnakeCase(f.FeatureName))
 }
 
 func (f Feature) FeatureNameURL() string {
-	return strings.ToLower(f.FeatureName)
+	return strings.ToLower(naming.ToSnakeCase(f.FeatureName))
 }
 
 func (f Feature) IDField() models.Field {

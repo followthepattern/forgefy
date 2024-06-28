@@ -14,18 +14,14 @@ type Feature struct {
 }
 
 func (f Feature) FeatureNameCamelCase() string {
-	return naming.LowerFirst(f.FeatureName)
-}
-
-func (f Feature) FeatureTypeName() string {
-	return naming.CapitalizeFirst(f.FeatureName)
-}
-
-func (f Feature) FeatureHumanReadableName() string {
-	return naming.CapitalizeFirst(f.FeatureName)
+	return naming.ToLowerCamelCase(f.FeatureName)
 }
 
 func (f Feature) FeatureNameCamelCaseUpper() string {
+	return naming.ToUpperCamelCase(f.FeatureName)
+}
+
+func (f Feature) FeatureHumanReadableName() string {
 	return naming.CapitalizeFirst(f.FeatureName)
 }
 
@@ -34,7 +30,7 @@ func (f Feature) IDField() models.Field {
 }
 
 func (f Feature) FeatureNameDir() string {
-	return strings.ToLower(f.FeatureName)
+	return strings.ToLower(naming.ToSnakeCase(f.FeatureName))
 }
 
 func (f Feature) Validate() error {

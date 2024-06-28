@@ -3,10 +3,10 @@ import Login from "./(auth)/login/page"
 import AuthLayout from "./(auth)/layout"
 import AccountLayout from "./(account)/layout"
 {{- range .Features }}
-import {{ .FeatureTypeName }}s from "./(account)/{{ .FeatureNameDir }}/page"
-import {{ .FeatureTypeName }} from "./(account)/{{ .FeatureNameDir }}/[id]/page"
-import {{ .FeatureTypeName }}Edit from "./(account)/{{ .FeatureNameDir }}/[id]/edit/page"
-import {{ .FeatureTypeName }}New from "./(account)/{{ .FeatureNameDir }}/new/page"
+import {{ .FeatureNameCamelCaseUpper }}s from "./(account)/{{ .FeatureNameDir }}/page"
+import {{ .FeatureNameCamelCaseUpper }} from "./(account)/{{ .FeatureNameDir }}/[id]/page"
+import {{ .FeatureNameCamelCaseUpper }}Edit from "./(account)/{{ .FeatureNameDir }}/[id]/edit/page"
+import {{ .FeatureNameCamelCaseUpper }}New from "./(account)/{{ .FeatureNameDir }}/new/page"
 {{- end }}
 
 import Profile from "./(account)/profile/page"
@@ -44,19 +44,19 @@ export const Routes: RouteObject[] = [
 {{- range .Features }}
             {
                 path: "{{ .FeatureNameURL }}s",
-                element: <ListPageWrapper Component={{ "{" }}{{ .FeatureTypeName }}s} />,
+                element: <ListPageWrapper Component={{ "{" }}{{ .FeatureNameCamelCaseUpper }}s} />,
             },
             {
                 path: "{{ .FeatureNameURL }}s/:id",
-                element: <{{ .FeatureTypeName }} />
+                element: <{{ .FeatureNameCamelCaseUpper }} />
             },
             {
                 path: "{{ .FeatureNameURL }}s/new",
-                element: <{{ .FeatureTypeName }}New />
+                element: <{{ .FeatureNameCamelCaseUpper }}New />
             },
             {
                 path: "{{ .FeatureNameURL }}s/:id/edit",
-                element: <{{ .FeatureTypeName }}Edit />
+                element: <{{ .FeatureNameCamelCaseUpper }}Edit />
             },
 {{- end }}
         ]

@@ -1,11 +1,11 @@
-import useSingle{{ .FeatureTypeName }} from "../../hooks/single{{ .FeatureTypeName }}";
-import useUpdate{{ .FeatureTypeName }} from "../../hooks/update{{ .FeatureTypeName }}";
+import useSingle{{ .FeatureNameCamelCaseUpper }} from "../../hooks/single{{ .FeatureNameCamelCaseUpper }}";
+import useUpdate{{ .FeatureNameCamelCaseUpper }} from "../../hooks/update{{ .FeatureNameCamelCaseUpper }}";
 import { useForm } from "react-hook-form";
-import useDelete{{ .FeatureTypeName }} from "../../hooks/delete{{ .FeatureTypeName }}";
+import useDelete{{ .FeatureNameCamelCaseUpper }} from "../../hooks/delete{{ .FeatureNameCamelCaseUpper }}";
 import { useNavigate, useParams } from "react-router-dom";
 import { RESOURCE_URL } from "../../page";
 import React, { useEffect } from "react";
-import { {{ .FeatureTypeName }} } from "../../model";
+import { {{ .FeatureNameCamelCaseUpper }} } from "../../model";
 import SingleLayout from "@/app/(account)/components/singleView/layout";
 import SecondaryButton from "@/app/(account)/components/buttons/secondaryButton";
 import PrimaryButton from "@/app/(account)/components/buttons/primaryButton";
@@ -15,14 +15,14 @@ import Input from "@/app/(account)/components/inputFields/input";
 import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 
-export default function {{ .FeatureTypeName }}Edit() {
+export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
     const { id } = useParams();
 
-    const { loading, data, error, itemNotFound } = useSingle{{ .FeatureTypeName }}(id ?? "");
+    const { loading, data, error, itemNotFound } = useSingle{{ .FeatureNameCamelCaseUpper }}(id ?? "");
 
-    const [executeUpdateMutation, { updateError, updateResult }] = useUpdate{{ .FeatureTypeName }}();
+    const [executeUpdateMutation, { updateError, updateResult }] = useUpdate{{ .FeatureNameCamelCaseUpper }}();
 
-    const [executeDeleteMutation, { deleteError, deleteResult }] = useDelete{{ .FeatureTypeName }}();
+    const [executeDeleteMutation, { deleteError, deleteResult }] = useDelete{{ .FeatureNameCamelCaseUpper }}();
 
     const navigate = useNavigate();
 
@@ -47,7 +47,7 @@ export default function {{ .FeatureTypeName }}Edit() {
         }
     }, [deleteResult])
 
-    const { register, getValues } = useForm<{{ .FeatureTypeName }}>();
+    const { register, getValues } = useForm<{{ .FeatureNameCamelCaseUpper }}>();
 
     if (loading) {
         return (<div>Loading...</div>)
@@ -79,7 +79,7 @@ export default function {{ .FeatureTypeName }}Edit() {
 
     return (
         <SingleLayout>
-            <SingleLayout.Title>{{ .FeatureTypeName }}: {data?.id}</SingleLayout.Title>
+            <SingleLayout.Title>{{ .FeatureNameCamelCaseUpper }}: {data?.id}</SingleLayout.Title>
             <form action="">
                 <GridFields className="py-6">
                 {{- range .Fields }}

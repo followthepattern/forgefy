@@ -9,11 +9,11 @@ apps:
 features:
   - name: user
     fields:
-      - name: Id
+      - name: id
         type: string
-      - name: Email
+      - name: email
         type: string
-      - name: FirstName
+      - name: First Name
         type: string
       - name: LastName
         type: string

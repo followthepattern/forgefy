@@ -2,9 +2,9 @@ import SectionHeader from '../components/listPage/sectionHeader/sectionHeader';
 import List from '../components/listPage/listPage';
 import { ListPageComponentProperties } from '../components/listPage/listPageWrapper/listPageWrapper';
 import { SortLabel, SetPageParams, SetSearchPatternParams, SetSortPatternParrams } from '../components/listPage/listPageWrapper/listingFunctions';
-import useList{{ .FeatureTypeName }} from './hooks/list{{ .FeatureTypeName }}';
+import useList{{ .FeatureNameCamelCaseUpper }} from './hooks/list{{ .FeatureNameCamelCaseUpper }}';
 import CreateTable, { CreateTableProperties } from '../components/listPage/table/table';
-import { {{ .FeatureTypeName }} } from './model';
+import { {{ .FeatureNameCamelCaseUpper }} } from './model';
 import { ToStringOrDefault } from '@/lib/strings';
 
 export const RESOURCE_NAME = "{{ .FeatureHumanReadableName }}"
@@ -12,22 +12,22 @@ export const RESOURCE_URL = "/{{ .FeatureNameURL }}s"
 
 const sortByLables: SortLabel[] = [{{- range .Fields }}
   {
-    code: "{{ .FieldNameSnakeCase }}",
+    code: "{{ .FieldNameSnakeCaseLower }}",
     name: "{{ .FieldNameHumanReadable }}",
     asc: true,
   },
 {{- end }}
 ];
 
-function {{ .FeatureNameCamelCase }}ViewLink(value: {{ .FeatureTypeName }}): string {
+function {{ .FeatureNameCamelCase }}ViewLink(value: {{ .FeatureNameCamelCaseUpper }}): string {
   return `/{{ .FeatureNameURL }}s/${value.{{ .IDField.FieldNameCamelCase }}}`
 }
 
-function {{ .FeatureNameCamelCase }}EditLink(value: {{ .FeatureTypeName }}): string {
+function {{ .FeatureNameCamelCase }}EditLink(value: {{ .FeatureNameCamelCaseUpper }}): string {
   return `/{{ .FeatureNameURL }}s/${value.{{ .IDField.FieldNameCamelCase }}}/edit`
 }
 
-function getCreateTableProperties(): CreateTableProperties<{{ .FeatureTypeName }}> {
+function getCreateTableProperties(): CreateTableProperties<{{ .FeatureNameCamelCaseUpper }}> {
   return {
     headerColumns: [{{- range .Fields }}"{{ .FieldNameHumanReadable }}", {{- end }}],
     getViewLink: {{ .FeatureNameCamelCase }}ViewLink,
@@ -36,7 +36,7 @@ function getCreateTableProperties(): CreateTableProperties<{{ .FeatureTypeName }
   }
 }
 
-export default function {{ .FeatureTypeName }}s(props: ListPageComponentProperties) {
+export default function {{ .FeatureNameCamelCaseUpper }}s(props: ListPageComponentProperties) {
   const sortOnChange = (sortLabel: SortLabel) => {
     SetSortPatternParrams(props.searchParams, props.setSearchParams, sortLabel);
   }
@@ -70,7 +70,7 @@ export default function {{ .FeatureTypeName }}s(props: ListPageComponentProperti
         <List {...props}
           sortProps={{ "{{" }}sortLabel: selectedSortLabel {{ "}}" }}
           onPageChange={pageOnChange}
-          useList={useList{{ .FeatureTypeName }}}
+          useList={useList{{ .FeatureNameCamelCaseUpper }}}
           tableComponent={entityTable}
         />
       </div>
