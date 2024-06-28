@@ -14,13 +14,13 @@ type Feature struct {
 }
 
 func (f Feature) FeatureNameGraphQL() string {
-	return naming.CapitalizeFirst(f.FeatureName)
+	return naming.ToUpperCamelCase(f.FeatureName)
 }
 
 func (f Feature) FeatureToFileSuffix() string {
-	return naming.CapitalizeFirst(f.FeatureName)
+	return naming.ToUpperCamelCase(f.FeatureName)
 }
 
 func (f Feature) FeatureNameURL() string {
-	return strings.ToLower(f.FeatureName)
+	return strings.ToLower(naming.ToSnakeCase(f.FeatureName))
 }

@@ -1,16 +1,16 @@
 import { useNavigate, useParams } from "react-router-dom";
-import useSingle{{ .FeatureTypeName }} from "../hooks/single{{ .FeatureTypeName }}";
+import useSingle{{ .FeatureNameCamelCaseUpper }} from "../hooks/single{{ .FeatureNameCamelCaseUpper }}";
 import { RESOURCE_URL } from "../page";
 import SingleLayout from "../../components/singleView/layout";
 import DataListView from "../../components/singleView/dataListView/dataListView";
 import SecondaryButton from "../../components/buttons/secondaryButton";
 import PrimaryButton from "../../components/buttons/primaryButton";
 
-export default function {{ .FeatureTypeName }}() {
+export default function {{ .FeatureNameCamelCaseUpper }}() {
     const { id } = useParams()
     const navigate = useNavigate();
 
-    const { loading, data, error, itemNotFound } = useSingle{{ .FeatureTypeName }}(id ?? "");
+    const { loading, data, error, itemNotFound } = useSingle{{ .FeatureNameCamelCaseUpper }}(id ?? "");
 
     if (loading) {
         return (
@@ -38,7 +38,7 @@ export default function {{ .FeatureTypeName }}() {
 
     return (
         <SingleLayout>
-            <SingleLayout.Title>{{ .FeatureTypeName }}</SingleLayout.Title>
+            <SingleLayout.Title>{{ .FeatureNameCamelCaseUpper }}</SingleLayout.Title>
             <DataListView className="mt-6">
             {{- range .Fields }}
                 <DataListView.Row>

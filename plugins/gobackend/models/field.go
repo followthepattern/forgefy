@@ -1,8 +1,6 @@
 package models
 
 import (
-	"strings"
-
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/naming"
 )
@@ -22,7 +20,7 @@ func (f Field) FieldTypeGo() string {
 }
 
 func (f Field) FieldNameAsTag() string {
-	return strings.ToLower(f.Name)
+	return f.FieldNameSnakeCaseLower()
 }
 
 func (f Field) FieldNameGraphQL() string {
@@ -36,11 +34,11 @@ func (f Field) FieldTypeGraphQL() string {
 	case "int":
 		return "Int64"
 	}
-	return naming.CapitalizeFirst(f.Type)
+	return naming.ToUpperCamelCase(f.Type)
 }
 
 func (f Field) FieldNameDB() string {
-	return naming.ToSnakeCase(f.Name)
+	return f.FieldNameSnakeCaseLower()
 }
 
 func (f Field) FieldTypeDB() string {

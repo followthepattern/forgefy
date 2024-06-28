@@ -1,12 +1,12 @@
 import { CreateMutationResult, MutationResourceResponse } from "@/graphql/mutation";
-import { {{ .FeatureTypeName }}, MutationResponse  } from "../model";
+import { {{ .FeatureNameCamelCaseUpper }}, MutationResponse  } from "../model";
 import useCreate from "@/graphql/hooks/useCreate";
-import { create{{ .FeatureTypeName }} as graphQL } from "../graphql/mutation";
+import { create{{ .FeatureNameCamelCaseUpper }} as graphQL } from "../graphql/mutation";
 
-export default function useCreate{{ .FeatureTypeName }}(): CreateMutationResult<{{ .FeatureTypeName }}, number> {
+export default function useCreate{{ .FeatureNameCamelCaseUpper }}(): CreateMutationResult<{{ .FeatureNameCamelCaseUpper }}, number> {
     const parseResult = (data?: MutationResponse | null) : number | undefined  => {
         return data?.{{ .FeatureNameCamelCase }}s?.create?.code;
     }
 
-    return useCreate<{{ .FeatureTypeName }}>({parseResult, graphQL})
+    return useCreate<{{ .FeatureNameCamelCaseUpper }}>({parseResult, graphQL})
 }

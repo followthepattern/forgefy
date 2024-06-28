@@ -8,7 +8,7 @@ import (
 
 type {{ .FeatureNameGo }}Model struct {
 	{{- range .Fields }}
-	{{ .FieldName }} {{ .FieldTypeGo }} `db:"{{ .FieldNameDB }}" goqu:"omitempty"`
+	{{ .FieldNameCamelCaseUpper }} {{ .FieldTypeGo }} `db:"{{ .FieldNameDB }}" goqu:"omitempty"`
 	{{- end }}
 	models.Userlog
 }
@@ -20,7 +20,7 @@ func (m {{ .FeatureNameGo }}Model) IsDefault() bool {
 func (m {{ .FeatureNameGo }}Model) CreateValidate() error {
 	return validation.ValidateStruct(&m,
 		{{- range .Fields }}
-		validation.Field(&m.{{ .FieldName }}, validation.Required),
+		validation.Field(&m.{{ .FieldNameCamelCaseUpper }}, validation.Required),
 		{{- end }}
 	)
 }

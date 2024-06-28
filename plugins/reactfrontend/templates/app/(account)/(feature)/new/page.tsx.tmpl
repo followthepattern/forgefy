@@ -1,9 +1,9 @@
 import { useForm } from "react-hook-form";
-import useCreate{{ .FeatureTypeName }} from "../hooks/create{{ .FeatureTypeName }}";
+import useCreate{{ .FeatureNameCamelCaseUpper }} from "../hooks/create{{ .FeatureNameCamelCaseUpper }}";
 import { useNavigate } from "react-router-dom";
 import { RESOURCE_URL } from "../page";
 import { useEffect } from "react";
-import { {{ .FeatureTypeName }} } from "../model";
+import { {{ .FeatureNameCamelCaseUpper }} } from "../model";
 import SingleLayout from "../../components/singleView/layout";
 import GridFields from "../../components/singleView/gridFields/gridFields";
 import Label from "../../components/labels/label";
@@ -11,8 +11,8 @@ import Input from "../../components/inputFields/input";
 import SecondaryButton from "../../components/buttons/secondaryButton";
 import PrimaryButton from "../../components/buttons/primaryButton";
 
-export default function {{ .FeatureTypeName }}New() {
-    const [executeMutation, { createLoading, createError, createResult }] = useCreate{{ .FeatureTypeName }}();
+export default function {{ .FeatureNameCamelCaseUpper }}New() {
+    const [executeMutation, { createLoading, createError, createResult }] = useCreate{{ .FeatureNameCamelCaseUpper }}();
 
     const navigate = useNavigate();
 
@@ -23,7 +23,7 @@ export default function {{ .FeatureTypeName }}New() {
 
     }, [createResult])
 
-    const { register, getValues } = useForm<{{ .FeatureTypeName }}>();
+    const { register, getValues } = useForm<{{ .FeatureNameCamelCaseUpper }}>();
 
     const onCreate = () => {
         const values = getValues();
@@ -41,7 +41,7 @@ export default function {{ .FeatureTypeName }}New() {
 
     return (
         <SingleLayout>
-            <SingleLayout.Title>New {{ .FeatureTypeName }}</SingleLayout.Title>
+            <SingleLayout.Title>New {{ .FeatureNameCamelCaseUpper }}</SingleLayout.Title>
             <form>
                 <GridFields className="py-6">
                 {{- range .Fields }}
