@@ -12,8 +12,8 @@ export const RESOURCE_URL = "/{{ .FeatureNameURL }}s"
 
 const sortByLables: SortLabel[] = [{{- range .Fields }}
   {
-    code: "{{ .Name }}",
-    name: "{{ .FieldNameCamelCase }}",
+    code: "{{ .FieldNameSnakeCase }}",
+    name: "{{ .FieldNameHumanReadable }}",
     asc: true,
   },
 {{- end }}

@@ -40,11 +40,11 @@ func (f Field) FieldNameCamelCaseUpper() string {
 }
 
 func (f Field) FieldNameSnakeCase() string {
-	return strings.ToLower(f.Name)
+	return naming.ToSnakeCase(f.Name)
 }
 
 func (f Field) FieldNameHumanReadable() string {
-	return f.Name
+	return naming.ToHumanReadable(f.Name)
 }
 
 func (f Field) FieldNameVarName() string {
