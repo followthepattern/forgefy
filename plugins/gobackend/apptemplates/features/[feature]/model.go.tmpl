@@ -8,13 +8,13 @@ import (
 
 type {{ .FeatureNameGo }}Model struct {
 	{{- range .Fields }}
-	{{ .FieldName }} {{ .FieldTypeGo }} `db:"{{ .FieldNameAsTag }}" goqu:"omitempty"`
+	{{ .FieldName }} {{ .FieldTypeGo }} `db:"{{ .FieldNameDB }}" goqu:"omitempty"`
 	{{- end }}
 	models.Userlog
 }
 
 func (m {{ .FeatureNameGo }}Model) IsDefault() bool {
-	return m.ID.Len() < 1
+	return m.{{ .IDField.FieldNameCamelCaseUpper }}.Len() < 1
 }
 
 func (m {{ .FeatureNameGo }}Model) CreateValidate() error {
@@ -27,7 +27,7 @@ func (m {{ .FeatureNameGo }}Model) CreateValidate() error {
 
 func (m {{ .FeatureNameGo }}Model) UpdateValidate() error {
 	return validation.ValidateStruct(&m,
-		validation.Field(&m.ID, validation.Required),
+		validation.Field(&m.{{ .IDField.FieldNameCamelCaseUpper }}, validation.Required),
 	)
 }
 

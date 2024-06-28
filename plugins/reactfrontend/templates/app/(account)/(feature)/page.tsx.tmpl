@@ -12,19 +12,19 @@ export const RESOURCE_URL = "/{{ .FeatureNameURL }}s"
 
 const sortByLables: SortLabel[] = [{{- range .Fields }}
   {
-    code: "{{ .Name }}",
-    name: "{{ .FieldNameCamelCase }}",
+    code: "{{ .FieldNameSnakeCase }}",
+    name: "{{ .FieldNameHumanReadable }}",
     asc: true,
   },
 {{- end }}
 ];
 
 function {{ .FeatureNameCamelCase }}ViewLink(value: {{ .FeatureTypeName }}): string {
-  return `/{{ .FeatureNameURL }}s/${value.id}`
+  return `/{{ .FeatureNameURL }}s/${value.{{ .IDField.FieldNameCamelCase }}}`
 }
 
 function {{ .FeatureNameCamelCase }}EditLink(value: {{ .FeatureTypeName }}): string {
-  return `/{{ .FeatureNameURL }}s/${value.id}/edit`
+  return `/{{ .FeatureNameURL }}s/${value.{{ .IDField.FieldNameCamelCase }}}/edit`
 }
 
 function getCreateTableProperties(): CreateTableProperties<{{ .FeatureTypeName }}> {

@@ -1,9 +1,8 @@
 package models
 
 import (
-	"strings"
-
 	"github.com/followthepattern/forgefy/specification/models"
+	"github.com/followthepattern/forgefy/specification/naming"
 )
 
 type Field struct {
@@ -11,7 +10,7 @@ type Field struct {
 }
 
 func (f Field) FieldNameGraphQL() string {
-	return strings.ToLower(f.Name)
+	return naming.ToLowerCamelCase(f.Name)
 }
 
 func (f Field) FieldTypeName() string {

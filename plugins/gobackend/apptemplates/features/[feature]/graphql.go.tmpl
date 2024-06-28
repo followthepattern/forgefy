@@ -70,7 +70,7 @@ func (graphQL {{ .FeatureNameGo }}GraphQL) Update(ctx context.Context, args stru
 	Id    types.String
 	Model {{ .FeatureNameGo }}Model
 }) (*models.ResponseStatus, error) {
-	args.Model.ID = args.Id
+	args.Model.{{ .IDField.FieldNameCamelCaseUpper }} = args.Id
 	err := graphQL.ctrl.Update(ctx, args.Model)
 	if err != nil {
 		return nil, err

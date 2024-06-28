@@ -95,7 +95,7 @@ func (repo {{ .FeatureNameGo }}Database) Update(model {{ .FeatureNameGo }}Model)
 
 	_, err := repo.db.Update({{ .FeatureNameGo }}Table).
 		Set(model).
-		Where(I("id").Eq(model.ID)).
+		Where(I("id").Eq(model.{{ .IDField.FieldNameCamelCaseUpper }})).
 		Executor().
 		Exec()
 

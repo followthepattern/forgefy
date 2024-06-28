@@ -78,7 +78,7 @@ func (service {{ .FeatureNameGo }}Rest) Update(w http.ResponseWriter, r *http.Re
 	}
 
 	id := r.URL.Query().Get("id")
-	value.ID = types.StringFrom(id)
+	value.{{ .IDField.FieldNameCamelCaseUpper }} = types.StringFrom(id)
 
 	err = service.{{ .FeatureNameCamelCase }}.Update(r.Context(), value)
 	if err != nil {

@@ -26,7 +26,7 @@ func (f Field) FieldNameAsTag() string {
 }
 
 func (f Field) FieldNameGraphQL() string {
-	return strings.ToLower(f.Name)
+	return naming.ToLowerCamelCase(f.Name)
 }
 
 func (f Field) FieldTypeGraphQL() string {
@@ -40,7 +40,7 @@ func (f Field) FieldTypeGraphQL() string {
 }
 
 func (f Field) FieldNameDB() string {
-	return strings.ToLower(f.Name)
+	return naming.ToSnakeCase(f.Name)
 }
 
 func (f Field) FieldTypeDB() string {
