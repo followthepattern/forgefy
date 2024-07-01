@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/{{ .AppNamePackage }}/config"
-	"github.com/{{ .AppNamePackage }}/features/mail"
+	"github.com/backend1/config"
+	"github.com/backend1/features/mail"
 
-	"github.com/{{ .AppNamePackage }}/types"
+	"github.com/backend1/types"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -97,12 +97,12 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 		return nil, err
 	}
 
-	mail := GetActivationMailTemplate(service.cfg, creationUser.ID, creationUser.Email)
+	go func() {
+		mail := GetActivationMailTemplate(service.cfg, creationUser.ID, creationUser.Email)
 
-	err = service.mail.SendMail(mail)
-	if err != nil {
-		return nil, err
-	}
+		service.mail.SendMail(mail)
+		// log
+	}()
 
 	return &RegisterResponse{
 		Email:     creationUser.Email,

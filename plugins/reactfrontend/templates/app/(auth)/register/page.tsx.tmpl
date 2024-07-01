@@ -1,0 +1,188 @@
+import { gql, useMutation } from "@apollo/client";
+import { register as r } from "../graphql/register";
+import { SubmitHandler, UseFormRegister, useForm } from "react-hook-form";
+import { ErrorParser } from "@/lib/errorParser";
+
+type FormValues = {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    firstName: string;
+    lastName: string
+};
+
+interface ContainerProperties {
+    children: any
+}
+
+function Container(props: ContainerProperties) {
+    return (
+        <div className="flex flex-col justify-center min-h-full px-6 py-8 md:py-12 lg:px-8">
+            {props.children}
+        </div>
+    )
+}
+
+interface TitleProperties {
+    children: any
+}
+
+function Title(props: TitleProperties) {
+    return (
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+            <h2 className="text-2xl font-bold text-center text-gray-900 md:mt-10">
+                {props.children}
+            </h2>
+        </div>
+    )
+}
+
+export default function Register() {
+    const {
+        register,
+        formState: { errors },
+        handleSubmit
+    } = useForm<FormValues>();
+
+    const [executeRegister, { data, called, loading, error }] = useMutation(gql(r), { errorPolicy: "all" });
+
+    const onSubmit: SubmitHandler<FormValues> = (formValues) => {
+        executeRegister({
+            variables: {
+                email: formValues.email,
+                firstName: formValues.firstName,
+                lastName: formValues.lastName,
+                password: formValues.password,
+            },
+        });
+    };
+
+    if (called && loading) {
+        return <p>Loading...</p>
+    }
+
+
+    if (called && data?.authentication?.register) {
+        return (
+            <Container>
+                <Title>
+                    Registration Completed!
+                </Title>
+                <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+                    <h1 className="mt-10 text-xl text-center text-gray-900">
+                        Check your emails
+                    </h1>
+                </div>
+            </Container>
+        )
+    }
+
+    const inputLabelClassName = "block text-sm font-medium text-gray-900"
+    const inputFieldClassName = "block w-full py-2 border-0 rounded-md shadow-sm text-gray-950 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm";
+
+    return (
+        <Container>
+            <Title>
+                Create Your Account!
+            </Title>
+            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+                <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+                    <div>
+                        <label htmlFor="first-name" className={inputLabelClassName}>
+                            First Name
+                        </label>
+                        <div className="mt-2">
+                            <input
+                                id="first-name"
+                                type="text"
+                                autoComplete="given-name"
+                                required
+                                className={inputFieldClassName}
+                                {...register("firstName")}
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label htmlFor="last-name" className={inputLabelClassName}>
+                            Last Name
+                        </label>
+                        <div className="mt-2">
+                            <input
+                                id="last-name"
+                                type="text"
+                                autoComplete="family-name"
+                                required
+                                className={inputFieldClassName}
+                                {...register("lastName")}
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label htmlFor="email" className={inputLabelClassName}>
+                            Email address
+                        </label>
+                        <div className="mt-2">
+                            <input
+                                id="email"
+                                type="email"
+                                autoComplete="email"
+                                required
+                                className={inputFieldClassName}
+                                {...register("email")}
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <div className="flex items-center justify-between">
+                            <label htmlFor="password" className={inputLabelClassName}>
+                                Enter Password
+                            </label>
+                        </div>
+                        <div className="mt-2">
+                            <input
+                                id="password"
+                                type="password"
+                                autoComplete="off"
+                                required
+                                className={inputFieldClassName}
+                                {...register("password", { validate: (value, formValues) => value == formValues.confirmPassword })}
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <div className="flex items-center justify-between">
+                            <label htmlFor="password" className={inputLabelClassName}>
+                                Confirm Password
+                            </label>
+                        </div>
+                        <div className="mt-2">
+                            <input
+                                id="confirm-password"
+                                type="password"
+                                autoComplete="off"
+                                required
+                                className={inputFieldClassName}
+                                {...register("confirmPassword")}
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <button
+                            type="submit"
+                            className="w-full px-3 py-3 text-sm font-semibold text-white bg-blue-500 rounded-md shadow-sm mx:auto hover:bg-blue-700 focus:bg-blue-900"
+                        >
+                            Sign Up
+                        </button>
+                        {error && <p className="mt-2 text-sm font-bold text-red-600">
+                            {ErrorParser(error.message)}
+                        </p>}
+                        {errors && <p className="mt-2 text-sm font-bold text-red-600">
+                            {errors.password ? "Passwords do not match" : ""}
+                        </p>}
+                    </div>
+                </form>
+            </div>
+        </Container>
+    )
+}

@@ -1,0 +1,12 @@
+export const register = `
+mutation Register(
+	$email: String!,
+	$firstName: String!,
+	$lastName: String!
+	$password: String!) {
+	authentication {
+		register(email: $email, firstName: $firstName, lastName: $lastName, password: $password ) {
+			email
+		}
+	}
+}`
