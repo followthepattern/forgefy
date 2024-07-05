@@ -7,6 +7,7 @@ import (
 	"github.com/{{ .AppNamePackage }}/config"
 	"github.com/{{ .AppNamePackage }}/container"
 	"github.com/{{ .AppNamePackage }}/features/auth"
+	"github.com/{{ .AppNamePackage }}/{{ .FeatureNamePackage }}/models"
 	"github.com/{{ .AppNamePackage }}/types"
 
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -29,7 +30,7 @@ func New{{ .FeatureNameGo }}Controller(cont container.Container) {{ .FeatureName
 	}
 }
 
-func (ctrl {{ .FeatureNameGo }}Controller) GetByID(ctx context.Context, id string) (*{{ .FeatureNameGo }}Model, error) {
+func (ctrl {{ .FeatureNameGo }}Controller) GetByID(ctx context.Context, id string) (*models.{{ .FeatureNameGo }}Model, error) {
 	if err := validation.Validate(id, types.Required("{{ .FeatureNameCamelCase }}ID")); err != nil {
 		return nil, err
 	}
@@ -46,18 +47,18 @@ func (ctrl {{ .FeatureNameGo }}Controller) GetByID(ctx context.Context, id strin
 	return result, nil
 }
 
-func (ctrl {{ .FeatureNameGo }}Controller) Get(ctx context.Context, filter {{ .FeatureNameGo }}ListRequestParams) (*{{ .FeatureNameGo }}ListResponse, error) {
+func (ctrl {{ .FeatureNameGo }}Controller) Get(ctx context.Context, filter models.{{ .FeatureNameGo }}ListRequestParams) (models.*{{ .FeatureNameGo }}ListResponse, error) {
 	return ctrl.{{ .FeatureNameCamelCase }}.Get(ctx, filter)
 }
 
-func (ctrl {{ .FeatureNameGo }}Controller) Create(ctx context.Context, value {{ .FeatureNameGo }}Model) error {
+func (ctrl {{ .FeatureNameGo }}Controller) Create(ctx context.Context, value models.{{ .FeatureNameGo }}Model) error {
 	if err := value.CreateValidate(); err != nil {
 		return err
 	}
 	return ctrl.{{ .FeatureNameCamelCase }}.Create(ctx, value)
 }
 
-func (ctrl {{ .FeatureNameGo }}Controller) Update(ctx context.Context, value {{ .FeatureNameGo }}Model) error {
+func (ctrl {{ .FeatureNameGo }}Controller) Update(ctx context.Context, value models.{{ .FeatureNameGo }}Model) error {
 	if err := value.UpdateValidate(); err != nil {
 		return err
 	}
