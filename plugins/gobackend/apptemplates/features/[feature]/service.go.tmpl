@@ -7,6 +7,7 @@ import (
 	"github.com/{{ .AppNamePackage }}/accesscontrol"
 	"github.com/{{ .AppNamePackage }}/container"
 	"github.com/{{ .AppNamePackage }}/features/auth"
+	"github.com/{{ .AppNamePackage }}/features/{{ .FeatureNamePackage }}/models"
 	"github.com/{{ .AppNamePackage }}/types"
 	"github.com/google/uuid"
 )
@@ -28,7 +29,7 @@ func New{{ .FeatureNameGo }}Service(cont container.Container, authorizationServi
 	return service
 }
 
-func (service {{ .FeatureNameGo }}Service) GetByID(ctx context.Context, id string) (*{{ .FeatureNameGo }}Model, error) {
+func (service {{ .FeatureNameGo }}Service) GetByID(ctx context.Context, id string) (*models.{{ .FeatureNameGo }}Model, error) {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, id)
 	if err != nil {
 		return nil, err
@@ -37,7 +38,7 @@ func (service {{ .FeatureNameGo }}Service) GetByID(ctx context.Context, id strin
 	return service.{{ .FeatureNameCamelCase }}Repository.GetByID(id)
 }
 
-func (service {{ .FeatureNameGo }}Service) Get(ctx context.Context, request {{ .FeatureNameGo }}ListRequestParams) (*{{ .FeatureNameGo }}ListResponse, error) {
+func (service {{ .FeatureNameGo }}Service) Get(ctx context.Context, request models.{{ .FeatureNameGo }}ListRequestParams) (models.*{{ .FeatureNameGo }}ListResponse, error) {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, accesscontrol.ALLRESOURCE)
 	if err != nil {
 		return nil, err
@@ -48,7 +49,7 @@ func (service {{ .FeatureNameGo }}Service) Get(ctx context.Context, request {{ .
 	return service.{{ .FeatureNameCamelCase }}Repository.Get(request)
 }
 
-func (service {{ .FeatureNameGo }}Service) Create(ctx context.Context, value {{ .FeatureNameGo }}Model) error {
+func (service {{ .FeatureNameGo }}Service) Create(ctx context.Context, value models.{{ .FeatureNameGo }}Model) error {
 	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.CREATE, accesscontrol.NEW)
 	if err != nil {
 		return err
@@ -60,7 +61,7 @@ func (service {{ .FeatureNameGo }}Service) Create(ctx context.Context, value {{ 
 	return service.{{ .FeatureNameCamelCase }}Repository.Create([]{{ .FeatureNameGo }}Model{value})
 }
 
-func (service {{ .FeatureNameGo }}Service) Update(ctx context.Context, value {{ .FeatureNameGo }}Model) error {
+func (service {{ .FeatureNameGo }}Service) Update(ctx context.Context, value models.{{ .FeatureNameGo }}Model) error {
 	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.UPDATE, value.{{ .IDField.FieldNameCamelCaseUpper }}.Data)
 	if err != nil {
 		return err
