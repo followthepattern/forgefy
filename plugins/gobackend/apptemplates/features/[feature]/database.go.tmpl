@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/{{ .AppNamePackage }}/{{ .FeatureNamePackage }}/models"
 	"github.com/{{ .AppNamePackage }}/repositories/database/sqlbuilder"
 	"github.com/{{ .AppNamePackage }}/types"
 
@@ -25,7 +26,7 @@ func New{{ .FeatureNameGo }}Database(database *sql.DB) {{ .FeatureNameGo }}Datab
 	}
 }
 
-func (repo {{ .FeatureNameGo }}Database) Create(values []{{ .FeatureNameGo }}Model) (err error) {
+func (repo {{ .FeatureNameGo }}Database) Create(values []models.{{ .FeatureNameGo }}Model) (err error) {
 	for i, _ := range values {
 		values[i].Userlog.CreatedAt = types.TimeNow()
 	}
@@ -36,8 +37,8 @@ func (repo {{ .FeatureNameGo }}Database) Create(values []{{ .FeatureNameGo }}Mod
 	return
 }
 
-func (repo {{ .FeatureNameGo }}Database) GetByID(id string) (*{{ .FeatureNameGo }}Model, error) {
-	value := {{ .FeatureNameGo }}Model{}
+func (repo {{ .FeatureNameGo }}Database) GetByID(id string) (*models.{{ .FeatureNameGo }}Model, error) {
+	value := models.{{ .FeatureNameGo }}Model{}
 
 	query := repo.db.From({{ .FeatureNameGo }}Table).
 		Where(Ex{
@@ -51,8 +52,8 @@ func (repo {{ .FeatureNameGo }}Database) GetByID(id string) (*{{ .FeatureNameGo 
 	return &value, nil
 }
 
-func (repo {{ .FeatureNameGo }}Database) Get(request {{ .FeatureNameGo }}ListRequestParams) (*{{ .FeatureNameGo }}ListResponse, error) {
-	data := []{{ .FeatureNameGo }}Model{}
+func (repo {{ .FeatureNameGo }}Database) Get(request models.{{ .FeatureNameGo }}ListRequestParams) (*models.{{ .FeatureNameGo }}ListResponse, error) {
+	data := []models.{{ .FeatureNameGo }}Model{}
 
 	query := repo.db.From({{ .FeatureNameGo }}Table)
 
@@ -80,7 +81,7 @@ func (repo {{ .FeatureNameGo }}Database) Get(request {{ .FeatureNameGo }}ListReq
 		return nil, err
 	}
 
-	result := {{ .FeatureNameGo }}ListResponse{
+	result := models.{{ .FeatureNameGo }}ListResponse{
 		Count:    types.Int64From(count),
 		PageSize: request.Pagination.PageSize,
 		Page:     request.Pagination.Page,
@@ -90,7 +91,7 @@ func (repo {{ .FeatureNameGo }}Database) Get(request {{ .FeatureNameGo }}ListReq
 	return &result, nil
 }
 
-func (repo {{ .FeatureNameGo }}Database) Update(model {{ .FeatureNameGo }}Model) error {
+func (repo {{ .FeatureNameGo }}Database) Update(model models.{{ .FeatureNameGo }}Model) error {
 	model.Userlog.UpdatedAt = types.TimeNow()
 
 	_, err := repo.db.Update({{ .FeatureNameGo }}Table).
