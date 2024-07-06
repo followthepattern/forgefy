@@ -7,16 +7,16 @@ import (
 )
 
 type UserModel struct {
-	Id        types.String `db:"id" goqu:"omitempty"`
-	Email     types.String `db:"email" goqu:"omitempty"`
+	Id        types.String `db:"id" goqu:"skipupdate,omitempty"`
+	Email     types.String `db:"email" goqu:"skipupdate,omitempty"`
 	FirstName types.String `db:"first_name" goqu:"omitempty"`
 	LastName  types.String `db:"last_name" goqu:"omitempty"`
-	Age       types.Int64  `db:"age" goqu:"omitempty"`
+	Active    types.Bool   `db:"active" goqu:"skipupdate,omitempty"`
 	basemodels.Userlog
 }
 
-func (m UserModel) IsDefault() bool {
-	return m.Id.Len() < 1
+func (model UserModel) IsDefault() bool {
+	return !model.Email.IsValid() || !model.FirstName.IsValid() || !model.LastName.IsValid()
 }
 
 func (m UserModel) CreateValidate() error {
@@ -25,7 +25,6 @@ func (m UserModel) CreateValidate() error {
 		validation.Field(&m.Email, validation.Required),
 		validation.Field(&m.FirstName, validation.Required),
 		validation.Field(&m.LastName, validation.Required),
-		validation.Field(&m.Age, validation.Required),
 	)
 }
 
