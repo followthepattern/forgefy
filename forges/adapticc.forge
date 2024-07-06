@@ -7,18 +7,6 @@ apps:
   - name: frontend1
     type: react-frontend
 features:
-  - name: user
-    fields:
-      - name: id
-        type: string
-      - name: email
-        type: string
-      - name: First Name
-        type: string
-      - name: LastName
-        type: string
-      - name: Age
-        type: int
   - name: product
     fields:
       - name: Id

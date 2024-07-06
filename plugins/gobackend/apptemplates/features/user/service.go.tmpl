@@ -1,0 +1,82 @@
+package user
+
+import (
+	"context"
+	"log/slog"
+
+	"github.com/google/uuid"
+	"github.com/{{ .AppNamePackage }}/accesscontrol"
+	"github.com/{{ .AppNamePackage }}/container"
+	"github.com/{{ .AppNamePackage }}/features/auth"
+	"github.com/{{ .AppNamePackage }}/features/user/models"
+	"github.com/{{ .AppNamePackage }}/types"
+)
+
+type UserService struct {
+	authorizationService auth.AuthorizationService
+	logger               *slog.Logger
+	userRepository       UserDatabase
+}
+
+func NewUserService(cont container.Container, authorizationService auth.AuthorizationService) UserService {
+	repository := NewUserDatabase(cont.GetDB())
+	service := UserService{
+		authorizationService: authorizationService,
+		userRepository:       repository,
+		logger:               cont.GetLogger(),
+	}
+
+	return service
+}
+
+func (service UserService) GetByID(ctx context.Context, id string) (*models.UserModel, error) {
+	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return service.userRepository.GetByID(id)
+}
+
+func (service UserService) Get(ctx context.Context, request models.UserListRequestParams) (*models.UserListResponse, error) {
+	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, accesscontrol.ALLRESOURCE)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Pagination.SetDefaultIfEmpty()
+
+	return service.userRepository.Get(request)
+}
+
+func (service UserService) Create(ctx context.Context, value models.UserModel) error {
+	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.CREATE, accesscontrol.NEW)
+	if err != nil {
+		return err
+	}
+
+	value.Id = types.StringFrom(uuid.NewString())
+	value.Userlog.CreationUserID = types.StringFrom(userID)
+
+	return service.userRepository.Create([]models.UserModel{value})
+}
+
+func (service UserService) Update(ctx context.Context, value models.UserModel) error {
+	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.UPDATE, value.Id.Data)
+	if err != nil {
+		return err
+	}
+
+	value.UpdateUserID = types.StringFrom(userID)
+
+	return service.userRepository.Update(value)
+}
+
+func (service UserService) Delete(ctx context.Context, id string) error {
+	err := service.authorizationService.Authorize(ctx, accesscontrol.DELETE, id)
+	if err != nil {
+		return err
+	}
+
+	return service.userRepository.Delete(id)
+}

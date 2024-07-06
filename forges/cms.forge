@@ -2,7 +2,7 @@
 version: 0
 product_name: "Startup CMS"
 apps:
-  - name: backend1
+  - name: {{ .AppNamePackage }}
     type: go-backend
   - name: backend2
     type: go-backend

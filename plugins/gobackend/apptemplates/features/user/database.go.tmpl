@@ -1,0 +1,128 @@
+package user
+
+import (
+	"database/sql"
+	"errors"
+	"fmt"
+
+	"github.com/{{ .AppNamePackage }}/features/user/models"
+	"github.com/{{ .AppNamePackage }}/repositories/database/sqlbuilder"
+	"github.com/{{ .AppNamePackage }}/types"
+
+	. "github.com/followthepattern/goqu/v9"
+)
+
+var UserTable = S("app").Table("user")
+
+type UserDatabase struct {
+	db *Database
+}
+
+func NewUserDatabase(database *sql.DB) UserDatabase {
+	db := New("postgres", database)
+
+	return UserDatabase{
+		db: db,
+	}
+}
+
+func (repo UserDatabase) Create(values []models.UserModel) (err error) {
+	for i, _ := range values {
+		values[i].Userlog.CreatedAt = types.TimeNow()
+	}
+
+	insertion := repo.db.Insert(UserTable)
+
+	_, err = insertion.Rows(values).Executor().Exec()
+	return
+}
+
+func (repo UserDatabase) GetByID(id string) (*models.UserModel, error) {
+	value := models.UserModel{}
+
+	query := repo.db.From(UserTable).
+		Where(Ex{
+			"id": id})
+
+	_, err := query.ScanStruct(&value)
+	if err != nil {
+		return nil, err
+	}
+
+	return &value, nil
+}
+
+func (repo UserDatabase) Get(request models.UserListRequestParams) (*models.UserListResponse, error) {
+	data := []models.UserModel{}
+
+	query := repo.db.From(UserTable)
+
+	if request.Filter.Search.IsValid() {
+		pattern := fmt.Sprintf("%%%s%%", request.Filter.Search)
+		query = query.Where(
+			Or(
+				I("id").Like(pattern),
+				I("email").Like(pattern),
+				I("first_name").Like(pattern),
+				I("last_name").Like(pattern),
+			))
+	}
+
+	count, err := query.Count()
+	if err != nil {
+		return nil, err
+	}
+
+	query = sqlbuilder.WithPagination(query, request.Pagination)
+
+	query = sqlbuilder.WithOrderBy(query, request.OrderBy)
+
+	err = query.ScanStructs(&data)
+	if err != nil {
+		return nil, err
+	}
+
+	result := models.UserListResponse{
+		Count:    types.Int64From(count),
+		PageSize: request.Pagination.PageSize,
+		Page:     request.Pagination.Page,
+		Data:     data,
+	}
+
+	return &result, nil
+}
+
+func (repo UserDatabase) Update(model models.UserModel) error {
+	model.Userlog.UpdatedAt = types.TimeNow()
+
+	_, err := repo.db.Update(UserTable).
+		Set(model).
+		Where(I("id").Eq(model.Id)).
+		Executor().
+		Exec()
+
+	return err
+}
+
+func (repo UserDatabase) Delete(id string) error {
+	res, err := repo.db.
+		Delete(UserTable).
+		Where(C("id").Eq(id)).
+		Executor().
+		Exec()
+
+	if err != nil {
+		return err
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows < 1 {
+		return errors.New("no rows been deleted")
+	}
+
+	return err
+}
