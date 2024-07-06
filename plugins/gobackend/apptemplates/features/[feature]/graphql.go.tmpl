@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/{{ .AppNamePackage }}/{{ .FeatureNamePackage }}/models"
-	basemodel "github.com/{{ .AppNamePackage }}/models"
+	"github.com/{{ .AppNamePackage }}/features/{{ .FeatureNamePackage }}/models"
+	basemodels "github.com/{{ .AppNamePackage }}/models"
 	"github.com/{{ .AppNamePackage }}/types"
 )
 
@@ -17,7 +17,7 @@ func New{{ .FeatureNameGo }}GraphQL(ctrl {{ .FeatureNameGo }}Controller) {{ .Fea
 	return {{ .FeatureNameGo }}GraphQL{ctrl: ctrl}
 }
 
-func (graphQL {{ .FeatureNameGo }}GraphQL) Single(ctx context.Context, args struct{ Id string }) (*{{ .FeatureNameGo }}Model, error) {
+func (graphQL {{ .FeatureNameGo }}GraphQL) Single(ctx context.Context, args struct{ Id string }) (*models.{{ .FeatureNameGo }}Model, error) {
 	value, err := graphQL.ctrl.GetByID(ctx, args.Id)
 	if err != nil {
 		return nil, err

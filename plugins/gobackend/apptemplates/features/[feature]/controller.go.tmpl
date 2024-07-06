@@ -7,7 +7,7 @@ import (
 	"github.com/{{ .AppNamePackage }}/config"
 	"github.com/{{ .AppNamePackage }}/container"
 	"github.com/{{ .AppNamePackage }}/features/auth"
-	"github.com/{{ .AppNamePackage }}/{{ .FeatureNamePackage }}/models"
+	"github.com/{{ .AppNamePackage }}/features/{{ .FeatureNamePackage }}/models"
 	"github.com/{{ .AppNamePackage }}/types"
 
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -47,7 +47,7 @@ func (ctrl {{ .FeatureNameGo }}Controller) GetByID(ctx context.Context, id strin
 	return result, nil
 }
 
-func (ctrl {{ .FeatureNameGo }}Controller) Get(ctx context.Context, filter models.{{ .FeatureNameGo }}ListRequestParams) (models.*{{ .FeatureNameGo }}ListResponse, error) {
+func (ctrl {{ .FeatureNameGo }}Controller) Get(ctx context.Context, filter models.{{ .FeatureNameGo }}ListRequestParams) (*models.{{ .FeatureNameGo }}ListResponse, error) {
 	return ctrl.{{ .FeatureNameCamelCase }}.Get(ctx, filter)
 }
 

@@ -38,7 +38,7 @@ func (service {{ .FeatureNameGo }}Service) GetByID(ctx context.Context, id strin
 	return service.{{ .FeatureNameCamelCase }}Repository.GetByID(id)
 }
 
-func (service {{ .FeatureNameGo }}Service) Get(ctx context.Context, request models.{{ .FeatureNameGo }}ListRequestParams) (models.*{{ .FeatureNameGo }}ListResponse, error) {
+func (service {{ .FeatureNameGo }}Service) Get(ctx context.Context, request models.{{ .FeatureNameGo }}ListRequestParams) (*models.{{ .FeatureNameGo }}ListResponse, error) {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, accesscontrol.ALLRESOURCE)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (service {{ .FeatureNameGo }}Service) Create(ctx context.Context, value mod
 	value.{{ .IDField.FieldNameCamelCaseUpper }} = types.StringFrom(uuid.NewString())
 	value.Userlog.CreationUserID = types.StringFrom(userID)
 
-	return service.{{ .FeatureNameCamelCase }}Repository.Create([]{{ .FeatureNameGo }}Model{value})
+	return service.{{ .FeatureNameCamelCase }}Repository.Create([]models.{{ .FeatureNameGo }}Model{value})
 }
 
 func (service {{ .FeatureNameGo }}Service) Update(ctx context.Context, value models.{{ .FeatureNameGo }}Model) error {
