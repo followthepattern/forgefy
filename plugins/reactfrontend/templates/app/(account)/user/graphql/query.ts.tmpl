@@ -1,0 +1,37 @@
+export const getSingleUser = `
+query GetSingleUser($id: String!) {
+	users {
+		single (id: $id) {
+			id
+			email
+			firstName
+			lastName
+		}
+	}
+}`
+
+export const getUsers = `
+query GetUsers(
+	$pageSize: Uint
+	$page: Uint
+	$search: String
+	$orderBy: [OrderBy!]
+) {
+	users {
+		list(
+			pagination: { pageSize: $pageSize, page: $page }
+			filter: { search: $search }
+			orderBy: $orderBy
+		) {
+			count
+			data {
+				id
+				email
+				firstName
+				lastName
+			}
+			page
+			pageSize
+		}
+	}
+}`

@@ -3,6 +3,10 @@ import Login from "./(auth)/login/page"
 import Register from "./(auth)/register/page"
 import AuthLayout from "./(auth)/layout"
 import AccountLayout from "./(account)/layout"
+import Users from "./(account)/user/page"
+import User from "./(account)/user/[id]/page"
+import UserEdit from "./(account)/user/[id]/edit/page"
+import UserNew from "./(account)/user/new/page"
 {{- range .Features }}
 import {{ .FeatureNameCamelCaseUpper }}s from "./(account)/{{ .FeatureNameDir }}/page"
 import {{ .FeatureNameCamelCaseUpper }} from "./(account)/{{ .FeatureNameDir }}/[id]/page"
@@ -51,6 +55,22 @@ export const Routes: RouteObject[] = [
             {
                 path: "/profile",
                 element: <Profile />
+            },
+            {
+                path: "users",
+                element: <ListPageWrapper Component={Users} />,
+            },
+            {
+                path: "users/:id",
+                element: <User />
+            },
+            {
+                path: "users/new",
+                element: <UserNew />
+            },
+            {
+                path: "users/:id/edit",
+                element: <UserEdit />
             },
 {{- range .Features }}
             {

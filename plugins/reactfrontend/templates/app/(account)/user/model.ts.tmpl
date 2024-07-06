@@ -1,0 +1,17 @@
+import { MutationResourceResponse } from "@/graphql/mutation";
+import { QueryResourceResponse } from "@/graphql/query";
+
+export interface User {
+	id?: string
+	email?: string
+	firstName?: string
+	lastName?: string
+}
+
+export interface MutationResponse {
+    users: MutationResourceResponse
+}
+
+export interface QueryResponse {
+	users?: QueryResourceResponse<User>
+}

@@ -1,0 +1,12 @@
+import { getUsers as graphQL } from "../graphql/query";
+import { ListResponse, ListQueryResult } from "@/graphql/utils/list";
+import { User, QueryResponse } from "../model";
+import useList from "@/graphql/hooks/useList";
+
+export default function useListUser(): ListQueryResult<ListResponse<User>> {
+    const parseResult = (data?: QueryResponse): ListResponse<User> | undefined => {
+        return data?.users?.list;
+    }
+
+    return useList<User>({parseResult, graphQL})
+}
