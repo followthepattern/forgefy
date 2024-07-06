@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/{{ .AppNamePackage }}/features/auth"
+	"github.com/{{ .AppNamePackage }}/features/user/models"
 	"github.com/{{ .AppNamePackage }}/types"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -23,9 +24,9 @@ func invalidTokenError(field string) error {
 }
 
 func getAuthorizedUserFromClaims(claims jwt.MapClaims) (*auth.AuthUser, error) {
-	id, ok := claims["ID"].(string)
+	id, ok := claims["id"].(string)
 	if !ok {
-		return nil, invalidTokenError("ID")
+		return nil, invalidTokenError("id")
 	}
 	email, ok := claims["email"].(string)
 	if !ok {
@@ -53,10 +54,12 @@ func getAuthorizedUserFromClaims(claims jwt.MapClaims) (*auth.AuthUser, error) {
 	}
 
 	return &auth.AuthUser{
-		ID:        types.StringFrom(id),
-		Email:     types.StringFrom(email),
-		FirstName: types.StringFrom(firstName),
-		LastName:  types.StringFrom(lastName),
+		UserModel: models.UserModel{
+			Id:        types.StringFrom(id),
+			Email:     types.StringFrom(email),
+			FirstName: types.StringFrom(firstName),
+			LastName:  types.StringFrom(lastName),
+		},
 	}, nil
 }
 

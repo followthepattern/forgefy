@@ -26,12 +26,12 @@ func (service AuthorizationService) AuthorizedUser(ctx context.Context, action s
 		return "", err
 	}
 
-	roles, err := service.authDatabase.GetRoleIDs(ctxu.ID.Data)
+	roles, err := service.authDatabase.GetRoleIDs(ctxu.Id.Data)
 	if err != nil {
 		return "", err
 	}
 
-	return ctxu.ID.Data, service.ac.Authorize(ctx, ctxu.ID.Data, action, resourceID, roles...)
+	return ctxu.Id.Data, service.ac.Authorize(ctx, ctxu.Id.Data, action, resourceID, roles...)
 }
 
 func (service AuthorizationService) Authorize(ctx context.Context, action string, resourceID string) error {
@@ -40,10 +40,10 @@ func (service AuthorizationService) Authorize(ctx context.Context, action string
 		return err
 	}
 
-	roles, err := service.authDatabase.GetRoleIDs(ctxu.ID.Data)
+	roles, err := service.authDatabase.GetRoleIDs(ctxu.Id.Data)
 	if err != nil {
 		return err
 	}
 
-	return service.ac.Authorize(ctx, ctxu.ID.Data, action, resourceID, roles...)
+	return service.ac.Authorize(ctx, ctxu.Id.Data, action, resourceID, roles...)
 }

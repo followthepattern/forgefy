@@ -25,12 +25,6 @@ func NewAuthDatabase(database *sql.DB) AuthDatabase {
 	}
 }
 
-func (db AuthDatabase) VerifyEmail(email types.String) (bool, error) {
-	count, err := db.db.From(AuthUserTable).Where(Ex{"email": email}).Count()
-
-	return count == 0, err
-}
-
 func (db AuthDatabase) RegisterUser(registerUser AuthUser) error {
 	registerUser.Userlog = models.Userlog{
 		CreatedAt: types.TimeNow(),
@@ -40,7 +34,13 @@ func (db AuthDatabase) RegisterUser(registerUser AuthUser) error {
 	return err
 }
 
-func (db AuthDatabase) VerifyLogin(email types.String) (AuthUser, error) {
+func (db AuthDatabase) VerifyEmail(email types.String) (bool, error) {
+	count, err := db.db.From(AuthUserTable).Where(Ex{"email": email}).Count()
+
+	return count == 0, err
+}
+
+func (db AuthDatabase) GetAuthUserByEmail(email types.String) (AuthUser, error) {
 	authUser := AuthUser{}
 
 	_, err := db.db.From(AuthUserTable).Where(Ex{"email": email}).ScanStruct(&authUser)
@@ -49,6 +49,19 @@ func (db AuthDatabase) VerifyLogin(email types.String) (AuthUser, error) {
 	}
 
 	return authUser, err
+}
+
+func (repo AuthDatabase) GetAuthUserByID(id types.String) (*AuthUser, error) {
+	user := AuthUser{}
+
+	query := repo.db.From(AuthUserTable).Where(Ex{"id": id})
+
+	_, err := query.ScanStruct(&user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, err
 }
 
 func (repo AuthDatabase) GetRoleIDs(userID string) ([]string, error) {
@@ -87,17 +100,4 @@ func (repo AuthDatabase) ActivateUser(userID string) error {
 	}
 
 	return nil
-}
-
-func (repo AuthDatabase) GetAuthUser(id types.String) (*AuthUser, error) {
-	user := AuthUser{}
-
-	query := repo.db.From(AuthUserTable).Where(Ex{"id": id})
-
-	_, err := query.ScanStruct(&user)
-	if err != nil {
-		return nil, err
-	}
-
-	return &user, err
 }

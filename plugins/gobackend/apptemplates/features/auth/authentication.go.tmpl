@@ -9,6 +9,7 @@ import (
 
 	"github.com/{{ .AppNamePackage }}/config"
 	"github.com/{{ .AppNamePackage }}/features/mail"
+	"github.com/{{ .AppNamePackage }}/features/user/models"
 
 	"github.com/{{ .AppNamePackage }}/types"
 	"github.com/golang-jwt/jwt/v4"
@@ -36,7 +37,7 @@ func NewAuthenticationService(cfg config.Config, repository AuthDatabase, emailC
 }
 
 func (service AuthenticationService) Login(ctx context.Context, email types.String, password types.String) (*LoginResponse, error) {
-	authUser, err := service.authDatabase.VerifyLogin(email)
+	authUser, err := service.authDatabase.GetAuthUserByEmail(email)
 	if err != nil {
 		return nil, err
 	}
@@ -83,13 +84,16 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 	}
 
 	creationUser := AuthUser{
-		ID:        types.StringFrom(uuid.NewString()),
-		Email:     register.Email,
-		FirstName: register.FirstName,
-		LastName:  register.LastName,
-		Active:    types.FALSE,
-
-		PasswordHash: string(passwordHash),
+		UserModel: models.UserModel{
+			Id:        types.StringFrom(uuid.NewString()),
+			Email:     register.Email,
+			FirstName: register.FirstName,
+			LastName:  register.LastName,
+			Active:    types.FALSE,
+		},
+		Password: Password{
+			PasswordHash: string(passwordHash),
+		},
 	}
 
 	err = service.authDatabase.RegisterUser(creationUser)
@@ -98,7 +102,7 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 	}
 
 	go func() {
-		mail := GetActivationMailTemplate(service.cfg, creationUser.ID, creationUser.Email)
+		mail := GetActivationMailTemplate(service.cfg, creationUser.Id, creationUser.Email)
 
 		service.mail.SendMail(mail)
 		// log
@@ -114,7 +118,7 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 func GenerateTokenStringFromUser(model AuthUser, privateKey crypto.PrivateKey) (string, error) {
 	expiresAt := time.Now().Add(time.Hour * 24)
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("EdDSA"), jwt.MapClaims{
-		"ID":        model.ID,
+		"id":        model.Id,
 		"email":     model.Email,
 		"firstName": model.FirstName,
 		"lastName":  model.LastName,
@@ -154,5 +158,5 @@ func (service AuthenticationService) Profile(ctx context.Context) (*AuthUser, er
 		return nil, err
 	}
 
-	return service.authDatabase.GetAuthUser(ctxu.ID)
+	return service.authDatabase.GetAuthUserByID(ctxu.Id)
 }
