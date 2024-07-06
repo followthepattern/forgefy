@@ -12,7 +12,7 @@ import (
 	. "github.com/followthepattern/goqu/v9"
 )
 
-var UserTable = S("app").Table("user")
+var UserTable = S("auth").Table("user")
 
 type UserDatabase struct {
 	db *Database
