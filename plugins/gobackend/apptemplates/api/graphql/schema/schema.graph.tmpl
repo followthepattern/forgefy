@@ -52,6 +52,49 @@ type AuthMutation {
 	register(email: String!, firstName: String!, lastName: String!, password: String!): RegisterResponse
 }
 
+type User {
+	id: String!
+	email: String!
+	firstName: String!
+	lastName: String!
+	creationUserID: String!
+	updateUserID: String!
+	createdAt: Time!
+	updatedAt: Time!
+}
+
+input CreateUser {
+	id: String!
+	email: String!
+	firstName: String!
+	lastName: String!
+}
+
+input UpdateUser {
+	id: String!
+	email: String!
+	firstName: String!
+	lastName: String!
+}
+
+type UserListResponse {
+	count: Int64!
+	pageSize: Uint!
+	page: Uint!
+	data: [User!]!
+}
+
+type UserQuery {
+	single(id: String!): User
+	list(pagination: Pagination, filter: ListFilter, orderBy: [OrderBy!]): UserListResponse
+}
+
+type UserMutation {
+	create(model: CreateUser!): ResponseStatus
+	update(id: String!, model: UpdateUser!): ResponseStatus
+	delete(id: String!): ResponseStatus
+}
+
 {{- range .Features }}
 
 type {{ .FeatureNameGraphQL }} {
@@ -103,6 +146,7 @@ schema {
 
 type Query {
 	auth: AuthQuery!
+	users: UserQuery!
 {{- range .Features }}
 	{{ .FeatureNameCamelCase }}s: {{ .FeatureNameGraphQL }}Query!
 {{- end }}
@@ -110,6 +154,7 @@ type Query {
 
 type Mutation {
 	authentication: AuthMutation!
+	users: UserMutation!
 {{- range .Features }}
 	{{ .FeatureNameCamelCase }}s: {{ .FeatureNameGraphQL }}Mutation!
 {{- end }}
