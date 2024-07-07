@@ -1,0 +1,75 @@
+package user
+
+import (
+	"context"
+	"log/slog"
+
+	"github.com/{{ .AppNamePackage }}/config"
+	"github.com/{{ .AppNamePackage }}/container"
+	"github.com/{{ .AppNamePackage }}/features/auth"
+	"github.com/{{ .AppNamePackage }}/features/user/models"
+	"github.com/{{ .AppNamePackage }}/types"
+
+	validation "github.com/go-ozzo/ozzo-validation"
+)
+
+type UserController struct {
+	user   UserService
+	logger *slog.Logger
+	cfg    config.Config
+}
+
+func NewUserController(cont container.Container) UserController {
+	authorizationService := auth.NewAuthorizationService(cont, "user")
+	userService := NewUserService(cont, authorizationService)
+
+	return UserController{
+		user:   userService,
+		logger: cont.GetLogger(),
+		cfg:    cont.GetConfig(),
+	}
+}
+
+func (ctrl UserController) GetByID(ctx context.Context, id string) (*models.UserModel, error) {
+	if err := validation.Validate(id, types.Required("userID")); err != nil {
+		return nil, err
+	}
+
+	result, err := ctrl.user.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.IsDefault() {
+		return nil, nil
+	}
+
+	return result, nil
+}
+
+func (ctrl UserController) Get(ctx context.Context, filter models.UserListRequestParams) (*models.UserListResponse, error) {
+	return ctrl.user.Get(ctx, filter)
+}
+
+func (ctrl UserController) Create(ctx context.Context, value models.UserModel) error {
+	if err := value.CreateValidate(); err != nil {
+		return err
+	}
+	return ctrl.user.Create(ctx, value)
+}
+
+func (ctrl UserController) Update(ctx context.Context, value models.UserModel) error {
+	if err := value.UpdateValidate(); err != nil {
+		return err
+	}
+
+	return ctrl.user.Update(ctx, value)
+}
+
+func (ctrl UserController) Delete(ctx context.Context, id string) error {
+	if err := validation.Validate(id, types.Required("userID")); err != nil {
+		return err
+	}
+
+	return ctrl.user.Delete(ctx, id)
+}

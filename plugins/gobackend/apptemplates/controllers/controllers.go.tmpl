@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/{{ .AppNamePackage }}/container"
 	"github.com/{{ .AppNamePackage }}/features/auth"
+	"github.com/{{ .AppNamePackage }}/features/user"
 
 {{- $AppNameToPackageName := .AppNamePackage }}
 {{- range .Features }}
@@ -12,6 +13,7 @@ import (
 
 type Controllers struct {
 	auth    auth.AuthController
+	user    user.UserController
 {{- range .Features }}
 	{{ .FeatureNameCamelCase }}    {{ .FeatureNamePackage }}.{{ .FeatureNameGo }}Controller
 {{- end }}
@@ -20,6 +22,7 @@ type Controllers struct {
 func New(cont container.Container) Controllers {
 	return Controllers{
 		auth:    auth.NewAuthController(cont),
+		user:    user.NewUserController(cont),
 {{- range .Features }}
 		{{ .FeatureNameCamelCase }}:    {{ .FeatureNamePackage }}.New{{ .FeatureNameGo }}Controller(cont),
 {{- end }}
@@ -28,6 +31,9 @@ func New(cont container.Container) Controllers {
 
 func (c Controllers) Auth() auth.AuthController {
 	return c.auth
+}
+func (c Controllers) User() user.UserController {
+	return c.user
 }
 
 {{- range .Features }}

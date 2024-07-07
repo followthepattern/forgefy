@@ -126,7 +126,6 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 		}
 
 		for _, feature := range goApp.Features() {
-
 			newFilePath := strings.ReplaceAll(filepath, "[feature]", feature.FeatureNamePackage())
 
 			file := productmap.NewFile(

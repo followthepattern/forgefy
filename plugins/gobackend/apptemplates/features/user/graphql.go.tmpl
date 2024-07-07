@@ -1,23 +1,23 @@
-package {{ .FeatureNamePackage }}
+package user
 
 import (
 	"context"
 	"net/http"
 
-	"github.com/{{ .AppNamePackage }}/features/{{ .FeatureNamePackage }}/models"
+	"github.com/{{ .AppNamePackage }}/features/user/models"
 	basemodels "github.com/{{ .AppNamePackage }}/models"
 	"github.com/{{ .AppNamePackage }}/types"
 )
 
-type {{ .FeatureNameGo }}GraphQL struct {
-	ctrl {{ .FeatureNameGo }}Controller
+type UserGraphQL struct {
+	ctrl UserController
 }
 
-func New{{ .FeatureNameGo }}GraphQL(ctrl {{ .FeatureNameGo }}Controller) {{ .FeatureNameGo }}GraphQL {
-	return {{ .FeatureNameGo }}GraphQL{ctrl: ctrl}
+func NewUserGraphQL(ctrl UserController) UserGraphQL {
+	return UserGraphQL{ctrl: ctrl}
 }
 
-func (graphQL {{ .FeatureNameGo }}GraphQL) Single(ctx context.Context, args struct{ Id string }) (*models.{{ .FeatureNameGo }}Model, error) {
+func (graphQL UserGraphQL) Single(ctx context.Context, args struct{ Id string }) (*models.UserModel, error) {
 	value, err := graphQL.ctrl.GetByID(ctx, args.Id)
 	if err != nil {
 		return nil, err
@@ -25,12 +25,12 @@ func (graphQL {{ .FeatureNameGo }}GraphQL) Single(ctx context.Context, args stru
 	return value, nil
 }
 
-func (graphQL {{ .FeatureNameGo }}GraphQL) List(ctx context.Context, args struct {
+func (graphQL UserGraphQL) List(ctx context.Context, args struct {
 	Pagination *basemodels.Pagination
 	Filter     *basemodels.ListFilter
 	OrderBy    *[]basemodels.OrderBy
-}) (*basemodels.ListResponse[models.{{ .FeatureNameGo }}Model], error) {
-	request := models.{{ .FeatureNameGo }}ListRequestParams{}
+}) (*basemodels.ListResponse[models.UserModel], error) {
+	request := models.UserListRequestParams{}
 
 	if args.Pagination != nil {
 		request.Pagination = basemodels.Pagination{
@@ -55,8 +55,8 @@ func (graphQL {{ .FeatureNameGo }}GraphQL) List(ctx context.Context, args struct
 	return results, err
 }
 
-func (graphQL {{ .FeatureNameGo }}GraphQL) Create(ctx context.Context, args struct {
-	Model models.{{ .FeatureNameGo }}Model
+func (graphQL UserGraphQL) Create(ctx context.Context, args struct {
+	Model models.UserModel
 }) (*basemodels.ResponseStatus, error) {
 	err := graphQL.ctrl.Create(ctx, args.Model)
 	if err != nil {
@@ -67,11 +67,11 @@ func (graphQL {{ .FeatureNameGo }}GraphQL) Create(ctx context.Context, args stru
 	}, nil
 }
 
-func (graphQL {{ .FeatureNameGo }}GraphQL) Update(ctx context.Context, args struct {
+func (graphQL UserGraphQL) Update(ctx context.Context, args struct {
 	Id    types.String
-	Model models.{{ .FeatureNameGo }}Model
+	Model models.UserModel
 }) (*basemodels.ResponseStatus, error) {
-	args.Model.{{ .IDField.FieldNameCamelCaseUpper }} = args.Id
+	args.Model.Id = args.Id
 	err := graphQL.ctrl.Update(ctx, args.Model)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (graphQL {{ .FeatureNameGo }}GraphQL) Update(ctx context.Context, args stru
 	}, nil
 }
 
-func (graphQL {{ .FeatureNameGo }}GraphQL) Delete(ctx context.Context, args struct {
+func (graphQL UserGraphQL) Delete(ctx context.Context, args struct {
 	Id string
 }) (*basemodels.ResponseStatus, error) {
 	err := graphQL.ctrl.Delete(ctx, args.Id)

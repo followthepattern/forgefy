@@ -3,6 +3,7 @@ package graphql
 import (
 	"github.com/{{ .AppNamePackage }}/controllers"
 	"github.com/{{ .AppNamePackage }}/features/auth"
+	"github.com/{{ .AppNamePackage }}/features/user"
 	{{ $AppNameToPackageName := .AppNamePackage }}
 {{- range .Features }}
 	"github.com/{{ $AppNameToPackageName }}/features/{{ .FeatureNamePackage }}"
@@ -11,6 +12,7 @@ import (
 
 type Resolver struct {
 	authGraphQL	auth.AuthGraphQL
+	userGraphQL user.UserGraphQL
 
 {{- range .Features }}
 	{{ .FeatureNameCamelCase }}GraphQL	{{ .FeatureNamePackage }}.{{ .FeatureNameGo }}GraphQL
@@ -19,6 +21,7 @@ type Resolver struct {
 
 func NewResolver(controllers controllers.Controllers) Resolver {
 	authGraphQL := auth.NewAuthGraphQL(controllers.Auth())
+	userGraphQL := user.NewUserGraphQL(controllers.User())
 	
 {{- range .Features }}
 	{{ .FeatureNameCamelCase }}GraphQL := {{ .FeatureNamePackage}}.New{{ .FeatureNameGo }}GraphQL(controllers.{{ .FeatureNameGo }}())
@@ -27,6 +30,7 @@ func NewResolver(controllers controllers.Controllers) Resolver {
 
 	resolver := Resolver{
 		authGraphQL:	authGraphQL,
+		userGraphQL:    userGraphQL,
 {{- range .Features }}
 		{{ .FeatureNameCamelCase }}GraphQL: {{ .FeatureNameCamelCase }}GraphQL,
 {{- end }}
@@ -41,6 +45,9 @@ func (r Resolver) Authentication() (auth.AuthGraphQL, error) {
 
 func (r Resolver) Auth() (auth.AuthGraphQL, error) {
 	return r.authGraphQL, nil
+}
+func (r Resolver) Users() (user.UserGraphQL, error) {
+	return r.userGraphQL, nil
 }
 
 {{- range .Features }}

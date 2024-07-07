@@ -1,5 +1,4 @@
 import FolderIcon from '@/app/icons/folder';
-import { ForwardRefExoticComponent, SVGProps } from 'react'
 
 export interface NavigationItem {
     name: string
@@ -8,6 +7,7 @@ export interface NavigationItem {
 }
 
 export const navigationItems: NavigationItem[] = [
+    { name: 'Users', href: '/users', icon: FolderIcon },
     {{- range .Features }}
     { name: '{{ .FeatureHumanReadableName }}s', href: '/{{ .FeatureNameURL}}s', icon: FolderIcon },
     {{- end }}

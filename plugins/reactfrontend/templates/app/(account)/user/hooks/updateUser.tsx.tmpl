@@ -1,0 +1,12 @@
+import { updateUser as graphQL } from "../graphql/mutation";
+import { UpdateMutationResult } from "@/graphql/mutation";
+import { User, MutationResponse } from "../model";
+import useUpdate from "@/graphql/hooks/useUpdate";
+
+export default function useUpdateUser(): UpdateMutationResult<User,number | undefined> {
+const parseResult = (data?: MutationResponse | null) : number | undefined  => {
+        return data?.users?.update?.code;
+    }
+
+    return useUpdate({parseResult, graphQL})
+}

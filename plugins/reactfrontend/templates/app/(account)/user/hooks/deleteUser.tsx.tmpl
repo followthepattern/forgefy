@@ -1,0 +1,12 @@
+import { deleteUser as graphQL } from "../graphql/mutation";
+import { DeleteMutationResult, MutationResourceResponse } from "@/graphql/mutation";
+import { MutationResponse  } from "../model";
+import useDelete from "@/graphql/hooks/useDelete";
+
+export default function useDeleteUser(): DeleteMutationResult<string,number | undefined> {
+    const parseResult = (data?: MutationResponse | null): number | undefined => {
+        return data?.users?.delete?.code
+    }
+
+    return useDelete({parseResult, graphQL})
+}

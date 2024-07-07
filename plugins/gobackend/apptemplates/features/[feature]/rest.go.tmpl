@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/{{ .AppNamePackage }}/api/httpresponses"
-	"github.com/{{ .AppNamePackage }}/models"
+	"github.com/{{ .AppNamePackage }}/features/{{ .FeatureNamePackage }}/models"
+	basemodels "github.com/{{ .AppNamePackage }}/models"
 	"github.com/{{ .AppNamePackage }}/types"
 
 	"github.com/go-chi/chi"
@@ -36,8 +37,8 @@ func (service {{ .FeatureNameGo }}Rest) GetByID(w http.ResponseWriter, r *http.R
 func (service {{ .FeatureNameGo }}Rest) Get(w http.ResponseWriter, r *http.Request) {
 	search := chi.URLParam(r, "search")
 
-	filter := {{ .FeatureNameGo }}ListRequestParams{
-		Filter: models.ListFilter{
+	filter := models.{{ .FeatureNameGo }}ListRequestParams{
+		Filter: basemodels.ListFilter{
 			Search: types.StringFrom(search),
 		},
 	}
@@ -53,7 +54,7 @@ func (service {{ .FeatureNameGo }}Rest) Get(w http.ResponseWriter, r *http.Reque
 }
 
 func (service {{ .FeatureNameGo }}Rest) Create(w http.ResponseWriter, r *http.Request) {
-	var value {{ .FeatureNameGo }}Model
+	var value models.{{ .FeatureNameGo }}Model
 	err := json.NewDecoder(r.Body).Decode(&value)
 	if err != nil {
 		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
@@ -70,7 +71,7 @@ func (service {{ .FeatureNameGo }}Rest) Create(w http.ResponseWriter, r *http.Re
 }
 
 func (service {{ .FeatureNameGo }}Rest) Update(w http.ResponseWriter, r *http.Request) {
-	var value {{ .FeatureNameGo }}Model
+	var value models.{{ .FeatureNameGo }}Model
 	err := json.NewDecoder(r.Body).Decode(&value)
 	if err != nil {
 		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)

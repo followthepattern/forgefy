@@ -1,0 +1,12 @@
+import { CreateMutationResult, MutationResourceResponse } from "@/graphql/mutation";
+import { User, MutationResponse  } from "../model";
+import useCreate from "@/graphql/hooks/useCreate";
+import { createUser as graphQL } from "../graphql/mutation";
+
+export default function useCreateUser(): CreateMutationResult<User, number> {
+    const parseResult = (data?: MutationResponse | null) : number | undefined  => {
+        return data?.users?.create?.code;
+    }
+
+    return useCreate<User>({parseResult, graphQL})
+}
