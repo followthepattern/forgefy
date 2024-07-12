@@ -1,6 +1,8 @@
 package models
 
 import (
+	"strings"
+
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/naming"
 )
@@ -58,7 +60,7 @@ func (f Field) FieldValueDB() string {
 }
 
 func (f Field) Nullable() string {
-	if f.Field.Nullable || f.Name != models.IDFieldName {
+	if f.Field.Nullable || strings.ToLower(f.Field.Type) == models.IDFieldType {
 		return ""
 	}
 
