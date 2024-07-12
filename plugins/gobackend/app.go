@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/followthepattern/forgefy/plugins"
-	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates"
 	"github.com/followthepattern/forgefy/plugins/gobackend/models"
+	"github.com/followthepattern/forgefy/plugins/gobackend/templates"
 	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
@@ -81,7 +81,7 @@ func (plugin *GoBackendPluginApp) GetNextCerbosPort() int {
 }
 
 func (plugin *GoBackendPluginApp) Build(pm productmap.ProductMap, app specification.App) error {
-	dir := apptemplates.EntireDir
+	dir := templates.EntireDir
 
 	goApp := App{app, plugin.dbPort, plugin.cerbosPort}
 
@@ -93,7 +93,7 @@ func (plugin *GoBackendPluginApp) Build(pm productmap.ProductMap, app specificat
 }
 
 func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) func(filepath string, d fs.DirEntry, err error) error {
-	dir := apptemplates.EntireDir
+	dir := templates.EntireDir
 
 	return func(filepath string, d fs.DirEntry, err error) error {
 		if err != nil {
