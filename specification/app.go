@@ -3,6 +3,7 @@ package specification
 import (
 	"strings"
 
+	"github.com/followthepattern/forgefy/specification/naming"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
@@ -19,11 +20,11 @@ type App struct {
 }
 
 func (a App) AppNameDir() string {
-	return strings.ToLower(a.AppName)
+	return strings.ToLower(naming.ToSnakeCase(a.AppName))
 }
 
 func (a App) AppNameCamelCase() string {
-	return a.AppName
+	return naming.ToLowerCamelCase(a.AppName)
 }
 
 func (a App) LoopLimit() []int {

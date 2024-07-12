@@ -1,14 +1,9 @@
 package specification
 
 import (
-	"strings"
-
+	"github.com/followthepattern/forgefy/specification/naming"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"gopkg.in/yaml.v3"
-)
-
-const (
-	defaultEmail = "app@product.io"
 )
 
 type Product struct {
@@ -25,8 +20,8 @@ func (fs Product) Validate() error {
 	)
 }
 
-func (p Product) ProductNameAsLower() string {
-	return strings.ToLower(p.ProductName)
+func (p Product) ProductNameCamelCase() string {
+	return naming.ToLowerCamelCase(p.ProductName)
 }
 
 func UnmarshalYaml(data []byte) (p Product, err error) {
@@ -35,15 +30,21 @@ func UnmarshalYaml(data []byte) (p Product, err error) {
 		return
 	}
 
-	p = setDefault(p)
+	p = constructProduct(p)
 
 	err = p.Validate()
 	return
 }
 
-func setDefault(p Product) Product {
-	if p.Email == "" {
-		p.Email = defaultEmail
+func constructProduct(p Product) Product {
+	for i := 0; i < len(p.Apps); i++ {
+		p.Apps[i].Product = p
+		p.Apps[i].Features = append(p.Features, p.Apps[i].Features...)
+
+		for j := 0; j < len(p.Apps[i].Features); j++ {
+			p.Apps[i].Features[j].App = p.Apps[i]
+		}
 	}
+
 	return p
 }
