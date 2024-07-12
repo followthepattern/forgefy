@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/followthepattern/forgefy/plugins"
+	"github.com/followthepattern/forgefy/plugins/gobackend/defaults"
 	"github.com/followthepattern/forgefy/plugins/gobackend/models"
 	"github.com/followthepattern/forgefy/plugins/gobackend/templates"
 	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
@@ -17,6 +18,11 @@ type App struct {
 	specification.App
 	DbPort     int
 	CerbosPort int
+	Defaults   defaults.Defaults
+}
+
+func newApp(app specification.App) App {
+	return App{app, 0, 0, defaults.Defaults{}}
 }
 
 func (a App) AppNameCapital() string {
@@ -83,13 +89,20 @@ func (plugin *GoBackendPluginApp) GetNextCerbosPort() int {
 func (plugin *GoBackendPluginApp) Build(pm productmap.ProductMap, app specification.App) error {
 	dir := templates.EntireDir
 
-	goApp := App{app, plugin.dbPort, plugin.cerbosPort}
+	goApp := newApp(app)
+	goApp = plugin.setDefaults(goApp)
 
+	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, goApp))
+}
+
+func (plugin *GoBackendPluginApp) setDefaults(goApp App) App {
 	goApp.App.AppPort = plugin.GetNextPortNumber()
 	goApp.DbPort = plugin.GetNextDBPort()
 	goApp.CerbosPort = plugin.GetNextCerbosPort()
 
-	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, goApp))
+	goApp.Defaults.Roles = defaults.DefaultRoles(goApp.App.Features)
+
+	return goApp
 }
 
 func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) func(filepath string, d fs.DirEntry, err error) error {

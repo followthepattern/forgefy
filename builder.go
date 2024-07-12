@@ -48,7 +48,6 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 	}
 
 	for _, appSpecification := range builder.productSpecification.Apps {
-		appSpecification.Init()
 		err = builder.buildApps(pm, appSpecification)
 		if err != nil {
 			return pm, err

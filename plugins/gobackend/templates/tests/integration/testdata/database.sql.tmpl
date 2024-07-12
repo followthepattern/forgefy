@@ -81,7 +81,7 @@ ALTER TABLE app.{{ $feature.FeatureName }} OWNER TO {{ $appName }}user;
 INSERT INTO auth.user VALUES ('613254df-c779-479c-9d76-b8036e342979', 'admin@admin.com', 'John', 'Jones', '$2a$10$1UZWtyK2f6BvSlqp6SBzkeGiTP5pdkiuRgvlt4Gd4MZIyfpVWCkYq', true, NULL, NULL, '2023-07-28 13:23:03.273735', NULL);
 
 
-{{- range .App.DefaultValues.Roles }}
+{{- range .App.Defaults.Roles }}
 INSERT INTO auth.role VALUES ('{{ .ID.Value }}', '{{ .Code.Value }}', '{{ .Name.Value }}', ' {{ .CreationUserID.Value }}', NULL, '{{ .CreatedAt.Value }}', NULL);
 INSERT INTO auth.user_role VALUES ('613254df-c779-479c-9d76-b8036e342979', '{{ .ID.Value }}', '613254df-c779-479c-9d76-b8036e342979', NULL, '2023-07-28 13:23:03.273735', NULL);
 {{- end }}

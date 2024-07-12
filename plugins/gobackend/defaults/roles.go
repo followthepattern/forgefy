@@ -1,23 +1,16 @@
-package specification
+package defaults
 
 import (
 	"fmt"
 	"time"
 
+	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/naming"
 	"github.com/google/uuid"
 )
 
-type DefaultValues struct {
-	Roles []models.Role
-}
-
-func (d *DefaultValues) InitDefaultTypes(features []Feature) {
-	d.generateRoles(features)
-}
-
-func (d *DefaultValues) generateRoles(features []Feature) {
+func DefaultRoles(features []specification.Feature) (roles []models.Role) {
 	for _, feature := range features {
 		role := models.Role{
 			ID: models.Field{
@@ -51,6 +44,7 @@ func (d *DefaultValues) generateRoles(features []Feature) {
 				},
 			},
 		}
-		d.Roles = append(d.Roles, role)
+		roles = append(roles, role)
 	}
+	return
 }

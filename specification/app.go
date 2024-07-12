@@ -11,7 +11,6 @@ type AppType string
 
 type App struct {
 	Product
-	DefaultValues       DefaultValues
 	AppName             string    `yaml:"name"`
 	AppType             AppType   `yaml:"type"`
 	Features            []Feature `yaml:"features"`
@@ -35,10 +34,6 @@ func (a App) LoopLimit() []int {
 	}
 
 	return make([]int, count)
-}
-
-func (a *App) Init() {
-	a.DefaultValues.InitDefaultTypes(a.Features)
 }
 
 func (a App) Validate() error {
