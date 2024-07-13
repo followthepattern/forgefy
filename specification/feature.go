@@ -11,9 +11,9 @@ import (
 
 type Feature struct {
 	App
-	FeatureName string         `yaml:"name"`
-	Fields      []models.Field `yaml:"fields"`
-	GivenRecord []string       `yaml:"records"`
+	FeatureName    string         `yaml:"name"`
+	Fields         []models.Field `yaml:"fields"`
+	DefinedRecords []string       `yaml:"records"`
 }
 
 func (f Feature) FeatureNameCamelCase() string {
@@ -37,7 +37,7 @@ func (f Feature) FeatureNameDir() string {
 }
 
 func (f Feature) Validate() error {
-	for _, data := range f.GivenRecord {
+	for _, data := range f.DefinedRecords {
 		line := strings.Split(data, ",")
 		if len(line) != len(f.Fields) {
 			return fmt.Errorf("given record (%s) is invalid, the length of the list doesn't equal to the number of fields", data)
@@ -64,8 +64,8 @@ func (f Feature) RandomRecords() (records []models.Record) {
 	return nil
 }
 
-func (f Feature) GivenRecords() (records []models.Record) {
-	for _, givenRecord := range f.GivenRecord {
+func (f Feature) UserDefinedRecords() (records []models.Record) {
+	for _, givenRecord := range f.DefinedRecords {
 		record := models.Record{}
 		values := strings.Split(givenRecord, ",")
 		for i, value := range values {
@@ -79,5 +79,5 @@ func (f Feature) GivenRecords() (records []models.Record) {
 }
 
 func (f Feature) Records() []models.Record {
-	return append(f.GivenRecords(), f.RandomRecords()...)
+	return append(f.UserDefinedRecords(), f.RandomRecords()...)
 }
