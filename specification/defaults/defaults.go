@@ -5,5 +5,6 @@ import (
 )
 
 type Defaults struct {
-	Roles []models.Role
+	AdminUser models.User
+	Roles     []models.Role
 }

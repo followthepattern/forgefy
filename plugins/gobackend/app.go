@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/followthepattern/forgefy/plugins"
-	"github.com/followthepattern/forgefy/plugins/gobackend/defaults"
 	"github.com/followthepattern/forgefy/plugins/gobackend/models"
 	"github.com/followthepattern/forgefy/plugins/gobackend/templates"
 	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
@@ -18,11 +17,10 @@ type App struct {
 	specification.App
 	DbPort     int
 	CerbosPort int
-	Defaults   defaults.Defaults
 }
 
 func newApp(app specification.App) App {
-	return App{app, 0, 0, defaults.Defaults{}}
+	return App{app, 0, 0}
 }
 
 func (a App) AppNameCapital() string {
@@ -99,8 +97,6 @@ func (plugin *GoBackendPluginApp) setDefaults(goApp App) App {
 	goApp.App.AppPort = plugin.GetNextPortNumber()
 	goApp.DbPort = plugin.GetNextDBPort()
 	goApp.CerbosPort = plugin.GetNextCerbosPort()
-
-	goApp.Defaults.Roles = defaults.DefaultRoles(goApp.App.Features)
 
 	return goApp
 }

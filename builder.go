@@ -7,6 +7,7 @@ import (
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
+	"github.com/followthepattern/forgefy/specification/defaults"
 )
 
 type Builder struct {
@@ -74,8 +75,10 @@ func (b Builder) buildApps(pm productmap.ProductMap, appSpecification specificat
 		return fmt.Errorf("unknown app definition: %s", appSpecification.AppType)
 	}
 
-	for _, a := range apps {
-		err := a.Build(pm, appSpecification)
+	appSpecification = b.setAppDefaults(appSpecification)
+
+	for _, app := range apps {
+		err := app.Build(pm, appSpecification)
 
 		if err != nil {
 			return err
@@ -83,4 +86,11 @@ func (b Builder) buildApps(pm productmap.ProductMap, appSpecification specificat
 	}
 
 	return nil
+}
+
+func (b Builder) setAppDefaults(app specification.App) specification.App {
+	app.Defaults.AdminUser = defaults.AdminUser()
+	app.Defaults.Roles = defaults.Roles(app.FeaturesArray())
+
+	return app
 }

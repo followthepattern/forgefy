@@ -61,7 +61,7 @@ func (f Feature) RandomRecords() (records []models.Record) {
 
 	}
 
-	return nil
+	return records
 }
 
 func (f Feature) UserDefinedRecords() (records []models.Record) {

@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/naming"
 	"github.com/google/uuid"
 )
 
-func DefaultRoles(features []specification.Feature) (roles []models.Role) {
+func Roles(features []string) (roles []models.Role) {
 	for _, feature := range features {
 		role := models.Role{
 			ID: models.Field{
@@ -20,12 +19,12 @@ func DefaultRoles(features []specification.Feature) (roles []models.Role) {
 			},
 			Code: models.Field{
 				Name:     "Code",
-				Value:    fmt.Sprintf("%s:editor", naming.LowerFirst(feature.FeatureName)),
+				Value:    fmt.Sprintf("%s:editor", naming.LowerFirst(feature)),
 				Nullable: false,
 			},
 			Name: models.Field{
 				Name:     "Name",
-				Value:    fmt.Sprintf("%s Editor", feature.FeatureName),
+				Value:    fmt.Sprintf("%s Editor", feature),
 				Nullable: false,
 			},
 			Userlog: models.Userlog{

@@ -3,6 +3,7 @@ package specification
 import (
 	"strings"
 
+	"github.com/followthepattern/forgefy/specification/defaults"
 	"github.com/followthepattern/forgefy/specification/naming"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -16,6 +17,17 @@ type App struct {
 	Features            []Feature `yaml:"features"`
 	AppPort             int       `yaml:"port"`
 	CountOfRandomValues int       `yaml:""`
+	Defaults            defaults.Defaults
+}
+
+func (a App) FeaturesArray() []string {
+	result := make([]string, len(a.Features))
+
+	for i, feature := range a.Features {
+		result[i] = feature.FeatureName
+	}
+
+	return result
 }
 
 func (a App) AppNameDir() string {
@@ -24,16 +36,6 @@ func (a App) AppNameDir() string {
 
 func (a App) AppNameCamelCase() string {
 	return naming.ToLowerCamelCase(a.AppName)
-}
-
-func (a App) LoopLimit() []int {
-	count := 10
-
-	if a.CountOfRandomValues != 0 {
-		count = a.CountOfRandomValues
-	}
-
-	return make([]int, count)
 }
 
 func (a App) Validate() error {
