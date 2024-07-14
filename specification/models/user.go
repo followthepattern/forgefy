@@ -6,6 +6,7 @@ type User struct {
 	FirstName Field
 	LastName  Field
 	Password  Field
+	Active    Field
 
 	Userlog
 }

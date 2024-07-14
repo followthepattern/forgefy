@@ -8,6 +8,7 @@ import (
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/defaults"
+	"github.com/followthepattern/forgefy/specification/models"
 )
 
 type Builder struct {
@@ -89,7 +90,7 @@ func (b Builder) buildApps(pm productmap.ProductMap, appSpecification specificat
 }
 
 func (b Builder) setAppDefaults(app specification.App) specification.App {
-	app.Defaults.AdminUser = defaults.AdminUser()
+	app.Defaults.Users = []models.User{defaults.AdminUser()}
 	app.Defaults.Roles = defaults.Roles(app.FeaturesArray())
 
 	return app

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/followthepattern/forgefy/specification/models"
@@ -55,8 +56,12 @@ func (f Field) FieldTypeDB() string {
 	return ""
 }
 
-func (f Field) FieldValueDB() string {
-	return f.Value
+func (f Field) ValueDB() string {
+	if len(f.Value) == 0 {
+		return "NULL"
+	}
+
+	return fmt.Sprintf("'%s'", f.Value)
 }
 
 func (f Field) Nullable() string {

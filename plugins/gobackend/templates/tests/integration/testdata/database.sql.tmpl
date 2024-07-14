@@ -77,19 +77,20 @@ CREATE TABLE app.{{ $feature.FeatureName }} (
 ALTER TABLE app.{{ $feature.FeatureName }} OWNER TO {{ $appName }}user;
 {{end}}
 
-INSERT INTO auth.user VALUES ('613254df-c779-479c-9d76-b8036e342979', 'admin@admin.com', 'John', 'Jones', '$2a$10$1UZWtyK2f6BvSlqp6SBzkeGiTP5pdkiuRgvlt4Gd4MZIyfpVWCkYq', true, NULL, NULL, '2023-07-28 13:23:03.273735', NULL);
-
+{{- range .Defaults.Users }}
+INSERT INTO auth.user VALUES ({{ .ID.ValueDB }}, {{ .Email.ValueDB }}, {{ .FirstName.ValueDB }}, {{ .LastName.ValueDB }}, {{ .Password.ValueDB }}, {{ .Active.ValueDB }}, {{ .CreationUserID.ValueDB }}, {{ .UpdateUserID.ValueDB }}, {{ .CreatedAt.ValueDB }}, {{ .UpdatedAt.ValueDB }});
+{{- end }}
 
 {{- range .Defaults.Roles }}
-INSERT INTO auth.role VALUES ('{{ .ID.Value }}', '{{ .Code.Value }}', '{{ .Name.Value }}', ' {{ .CreationUserID.Value }}', NULL, '{{ .CreatedAt.Value }}', NULL);
-INSERT INTO auth.user_role VALUES ('613254df-c779-479c-9d76-b8036e342979', '{{ .ID.Value }}', '613254df-c779-479c-9d76-b8036e342979', NULL, '2023-07-28 13:23:03.273735', NULL);
+INSERT INTO auth.role VALUES ({{ .ID.ValueDB }}, {{ .Code.ValueDB }}, {{ .Name.ValueDB }}, ' {{ .CreationUserID.ValueDB }}, NULL, {{ .CreatedAt.ValueDB }}, NULL);
+INSERT INTO auth.user_role VALUES ('613254df-c779-479c-9d76-b8036e342979', {{ .ID.ValueDB }}, '613254df-c779-479c-9d76-b8036e342979', NULL, '2023-07-28 13:23:03.273735', NULL);
 {{- end }}
 
 {{- range .Features }}
     {{- $featureName := .FeatureName }}
     {{- range .Records }}
         {{- $fields := .Fields }}
-INSERT INTO app.{{ $featureName }} VALUES ({{- range $index, $field := $fields }}{{ if $index }},{{end}}'{{ $field.Value }}'{{- end }});
+INSERT INTO app.{{ $featureName }} VALUES ({{- range $index, $field := $fields }}{{ if $index }},{{end}}{{ $field.ValueDB }}{{- end }});
         
     {{- end }}
 {{- end }}
