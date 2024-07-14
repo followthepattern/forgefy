@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"path"
 	"strings"
+	"text/template"
 
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/gobackend/models"
@@ -128,8 +129,11 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 		if !strings.Contains(filepath, "[feature]") {
 			file := productmap.NewFile(
 				filepath,
-				string(content),
-			).WithData(goApp)
+				string(content)).
+				WithData(goApp).
+				WithFuncMap(template.FuncMap{
+					"DB": models.DB,
+				})
 
 			return pm.Insert(file)
 		}
@@ -143,6 +147,8 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 			).WithData(FeatureTemplateModel{
 				Feature: feature,
 				App:     goApp,
+			}).WithFuncMap(template.FuncMap{
+				"DB": models.DB,
 			})
 
 			err = pm.Insert(file)

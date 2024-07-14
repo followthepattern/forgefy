@@ -64,6 +64,14 @@ func (f Field) ValueDB() string {
 	return fmt.Sprintf("'%s'", f.Value)
 }
 
+func DB(f models.Field) string {
+	if len(f.Value) == 0 {
+		return "NULL"
+	}
+
+	return fmt.Sprintf("'%s'", f.Value)
+}
+
 func (f Field) Nullable() string {
 	if f.Field.Nullable || strings.ToLower(f.Field.Type) == models.IDFieldType {
 		return ""
