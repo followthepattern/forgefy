@@ -14,11 +14,7 @@ func (Plugin) Name() string { return "Go Plugin" }
 
 func (Plugin) Apps() []plugins.App {
 	return []plugins.App{
-		&GoBackendPluginApp{
-			port:       8080,
-			cerbosPort: 3592,
-			dbPort:     5433,
-		},
+		NewApp(),
 	}
 }
 

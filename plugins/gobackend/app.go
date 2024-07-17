@@ -8,6 +8,7 @@ import (
 
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/gobackend/models"
+	"github.com/followthepattern/forgefy/plugins/gobackend/parsing"
 	"github.com/followthepattern/forgefy/plugins/gobackend/templates"
 	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
 	"github.com/followthepattern/forgefy/productmap"
@@ -48,9 +49,24 @@ func (a App) Features() []Feature {
 var _ plugins.App = &GoBackendPluginApp{}
 
 type GoBackendPluginApp struct {
-	port       int
-	dbPort     int
-	cerbosPort int
+	port             int
+	dbPort           int
+	cerbosPort       int
+	parsingFunctions template.FuncMap
+}
+
+func NewApp() *GoBackendPluginApp {
+	return &GoBackendPluginApp{
+		port:       8080,
+		cerbosPort: 3592,
+		dbPort:     5433,
+		parsingFunctions: template.FuncMap{
+			"NameDB":     parsing.NameDB,
+			"TypeDB":     parsing.TypeDB,
+			"ValueDB":    parsing.ValueDB,
+			"NullableDB": parsing.NullableDB,
+		},
+	}
 }
 
 func (GoBackendPluginApp) Name() string {
@@ -131,9 +147,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 				filepath,
 				string(content)).
 				WithData(goApp).
-				WithFuncMap(template.FuncMap{
-					"DB": models.DB,
-				})
+				WithFuncMap(b.parsingFunctions)
 
 			return pm.Insert(file)
 		}
@@ -147,9 +161,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 			).WithData(FeatureTemplateModel{
 				Feature: feature,
 				App:     goApp,
-			}).WithFuncMap(template.FuncMap{
-				"DB": models.DB,
-			})
+			}).WithFuncMap(b.parsingFunctions)
 
 			err = pm.Insert(file)
 			if err != nil {

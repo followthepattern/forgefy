@@ -56,7 +56,7 @@ CREATE SCHEMA app;
 {{ range $feature := .Features }}
 CREATE TABLE app.{{ $feature.FeatureName }} (
 {{- range $index, $field := .Fields }}
-    {{ $field.FieldNameDB }} {{ $field.FieldTypeDB }}{{- if $field.Nullable }} {{ $field.Nullable }}{{end}},
+    {{ NameDB $field }} {{ $field | TypeDB }}{{- if $field.Nullable }} {{ $field.Nullable }}{{end}},
 {{- end }}
     creation_user_id character varying,
     update_user_id character varying,

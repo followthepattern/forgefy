@@ -1,9 +1,6 @@
 package models
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/naming"
 )
@@ -38,44 +35,4 @@ func (f Field) FieldTypeGraphQL() string {
 		return "Int64"
 	}
 	return naming.ToUpperCamelCase(f.Type)
-}
-
-func (f Field) FieldNameDB() string {
-	return f.FieldNameSnakeCaseLower()
-}
-
-func (f Field) FieldTypeDB() string {
-	switch f.Type {
-	case "string":
-		return "varchar"
-	case "bool":
-		return "boolean"
-	case "int":
-		return "integer"
-	}
-	return ""
-}
-
-func (f Field) ValueDB() string {
-	if len(f.Value) == 0 {
-		return "NULL"
-	}
-
-	return fmt.Sprintf("'%s'", f.Value)
-}
-
-func DB(f models.Field) string {
-	if len(f.Value) == 0 {
-		return "NULL"
-	}
-
-	return fmt.Sprintf("'%s'", f.Value)
-}
-
-func (f Field) Nullable() string {
-	if f.Field.Nullable || strings.ToLower(f.Field.Type) == models.IDFieldType {
-		return ""
-	}
-
-	return "NOT NULL"
 }
