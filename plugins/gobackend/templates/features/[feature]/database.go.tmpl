@@ -62,7 +62,7 @@ func (repo {{ .FeatureNameGo }}Database) Get(request models.{{ .FeatureNameGo }}
 		query = query.Where(
 			Or(
 			{{- range $field := .Fields }}{{- if eq .Type "string" }}
-				I("{{ NameDB $field }}").Like(pattern),
+				I("{{ $field | NameDB }}").Like(pattern),
 			{{- end }}{{- end }}
 			))
 	}
@@ -106,7 +106,7 @@ func (repo {{ .FeatureNameGo }}Database) Update(model models.{{ .FeatureNameGo }
 func (repo {{ .FeatureNameGo }}Database) Delete(id string) error {
 	res, err := repo.db.
 		Delete({{ .FeatureNameGo }}Table).
-		Where(C("{{ NameDB .IDField }}").Eq(id)).
+		Where(C("{{ .IDField | NameDB }}").Eq(id)).
 		Executor().
 		Exec()
 
