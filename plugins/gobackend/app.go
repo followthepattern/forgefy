@@ -7,7 +7,6 @@ import (
 	"text/template"
 
 	"github.com/followthepattern/forgefy/plugins"
-	"github.com/followthepattern/forgefy/plugins/gobackend/models"
 	"github.com/followthepattern/forgefy/plugins/gobackend/parsing"
 	"github.com/followthepattern/forgefy/plugins/gobackend/templates"
 	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
@@ -36,12 +35,7 @@ func (a App) AppNamePackage() string {
 func (a App) Features() []Feature {
 	features := make([]Feature, len(a.App.Features))
 	for i, feature := range a.App.Features {
-
-		fields := make([]models.Field, len(feature.Fields))
-		for j, field := range feature.Fields {
-			fields[j] = models.Field{Field: field}
-		}
-		features[i] = Feature{Feature: feature, Fields: fields}
+		features[i] = Feature{Feature: feature}
 	}
 	return features
 }

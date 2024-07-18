@@ -4,32 +4,15 @@ import (
 	"fmt"
 	"strings"
 
-	gomodels "github.com/followthepattern/forgefy/plugins/gobackend/models"
 	"github.com/followthepattern/forgefy/specification/models"
 )
 
-func NameDB(f interface{}) string {
-	switch v := f.(type) {
-	case models.Field:
-		return v.FieldNameSnakeCaseLower()
-	case gomodels.Field:
-		return v.FieldNameSnakeCaseLower()
-	}
-
-	return ""
+func NameDB(f models.Field) string {
+	return f.FieldNameSnakeCaseLower()
 }
 
-func TypeDB(f interface{}) string {
-	t := models.Field{}
-
-	switch v := f.(type) {
-	case models.Field:
-		t = v
-	case gomodels.Field:
-		t = v.Field
-	}
-
-	switch t.Type {
+func TypeDB(f models.Field) string {
+	switch f.Type {
 	case "string":
 		return "varchar"
 	case "bool":
@@ -37,7 +20,7 @@ func TypeDB(f interface{}) string {
 	case "int":
 		return "integer"
 	}
-	return ""
+	return "unknown"
 }
 
 func ValueDB(f models.Field) string {
