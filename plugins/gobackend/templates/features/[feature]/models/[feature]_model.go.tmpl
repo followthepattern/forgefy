@@ -7,8 +7,8 @@ import (
 )
 
 type {{ .FeatureNameGo }}Model struct {
-	{{- range .Fields }}
-	{{ .FieldNameCamelCaseUpper }} {{ .FieldTypeGo }} `db:"{{ .Field | NameDB }}" goqu:"omitempty"`
+	{{- range $field := .Fields }}
+	{{ $field.FieldNameCamelCaseUpper }} {{ $field | GoType }} `db:"{{ $field | NameDB }}" goqu:"omitempty"`
 	{{- end }}
 	basemodels.Userlog
 }

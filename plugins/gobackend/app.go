@@ -55,10 +55,14 @@ func NewApp() *GoBackendPluginApp {
 		cerbosPort: 3592,
 		dbPort:     5433,
 		parsingFunctions: template.FuncMap{
-			"NameDB":     parsing.NameDB,
-			"TypeDB":     parsing.TypeDB,
-			"ValueDB":    parsing.ValueDB,
-			"NullableDB": parsing.NullableDB,
+			"NameDB":      parsing.NameDB,
+			"TypeDB":      parsing.TypeDB,
+			"ValueDB":     parsing.ValueDB,
+			"NullableDB":  parsing.NullableDB,
+			"NameGraphQL": parsing.NameGraphQL,
+			"TypeGraphQL": parsing.TypeGraphQL,
+			"GoType":      parsing.GoType,
+			"AsTag":       parsing.AsTag,
 		},
 	}
 }

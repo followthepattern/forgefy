@@ -98,8 +98,8 @@ type UserMutation {
 {{- range .Features }}
 
 type {{ .FeatureNameGraphQL }} {
-	{{- range .Fields }}
-	{{ .FieldNameGraphQL }}: {{ .FieldTypeGraphQL }}!
+	{{- range $field := .Fields }}
+	{{ $field | NameGraphQL }}: {{ $field | TypeGraphQL }}!
 	{{- end }}
 	creationUserID: String!
 	updateUserID: String!
@@ -108,14 +108,14 @@ type {{ .FeatureNameGraphQL }} {
 }
 
 input Create{{ .FeatureNameGraphQL }} {
-	{{- range .Fields }}
-	{{ .FieldNameGraphQL }}: {{ .FieldTypeGraphQL }}!
+	{{- range $field := .Fields }}
+	{{ $field | NameGraphQL }}: {{ $field | TypeGraphQL }}!
 	{{- end }}
 }
 
 input Update{{ .FeatureNameGraphQL }} {
-	{{- range .Fields }}
-	{{ .FieldNameGraphQL }}: {{ .FieldTypeGraphQL }}!
+	{{- range $field := .Fields }}
+	{{ $field | NameGraphQL }}: {{ $field | TypeGraphQL }}!
 	{{- end }}
 }
 
