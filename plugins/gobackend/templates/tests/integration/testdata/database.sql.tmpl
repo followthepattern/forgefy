@@ -66,7 +66,7 @@ ALTER SCHEMA app OWNER TO {{ $appName }}user;
 {{ range $feature := .Features }}
 CREATE TABLE app.{{ $feature.FeatureName }} (
 {{- range $index, $field := .Fields }}
-    {{ $field.Field | NameDB }} {{ TypeDB $field.Field }}{{- if $field.Nullable }} {{ NullableDB $field }}{{end}},
+    {{ $field.Field | NameDB }} {{ $field.Field | TypeDB }}{{- if $field.Nullable }} {{ $field | NullableDB }}{{end}},
 {{- end }}
     creation_user_id character varying,
     update_user_id character varying,
