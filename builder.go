@@ -2,7 +2,6 @@ package forgefy
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/productmap"
@@ -38,8 +37,6 @@ func (builder Builder) withApps(apps map[string][]plugins.App) Builder {
 func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, error) {
 	pm := productmap.NewProductMap()
 
-	builder.setDefaults()
-
 	err := builder.addDefaultFiles(pm)
 	if err != nil {
 		return pm, err
@@ -64,12 +61,6 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 
 func (builder Builder) addDefaultFiles(_ productmap.ProductMap) error { return nil }
 
-func (builder *Builder) setDefaults() {
-	if builder.productSpecification.Email == "" {
-		builder.productSpecification.Email = fmt.Sprintf("info@%s.com", strings.ToLower(builder.productSpecification.ProductName))
-	}
-}
-
 func (b Builder) buildApps(pm productmap.ProductMap, appSpecification specification.App) error {
 	apps, ok := b.apps[string(appSpecification.AppType)]
 	if !ok {
@@ -91,7 +82,9 @@ func (b Builder) buildApps(pm productmap.ProductMap, appSpecification specificat
 
 func (b Builder) setAppDefaults(app specification.App) specification.App {
 	app.Defaults.Users = []models.User{defaults.AdminUser()}
-	app.Defaults.Roles = defaults.Roles(app.FeaturesArray())
+	roles := defaults.Roles(defaults.AdminUser(), app.FeaturesArray())
+	app.Defaults.Roles = roles
+	app.Defaults.UserRoles = defaults.UserRole(defaults.AdminUser(), roles)
 
 	return app
 }

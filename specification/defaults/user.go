@@ -32,6 +32,11 @@ func AdminUser() models.User {
 			Type:  "string",
 			Value: "$2a$10$1UZWtyK2f6BvSlqp6SBzkeGiTP5pdkiuRgvlt4Gd4MZIyfpVWCkYq",
 		},
+		Active: models.Field{
+			Name:  "Active",
+			Type:  "boolean",
+			Value: "true",
+		},
 	}
 
 	user.Userlog = DefaultUserlog(user)

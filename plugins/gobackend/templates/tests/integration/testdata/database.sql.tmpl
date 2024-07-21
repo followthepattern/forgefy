@@ -82,8 +82,11 @@ INSERT INTO auth.user VALUES ({{ .ID | ValueDB }}, {{ .Email | ValueDB }}, {{ .F
 {{- end }}
 
 {{- range .Defaults.Roles }}
-INSERT INTO auth.role VALUES ({{ .ID | ValueDB }}, {{ .Code | ValueDB  }}, {{ .Name | ValueDB }}, ' {{ .CreationUserID | ValueDB }}, NULL, {{ .CreatedAt | ValueDB }}, NULL);
-INSERT INTO auth.user_role VALUES ('613254df-c779-479c-9d76-b8036e342979', {{ .ID | ValueDB }}, '613254df-c779-479c-9d76-b8036e342979', NULL, '2023-07-28 13:23:03.273735', NULL);
+INSERT INTO auth.role VALUES ({{ .ID | ValueDB }}, {{ .Code | ValueDB  }}, {{ .Name | ValueDB }}, {{ .CreationUserID | ValueDB }}, {{ .UpdateUserID | ValueDB }}, {{ .CreatedAt | ValueDB }}, {{ .UpdatedAt | ValueDB}});
+{{- end }}
+
+{{- range .Defaults.UserRoles }}
+INSERT INTO auth.user_role VALUES ({{ .UserID | ValueDB }}, {{ .RoleID | ValueDB }}, {{ .CreationUserID | ValueDB }}, {{ .UpdateUserID | ValueDB }}, {{ .CreatedAt | ValueDB }}, {{ .UpdatedAt | ValueDB}});
 {{- end }}
 
 {{- range .Features }}

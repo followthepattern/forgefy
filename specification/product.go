@@ -1,6 +1,9 @@
 package specification
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/followthepattern/forgefy/specification/naming"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"gopkg.in/yaml.v3"
@@ -20,6 +23,12 @@ func (fs Product) Validate() error {
 	)
 }
 
+func (product *Product) setDefaults() {
+	if product.Email == "" {
+		product.Email = fmt.Sprintf("info@%s.com", strings.ToLower(product.ProductName))
+	}
+}
+
 func (p Product) ProductNameCamelCase() string {
 	return naming.ToLowerCamelCase(p.ProductName)
 }
@@ -30,9 +39,12 @@ func UnmarshalYaml(data []byte) (p Product, err error) {
 		return
 	}
 
+	err = p.Validate()
+
+	p.setDefaults()
+
 	p = constructProduct(p)
 
-	err = p.Validate()
 	return
 }
 
