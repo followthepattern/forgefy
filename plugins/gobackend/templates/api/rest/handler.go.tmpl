@@ -9,7 +9,7 @@ import (
 {{- range .Features }}
 	"github.com/{{ $AppNameToPackageName }}/features/{{ .FeatureNamePackage }}"
 {{- end }}
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 )
 
 func New(ctrls controllers.Controllers) http.Handler {

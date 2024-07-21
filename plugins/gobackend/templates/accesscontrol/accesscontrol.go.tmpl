@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	cerbos "github.com/cerbos/cerbos/client"
-	"github.com/{{ .AppNamePackage }}/config"
+	"github.com/backend1/config"
+	"github.com/cerbos/cerbos-sdk-go/cerbos"
 )
 
 const (
@@ -20,7 +20,7 @@ const (
 
 type Config struct {
 	Kind   string
-	Cerbos cerbos.Client
+	Cerbos cerbos.Client[*cerbos.GRPCClient, cerbos.PrincipalCtx]
 }
 
 func (c Config) Build() AccessControl {
@@ -32,10 +32,10 @@ func (c Config) Build() AccessControl {
 
 type AccessControl struct {
 	kind   string
-	cerbos cerbos.Client
+	cerbos cerbos.Client[*cerbos.GRPCClient, cerbos.PrincipalCtx]
 }
 
-func NewClient(cfg config.Cerbos) (cerbos.Client, error) {
+func NewClient(cfg config.Cerbos) (cerbos.Client[*cerbos.GRPCClient, cerbos.PrincipalCtx], error) {
 	client, err := cerbos.New(cfg.Address, cerbos.WithPlaintext())
 	if err != nil {
 		return nil, err
