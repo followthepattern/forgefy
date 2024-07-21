@@ -44,3 +44,7 @@ func (a App) Validate() error {
 		validation.Field(&a.AppType, validation.Required),
 	)
 }
+
+func (a *App) setDefaults() {
+	a.CountOfRandomValues = 30
+}

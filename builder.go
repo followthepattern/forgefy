@@ -87,5 +87,7 @@ func (b Builder) setAppDefaults(app specification.App) specification.App {
 	app.Defaults.Roles = roles
 	app.Defaults.UserRoles = defaults.UserRole(admin, roles)
 
+	app.CountOfRandomValues = 30
+
 	return app
 }

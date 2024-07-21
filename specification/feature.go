@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/followthepattern/forgefy/specification/defaults"
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/naming"
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -57,6 +58,8 @@ func (f Feature) RandomRecords() (records []models.Record) {
 			field.Value = field.RandomValue()
 			record.Fields = append(record.Fields, field)
 		}
+		record.Fields = append(record.Fields, defaults.DefaultUserlog(defaults.AdminUser()).ToFields()...)
+
 		records = append(records, record)
 
 	}
@@ -72,6 +75,7 @@ func (f Feature) UserDefinedRecords() (records []models.Record) {
 			f.Fields[i].Value = value
 			record.Fields = append(record.Fields, f.Fields[i])
 		}
+		record.Fields = append(record.Fields, defaults.DefaultUserlog(defaults.AdminUser()).ToFields()...)
 		records = append(records, record)
 	}
 

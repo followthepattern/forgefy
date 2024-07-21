@@ -53,6 +53,8 @@ func constructProduct(p Product) Product {
 		p.Apps[i].Product = p
 		p.Apps[i].Features = append(p.Features, p.Apps[i].Features...)
 
+		p.Apps[i].setDefaults()
+
 		for j := 0; j < len(p.Apps[i].Features); j++ {
 			p.Apps[i].Features[j].App = p.Apps[i]
 		}

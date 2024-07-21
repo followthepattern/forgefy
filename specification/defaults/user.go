@@ -5,12 +5,14 @@ import (
 	"github.com/google/uuid"
 )
 
+var adminID = uuid.NewString()
+
 func AdminUser() models.User {
 	user := models.User{
 		ID: models.Field{
 			Name:  "Id",
 			Type:  "uuid",
-			Value: uuid.NewString(),
+			Value: adminID,
 		},
 		Email: models.Field{
 			Name:  "Email",
