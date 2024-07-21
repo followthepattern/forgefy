@@ -11,5 +11,5 @@ func UserRole(admin models.User, roles []models.Role) (userRoles []models.UserRo
 		})
 	}
 
-	return nil
+	return
 }

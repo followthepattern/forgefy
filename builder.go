@@ -81,10 +81,11 @@ func (b Builder) buildApps(pm productmap.ProductMap, appSpecification specificat
 }
 
 func (b Builder) setAppDefaults(app specification.App) specification.App {
-	app.Defaults.Users = []models.User{defaults.AdminUser()}
-	roles := defaults.Roles(defaults.AdminUser(), app.FeaturesArray())
+	admin := defaults.AdminUser()
+	app.Defaults.Users = []models.User{admin}
+	roles := defaults.Roles(admin, app.FeaturesArray())
 	app.Defaults.Roles = roles
-	app.Defaults.UserRoles = defaults.UserRole(defaults.AdminUser(), roles)
+	app.Defaults.UserRoles = defaults.UserRole(admin, roles)
 
 	return app
 }
