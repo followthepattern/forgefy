@@ -1,0 +1,91 @@
+package {{ .FeatureNamePackage }}
+
+import (
+	"encoding/json"
+	"net/http"
+
+	"github.com/{{ .AppNamePackage }}/api/httpresponses"
+	"github.com/{{ .AppNamePackage }}/features/{{ .FeatureNamePackage }}/models"
+	basemodels "github.com/{{ .AppNamePackage }}/models"
+	"github.com/{{ .AppNamePackage }}/types"
+
+	"github.com/go-chi/chi/v5"
+)
+
+type {{ .FeatureNameGo }}Rest struct {
+	{{ .FeatureNameCamelCase }} {{ .FeatureNameGo }}Controller
+}
+
+func New{{ .FeatureNameGo }}Rest(ctrl {{ .FeatureNameGo }}Controller) {{ .FeatureNameGo }}Rest {
+	return {{ .FeatureNameGo }}Rest{
+		{{ .FeatureNameCamelCase }}: ctrl,
+	}
+}
+
+func (service {{ .FeatureNameGo }}Rest) GetByID(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	result, err := service.{{ .FeatureNameCamelCase }}.GetByID(r.Context(), id)
+	if err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
+	httpresponses.Write(w, http.StatusOK, result)
+}
+
+func (service {{ .FeatureNameGo }}Rest) Get(w http.ResponseWriter, r *http.Request) {
+	search := chi.URLParam(r, "search")
+
+	filter := models.{{ .FeatureNameGo }}ListRequestParams{
+		Filter: basemodels.ListFilter{
+			Search: types.StringFrom(search),
+		},
+	}
+
+	results, err := service.{{ .FeatureNameCamelCase }}.Get(r.Context(), filter)
+
+	if err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
+	httpresponses.Write(w, http.StatusOK, results)
+}
+
+func (service {{ .FeatureNameGo }}Rest) Create(w http.ResponseWriter, r *http.Request) {
+	var value models.{{ .FeatureNameGo }}Model
+	err := json.NewDecoder(r.Body).Decode(&value)
+	if err != nil {
+		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
+		return
+	}
+
+	err = service.{{ .FeatureNameCamelCase }}.Create(r.Context(), value)
+	if err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
+	httpresponses.Created(w)
+}
+
+func (service {{ .FeatureNameGo }}Rest) Update(w http.ResponseWriter, r *http.Request) {
+	var value models.{{ .FeatureNameGo }}Model
+	err := json.NewDecoder(r.Body).Decode(&value)
+	if err != nil {
+		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
+		return
+	}
+
+	id := r.URL.Query().Get("id")
+	value.{{ .IDField.FieldNameCamelCaseUpper }} = types.StringFrom(id)
+
+	err = service.{{ .FeatureNameCamelCase }}.Update(r.Context(), value)
+	if err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
+	httpresponses.Success(w)
+}

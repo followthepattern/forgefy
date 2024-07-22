@@ -11,6 +11,7 @@ type File struct {
 	filePath string
 	template string
 	data     any
+	funcMap  template.FuncMap
 }
 
 func NewFile(filePath string, template string) File {
@@ -22,6 +23,11 @@ func NewFile(filePath string, template string) File {
 
 func (f File) WithData(data any) File {
 	f.data = data
+	return f
+}
+
+func (f File) WithFuncMap(fm template.FuncMap) File {
+	f.funcMap = fm
 	return f
 }
 
@@ -54,7 +60,10 @@ func (f File) Write(w io.Writer) error {
 		return err
 	}
 
-	tmpl, err := template.New(f.filePath).Parse(f.template)
+	tmpl, err := template.
+		New(f.filePath).
+		Funcs(f.funcMap).
+		Parse(f.template)
 	if err != nil {
 		return err
 	}

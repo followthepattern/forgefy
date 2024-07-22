@@ -1,0 +1,29 @@
+package auth
+
+import (
+	"net/http"
+
+	"github.com/{{ .AppNamePackage }}/api/httpresponses"
+	"github.com/go-chi/chi/v5"
+)
+
+type AuthRest struct {
+	auth AuthController
+}
+
+func NewAuthRest(ctrl AuthController) AuthRest {
+	return AuthRest{
+		auth: ctrl,
+	}
+}
+
+func (rest AuthRest) ActivateUser(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "userID")
+
+	if err := rest.auth.ActivateUser(r.Context(), userID); err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
+	httpresponses.Success(w)
+}

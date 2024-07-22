@@ -6,3 +6,7 @@ type Userlog struct {
 	CreatedAt      Field
 	UpdatedAt      Field
 }
+
+func (u Userlog) ToFields() []Field {
+	return []Field{u.CreationUserID, u.UpdateUserID, u.CreatedAt, u.UpdatedAt}
+}

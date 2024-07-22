@@ -4,10 +4,11 @@ import (
 	"io/fs"
 	"path"
 	"strings"
+	"text/template"
 
 	"github.com/followthepattern/forgefy/plugins"
-	"github.com/followthepattern/forgefy/plugins/gobackend/apptemplates"
-	"github.com/followthepattern/forgefy/plugins/gobackend/models"
+	"github.com/followthepattern/forgefy/plugins/gobackend/parsing"
+	"github.com/followthepattern/forgefy/plugins/gobackend/templates"
 	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
@@ -17,6 +18,10 @@ type App struct {
 	specification.App
 	DbPort     int
 	CerbosPort int
+}
+
+func newApp(app specification.App) App {
+	return App{app, 0, 0}
 }
 
 func (a App) AppNameCapital() string {
@@ -30,12 +35,7 @@ func (a App) AppNamePackage() string {
 func (a App) Features() []Feature {
 	features := make([]Feature, len(a.App.Features))
 	for i, feature := range a.App.Features {
-
-		fields := make([]models.Field, len(feature.Fields))
-		for j, field := range feature.Fields {
-			fields[j] = models.Field{Field: field}
-		}
-		features[i] = Feature{Feature: feature, Fields: fields}
+		features[i] = Feature{Feature: feature}
 	}
 	return features
 }
@@ -43,9 +43,28 @@ func (a App) Features() []Feature {
 var _ plugins.App = &GoBackendPluginApp{}
 
 type GoBackendPluginApp struct {
-	port       int
-	dbPort     int
-	cerbosPort int
+	port             int
+	dbPort           int
+	cerbosPort       int
+	parsingFunctions template.FuncMap
+}
+
+func NewApp() *GoBackendPluginApp {
+	return &GoBackendPluginApp{
+		port:       8080,
+		cerbosPort: 3592,
+		dbPort:     5433,
+		parsingFunctions: template.FuncMap{
+			"NameDB":      parsing.NameDB,
+			"TypeDB":      parsing.TypeDB,
+			"ValueDB":     parsing.ValueDB,
+			"NullableDB":  parsing.NullableDB,
+			"NameGraphQL": parsing.NameGraphQL,
+			"TypeGraphQL": parsing.TypeGraphQL,
+			"GoType":      parsing.GoType,
+			"AsTag":       parsing.AsTag,
+		},
+	}
 }
 
 func (GoBackendPluginApp) Name() string {
@@ -81,19 +100,24 @@ func (plugin *GoBackendPluginApp) GetNextCerbosPort() int {
 }
 
 func (plugin *GoBackendPluginApp) Build(pm productmap.ProductMap, app specification.App) error {
-	dir := apptemplates.EntireDir
+	dir := templates.EntireDir
 
-	goApp := App{app, plugin.dbPort, plugin.cerbosPort}
-
-	goApp.App.AppPort = plugin.GetNextPortNumber()
-	goApp.DbPort = plugin.GetNextDBPort()
-	goApp.CerbosPort = plugin.GetNextCerbosPort()
+	goApp := newApp(app)
+	goApp = plugin.setDefaults(goApp)
 
 	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, goApp))
 }
 
+func (plugin *GoBackendPluginApp) setDefaults(goApp App) App {
+	goApp.App.AppPort = plugin.GetNextPortNumber()
+	goApp.DbPort = plugin.GetNextDBPort()
+	goApp.CerbosPort = plugin.GetNextCerbosPort()
+
+	return goApp
+}
+
 func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) func(filepath string, d fs.DirEntry, err error) error {
-	dir := apptemplates.EntireDir
+	dir := templates.EntireDir
 
 	return func(filepath string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -119,8 +143,9 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 		if !strings.Contains(filepath, "[feature]") {
 			file := productmap.NewFile(
 				filepath,
-				string(content),
-			).WithData(goApp)
+				string(content)).
+				WithData(goApp).
+				WithFuncMap(b.parsingFunctions)
 
 			return pm.Insert(file)
 		}
@@ -134,7 +159,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 			).WithData(FeatureTemplateModel{
 				Feature: feature,
 				App:     goApp,
-			})
+			}).WithFuncMap(b.parsingFunctions)
 
 			err = pm.Insert(file)
 			if err != nil {

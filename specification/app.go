@@ -3,6 +3,8 @@ package specification
 import (
 	"strings"
 
+	"github.com/followthepattern/forgefy/specification/defaults"
+	"github.com/followthepattern/forgefy/specification/naming"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
@@ -10,34 +12,30 @@ type AppType string
 
 type App struct {
 	Product
-	DefaultValues       DefaultValues
 	AppName             string    `yaml:"name"`
 	AppType             AppType   `yaml:"type"`
 	Features            []Feature `yaml:"features"`
 	AppPort             int       `yaml:"port"`
 	CountOfRandomValues int       `yaml:""`
+	Defaults            defaults.Defaults
+}
+
+func (a App) FeaturesArray() []string {
+	result := make([]string, len(a.Features))
+
+	for i, feature := range a.Features {
+		result[i] = feature.FeatureName
+	}
+
+	return result
 }
 
 func (a App) AppNameDir() string {
-	return strings.ToLower(a.AppName)
+	return strings.ToLower(naming.ToSnakeCase(a.AppName))
 }
 
 func (a App) AppNameCamelCase() string {
-	return a.AppName
-}
-
-func (a App) LoopLimit() []int {
-	count := 10
-
-	if a.CountOfRandomValues != 0 {
-		count = a.CountOfRandomValues
-	}
-
-	return make([]int, count)
-}
-
-func (a *App) Init() {
-	a.DefaultValues.InitDefaultTypes(a.Features)
+	return naming.ToLowerCamelCase(a.AppName)
 }
 
 func (a App) Validate() error {
@@ -45,4 +43,8 @@ func (a App) Validate() error {
 		validation.Field(&a.AppName, validation.Required),
 		validation.Field(&a.AppType, validation.Required),
 	)
+}
+
+func (a *App) setDefaults() {
+	a.CountOfRandomValues = 30
 }

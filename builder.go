@@ -6,6 +6,8 @@ import (
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
+	"github.com/followthepattern/forgefy/specification/defaults"
+	"github.com/followthepattern/forgefy/specification/models"
 )
 
 type Builder struct {
@@ -47,11 +49,8 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 		}
 	}
 
-	for _, app := range builder.productSpecification.Apps {
-		app.Product = builder.productSpecification
-		app.Features = append(builder.productSpecification.Features, app.Features...)
-		app.Init()
-		err = builder.appBuilders(pm, app)
+	for _, appSpecification := range builder.productSpecification.Apps {
+		err = builder.buildApps(pm, appSpecification)
 		if err != nil {
 			return pm, err
 		}
@@ -62,14 +61,16 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 
 func (builder Builder) addDefaultFiles(_ productmap.ProductMap) error { return nil }
 
-func (b Builder) appBuilders(pm productmap.ProductMap, app specification.App) error {
-	apps, ok := b.apps[string(app.AppType)]
+func (b Builder) buildApps(pm productmap.ProductMap, appSpecification specification.App) error {
+	apps, ok := b.apps[string(appSpecification.AppType)]
 	if !ok {
-		return fmt.Errorf("unknown app definition: %s", app.AppType)
+		return fmt.Errorf("unknown app definition: %s", appSpecification.AppType)
 	}
 
-	for _, a := range apps {
-		err := a.Build(pm, app)
+	appSpecification = b.setAppDefaults(appSpecification)
+
+	for _, app := range apps {
+		err := app.Build(pm, appSpecification)
 
 		if err != nil {
 			return err
@@ -77,4 +78,16 @@ func (b Builder) appBuilders(pm productmap.ProductMap, app specification.App) er
 	}
 
 	return nil
+}
+
+func (b Builder) setAppDefaults(app specification.App) specification.App {
+	admin := defaults.AdminUser()
+	app.Defaults.Users = []models.User{admin}
+	roles := defaults.Roles(admin, app.FeaturesArray())
+	app.Defaults.Roles = roles
+	app.Defaults.UserRoles = defaults.UserRole(admin, roles)
+
+	app.CountOfRandomValues = 30
+
+	return app
 }

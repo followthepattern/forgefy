@@ -10,12 +10,12 @@ import (
 	"github.com/google/uuid"
 )
 
-const IDFieldName = "ID"
+const IDFieldType = "id"
 
 type Field struct {
 	Name     string `yaml:"name"`
 	Type     string `yaml:"type"`
-	Value    string `yaml:"value"`
+	Value    string `yaml:"-"`
 	Nullable bool   `yaml:"nullable" default:"true"`
 }
 
@@ -56,11 +56,9 @@ func (f Field) FieldNameVarName() string {
 }
 
 func (f Field) RandomValue() string {
-	if f.Name == IDFieldName {
-		return uuid.NewString()
-	}
-
 	switch f.Type {
+	case "id":
+		return uuid.NewString()
 	case "string":
 		return datagenerator.String(10)
 	case "uuid":
@@ -68,7 +66,8 @@ func (f Field) RandomValue() string {
 	case "int":
 		return fmt.Sprint(datagenerator.RandomInt())
 	}
-	return ""
+
+	return datagenerator.String(10)
 }
 
 func (f Field) Validate() error {

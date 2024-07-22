@@ -1,0 +1,91 @@
+package user
+
+import (
+	"encoding/json"
+	"net/http"
+
+	"github.com/{{ .AppNamePackage }}/api/httpresponses"
+	"github.com/{{ .AppNamePackage }}/features/user/models"
+	basemodels "github.com/{{ .AppNamePackage }}/models"
+	"github.com/{{ .AppNamePackage }}/types"
+
+	"github.com/go-chi/chi/v5"
+)
+
+type UserRest struct {
+	user UserController
+}
+
+func NewUserRest(ctrl UserController) UserRest {
+	return UserRest{
+		user: ctrl,
+	}
+}
+
+func (service UserRest) GetByID(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	result, err := service.user.GetByID(r.Context(), id)
+	if err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
+	httpresponses.Write(w, http.StatusOK, result)
+}
+
+func (service UserRest) Get(w http.ResponseWriter, r *http.Request) {
+	search := chi.URLParam(r, "search")
+
+	filter := models.UserListRequestParams{
+		Filter: basemodels.ListFilter{
+			Search: types.StringFrom(search),
+		},
+	}
+
+	results, err := service.user.Get(r.Context(), filter)
+
+	if err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
+	httpresponses.Write(w, http.StatusOK, results)
+}
+
+func (service UserRest) Create(w http.ResponseWriter, r *http.Request) {
+	var value models.UserModel
+	err := json.NewDecoder(r.Body).Decode(&value)
+	if err != nil {
+		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
+		return
+	}
+
+	err = service.user.Create(r.Context(), value)
+	if err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
+	httpresponses.Created(w)
+}
+
+func (service UserRest) Update(w http.ResponseWriter, r *http.Request) {
+	var value models.UserModel
+	err := json.NewDecoder(r.Body).Decode(&value)
+	if err != nil {
+		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
+		return
+	}
+
+	id := r.URL.Query().Get("id")
+	value.Id = types.StringFrom(id)
+
+	err = service.user.Update(r.Context(), value)
+	if err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
+	httpresponses.Success(w)
+}

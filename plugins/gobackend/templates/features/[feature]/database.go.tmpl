@@ -1,0 +1,127 @@
+package {{ .FeatureNamePackage }}
+
+import (
+	"database/sql"
+	"errors"
+	"fmt"
+
+	"github.com/{{ .AppNamePackage }}/features/{{ .FeatureNamePackage }}/models"
+	"github.com/{{ .AppNamePackage }}/repositories/database/sqlbuilder"
+	"github.com/{{ .AppNamePackage }}/types"
+
+	. "github.com/followthepattern/goqu/v9"
+)
+
+var {{ .FeatureNameGo }}Table = S("app").Table("{{ .FeatureNameDBTable }}")
+
+type {{ .FeatureNameGo }}Database struct {
+	db *Database
+}
+
+func New{{ .FeatureNameGo }}Database(database *sql.DB) {{ .FeatureNameGo }}Database {
+	db := New("postgres", database)
+
+	return {{ .FeatureNameGo }}Database{
+		db: db,
+	}
+}
+
+func (repo {{ .FeatureNameGo }}Database) Create(values []models.{{ .FeatureNameGo }}Model) (err error) {
+	for i, _ := range values {
+		values[i].Userlog.CreatedAt = types.TimeNow()
+	}
+
+	insertion := repo.db.Insert({{ .FeatureNameGo }}Table)
+
+	_, err = insertion.Rows(values).Executor().Exec()
+	return
+}
+
+func (repo {{ .FeatureNameGo }}Database) GetByID(id string) (*models.{{ .FeatureNameGo }}Model, error) {
+	value := models.{{ .FeatureNameGo }}Model{}
+
+	query := repo.db.From({{ .FeatureNameGo }}Table).
+		Where(Ex{
+			"id": id})
+
+	_, err := query.ScanStruct(&value)
+	if err != nil {
+		return nil, err
+	}
+
+	return &value, nil
+}
+
+func (repo {{ .FeatureNameGo }}Database) Get(request models.{{ .FeatureNameGo }}ListRequestParams) (*models.{{ .FeatureNameGo }}ListResponse, error) {
+	data := []models.{{ .FeatureNameGo }}Model{}
+
+	query := repo.db.From({{ .FeatureNameGo }}Table)
+
+	if request.Filter.Search.IsValid() {
+		pattern := fmt.Sprintf("%%%s%%", request.Filter.Search)
+		query = query.Where(
+			Or(
+			{{- range $field := .Fields }}{{- if eq .Type "string" }}
+				I("{{ $field | NameDB }}").Like(pattern),
+			{{- end }}{{- end }}
+			))
+	}
+
+	count, err := query.Count()
+	if err != nil {
+		return nil, err
+	}
+
+	query = sqlbuilder.WithPagination(query, request.Pagination)
+
+	query = sqlbuilder.WithOrderBy(query, request.OrderBy)
+
+	err = query.ScanStructs(&data)
+	if err != nil {
+		return nil, err
+	}
+
+	result := models.{{ .FeatureNameGo }}ListResponse{
+		Count:    types.Int64From(count),
+		PageSize: request.Pagination.PageSize,
+		Page:     request.Pagination.Page,
+		Data:     data,
+	}
+
+	return &result, nil
+}
+
+func (repo {{ .FeatureNameGo }}Database) Update(model models.{{ .FeatureNameGo }}Model) error {
+	model.Userlog.UpdatedAt = types.TimeNow()
+
+	_, err := repo.db.Update({{ .FeatureNameGo }}Table).
+		Set(model).
+		Where(I("id").Eq(model.{{ .IDField.FieldNameCamelCaseUpper }})).
+		Executor().
+		Exec()
+
+	return err
+}
+
+func (repo {{ .FeatureNameGo }}Database) Delete(id string) error {
+	res, err := repo.db.
+		Delete({{ .FeatureNameGo }}Table).
+		Where(C("{{ .IDField | NameDB }}").Eq(id)).
+		Executor().
+		Exec()
+
+	if err != nil {
+		return err
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows < 1 {
+		return errors.New("no rows been deleted")
+	}
+
+	return err
+}
