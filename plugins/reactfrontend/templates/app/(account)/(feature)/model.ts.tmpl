@@ -2,8 +2,8 @@ import { MutationResourceResponse } from "@/graphql/mutation";
 import { QueryResourceResponse } from "@/graphql/query";
 
 export interface {{ .FeatureNameCamelCaseUpper }} {
-{{- range .Fields }}
-	{{ .FieldNameCamelCase }}?: {{ .FieldTypeName }}
+{{- range $field := .Fields }}
+	{{ .FieldNameCamelCase }}?: {{ $field | JSType }}
 {{- end}}
 }
 

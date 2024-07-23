@@ -82,14 +82,14 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
             <SingleLayout.Title>{{ .FeatureNameCamelCaseUpper }}: {data?.id}</SingleLayout.Title>
             <form action="">
                 <GridFields className="py-6">
-                {{- range .Fields }}
+                {{- range $field := .Fields }}
                     <div className="sm:col-span-2">
                         <Label htmlFor="{{ .FieldNameCamelCase }}">
                             {{ .FieldNameHumanReadable }}
                         </Label>
                         <Input
                             {...register("{{ .FieldNameCamelCase }}")}
-                            type="{{ .FieldTypeHTML }}"
+                            type="{{ $field | HTMLType }}"
                             id="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
                         />

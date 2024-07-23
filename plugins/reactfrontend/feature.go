@@ -3,14 +3,12 @@ package reactfrontend
 import (
 	"strings"
 
-	"github.com/followthepattern/forgefy/plugins/reactfrontend/models"
 	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/naming"
 )
 
 type Feature struct {
 	specification.Feature
-	Fields []models.Field
 }
 
 func (f Feature) FeatureNameGraphQL() string {

@@ -4,10 +4,11 @@ import (
 	"io/fs"
 	"path"
 	"strings"
+	"text/template"
 
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
-	"github.com/followthepattern/forgefy/plugins/reactfrontend/models"
+	"github.com/followthepattern/forgefy/plugins/reactfrontend/parsing"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend/templates"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
@@ -16,8 +17,21 @@ import (
 var _ plugins.App = &ReactFrontend{}
 
 type ReactFrontend struct {
-	port         int
-	tailwindPort int
+	port             int
+	tailwindPort     int
+	parsingFunctions template.FuncMap
+}
+
+func NewApp() *ReactFrontend {
+	return &ReactFrontend{
+		port:         3000,
+		tailwindPort: 9999,
+		parsingFunctions: template.FuncMap{
+			"JSType":      parsing.JSType,
+			"HTMLType":    parsing.HTMLType,
+			"GraphQLName": parsing.GraphQLName,
+		},
+	}
 }
 
 func (ReactFrontend) Name() string {
@@ -60,12 +74,7 @@ func (a App) AppNameToPackageName() string {
 func (a App) Features() []Feature {
 	features := make([]Feature, len(a.App.Features))
 	for i, feature := range a.App.Features {
-
-		fields := make([]models.Field, len(feature.Fields))
-		for j, field := range feature.Fields {
-			fields[j] = models.Field{Field: field}
-		}
-		features[i] = Feature{Feature: feature, Fields: fields}
+		features[i] = Feature{feature}
 	}
 	return features
 }
@@ -108,7 +117,8 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 			file := productmap.NewFile(
 				filepath,
 				string(content),
-			).WithData(reactApp)
+			).WithData(reactApp).
+				WithFuncMap(plugin.parsingFunctions)
 
 			return pm.Insert(file)
 		}
@@ -123,7 +133,7 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 			).WithData(FeatureTemplateModel{
 				Feature: feature,
 				App:     reactApp,
-			})
+			}).WithFuncMap(plugin.parsingFunctions)
 
 			err = pm.Insert(file)
 			if err != nil {
