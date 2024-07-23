@@ -2,8 +2,8 @@ export const getSingle{{ .FeatureNameGraphQL }} = `
 query GetSingle{{ .FeatureNameGraphQL }}($id: String!) {
 	{{ .FeatureNameCamelCase }}s {
 		single (id: $id) {
-		{{- range .Fields }}
-			{{ .FieldNameGraphQL }}
+		{{- range $field := .Fields }}
+			{{ $field | GraphQLName }}
 		{{- end }}
 		}
 	}
@@ -24,8 +24,8 @@ query Get{{ .FeatureNameGraphQL }}s(
 		) {
 			count
 			data {
-			{{- range .Fields }}
-				{{ .FieldNameGraphQL }}
+			{{- range $field := .Fields }}
+				{{ $field | GraphQLName }}
 			{{- end }}
 			}
 			page

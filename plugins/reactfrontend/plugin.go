@@ -14,10 +14,7 @@ func (Plugin) Name() string { return "React Plugin" }
 
 func (Plugin) Apps() []plugins.App {
 	return []plugins.App{
-		&ReactFrontend{
-			port:         3000,
-			tailwindPort: 9999,
-		},
+		NewApp(),
 	}
 }
 
