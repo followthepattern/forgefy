@@ -1,10 +1,12 @@
+{{ $app := . -}}
+
 package auth
 
 import (
 	"time"
 
-	"github.com/{{ .AppNamePackage }}/features/user/models"
-	"github.com/{{ .AppNamePackage }}/types"
+	"github.com/{{ $app | PackageName }}/features/user/models"
+	"github.com/{{ $app | PackageName }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 

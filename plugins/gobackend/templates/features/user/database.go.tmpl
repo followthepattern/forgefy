@@ -1,3 +1,4 @@
+{{ $app := . -}}
 package user
 
 import (
@@ -5,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/{{ .AppNamePackage }}/features/user/models"
-	"github.com/{{ .AppNamePackage }}/repositories/database/sqlbuilder"
-	"github.com/{{ .AppNamePackage }}/types"
+	"github.com/{{ $app | PackageName }}/features/user/models"
+	"github.com/{{ $app | PackageName }}/repositories/database/sqlbuilder"
+	"github.com/{{ $app | PackageName }}/types"
 
 	. "github.com/followthepattern/goqu/v9"
 )

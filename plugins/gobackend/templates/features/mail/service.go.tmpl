@@ -1,9 +1,11 @@
+{{ $app := . -}}
+
 package mail
 
 import (
 	"net/smtp"
 
-	"github.com/{{ .AppNamePackage }}/config"
+	"github.com/{{ $app | PackageName }}/config"
 )
 
 type Mail struct {

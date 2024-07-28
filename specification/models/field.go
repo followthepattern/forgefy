@@ -1,11 +1,11 @@
 package models
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/followthepattern/forgefy/datagenerator"
 	"github.com/followthepattern/forgefy/specification/naming"
+	"github.com/followthepattern/forgefy/specification/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 )
@@ -56,15 +56,15 @@ func (f Field) FieldNameVarName() string {
 }
 
 func (f Field) RandomValue() string {
-	switch f.Type {
-	case "id":
+	switch types.Registered.GetType(f.Type) {
+	case types.ID:
 		return uuid.NewString()
-	case "string":
+	case types.String:
 		return datagenerator.String(10)
-	case "uuid":
+	case types.UUID:
 		return uuid.NewString()
-	case "int":
-		return fmt.Sprint(datagenerator.RandomInt())
+	case types.Undefined:
+		return types.UNDEFINED_PLACEHOLDER
 	}
 
 	return datagenerator.String(10)

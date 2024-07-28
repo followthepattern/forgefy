@@ -1,13 +1,15 @@
+{{ $app := . -}}
+
 package rest
 
 import (
 	"net/http"
 
-	"github.com/{{ .AppNamePackage }}/controllers"
-	"github.com/{{ .AppNamePackage }}/features/auth"
-{{- $AppNameToPackageName := .AppNamePackage }}
-{{- range .Features }}
-	"github.com/{{ $AppNameToPackageName }}/features/{{ .FeatureNamePackage }}"
+	"github.com/{{ $app | PackageName }}/controllers"
+	"github.com/{{ $app | PackageName }}/features/auth"
+{{- $AppNameToPackageName := $app | PackageName }}
+{{- range $feature := .Features }}
+	"github.com/{{ $AppNameToPackageName }}/features/{{ $feature | PackageName }}"
 {{- end }}
 	"github.com/go-chi/chi/v5"
 )
@@ -16,9 +18,9 @@ func New(ctrls controllers.Controllers) http.Handler {
 	r := chi.NewMux()
 
 	auth := auth.NewAuthRest(ctrls.Auth())
-	{{ range .Features }}
-	{{ .FeatureNameCamelCase }} := {{ .FeatureNamePackage }}.New{{ .FeatureNameGo }}Rest(ctrls.{{ .FeatureNameGo}}())
-	r.Route("/{{ .FeatureNameURL }}s", func(r chi.Router) {
+	{{ range $feature := .Features }}
+	{{ .FeatureNameCamelCase }} := {{ $feature | PackageName }}.New{{ $feature | GoType }}Rest(ctrls.{{ $feature | GoType}}())
+	r.Route("/{{ $feature | AsURL }}s", func(r chi.Router) {
 		r.Get("/", {{ .FeatureNameCamelCase }}.Get)
 		r.Get("/id", {{ .FeatureNameCamelCase }}.GetByID)
 		r.Post("/", {{ .FeatureNameCamelCase }}.Create)

@@ -1,41 +1,44 @@
-package {{ .FeatureNamePackage }}
+{{ $app := . -}}
+{{ $feature := . -}}
+
+package {{ $feature | PackageName }}
 
 import (
 	"context"
 	"log/slog"
 
-	"github.com/{{ .AppNamePackage }}/config"
-	"github.com/{{ .AppNamePackage }}/container"
-	"github.com/{{ .AppNamePackage }}/features/auth"
-	"github.com/{{ .AppNamePackage }}/features/{{ .FeatureNamePackage }}/models"
-	"github.com/{{ .AppNamePackage }}/types"
+	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/container"
+	"github.com/{{ $app | PackageName }}/features/auth"
+	"github.com/{{ $app | PackageName }}/features/{{ $feature | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/types"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
-type {{ .FeatureNameGo }}Controller struct {
-	{{ .FeatureNameCamelCase }} {{ .FeatureNameGo }}Service
+type {{ $feature | GoType }}Controller struct {
+	{{ $feature.FeatureNameCamelCase }} {{ $feature | GoType }}Service
 	logger  *slog.Logger
 	cfg     config.Config
 }
 
-func New{{ .FeatureNameGo }}Controller(cont container.Container) {{ .FeatureNameGo }}Controller {
-	authorizationService := auth.NewAuthorizationService(cont, "{{ .FeatureNameCamelCase }}")
-	{{ .FeatureNameCamelCase }}Service := New{{ .FeatureNameGo }}Service(cont, authorizationService)
+func New{{ $feature | GoType }}Controller(cont container.Container) {{ $feature | GoType }}Controller {
+	authorizationService := auth.NewAuthorizationService(cont, "{{ $feature.FeatureNameCamelCase }}")
+	{{ $feature.FeatureNameCamelCase }}Service := New{{ $feature | GoType }}Service(cont, authorizationService)
 
-	return {{ .FeatureNameGo }}Controller{
-		{{ .FeatureNameCamelCase }}: {{ .FeatureNameCamelCase }}Service,
+	return {{ $feature | GoType }}Controller{
+		{{ $feature.FeatureNameCamelCase }}: {{ $feature.FeatureNameCamelCase }}Service,
 		logger:  cont.GetLogger(),
 		cfg:     cont.GetConfig(),
 	}
 }
 
-func (ctrl {{ .FeatureNameGo }}Controller) GetByID(ctx context.Context, id string) (*models.{{ .FeatureNameGo }}Model, error) {
-	if err := validation.Validate(id, types.Required("{{ .FeatureNameCamelCase }}ID")); err != nil {
+func (ctrl {{ $feature | GoType }}Controller) GetByID(ctx context.Context, id string) (*models.{{ $feature | GoType }}Model, error) {
+	if err := validation.Validate(id, types.Required("{{ $feature.FeatureNameCamelCase }}ID")); err != nil {
 		return nil, err
 	}
 
-	result, err := ctrl.{{ .FeatureNameCamelCase }}.GetByID(ctx, id)
+	result, err := ctrl.{{ $feature.FeatureNameCamelCase }}.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -47,29 +50,29 @@ func (ctrl {{ .FeatureNameGo }}Controller) GetByID(ctx context.Context, id strin
 	return result, nil
 }
 
-func (ctrl {{ .FeatureNameGo }}Controller) Get(ctx context.Context, filter models.{{ .FeatureNameGo }}ListRequestParams) (*models.{{ .FeatureNameGo }}ListResponse, error) {
-	return ctrl.{{ .FeatureNameCamelCase }}.Get(ctx, filter)
+func (ctrl {{ $feature | GoType }}Controller) Get(ctx context.Context, filter models.{{ $feature | GoType }}ListRequestParams) (*models.{{ $feature | GoType }}ListResponse, error) {
+	return ctrl.{{ $feature.FeatureNameCamelCase }}.Get(ctx, filter)
 }
 
-func (ctrl {{ .FeatureNameGo }}Controller) Create(ctx context.Context, value models.{{ .FeatureNameGo }}Model) error {
+func (ctrl {{ $feature | GoType }}Controller) Create(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
 	if err := value.CreateValidate(); err != nil {
 		return err
 	}
-	return ctrl.{{ .FeatureNameCamelCase }}.Create(ctx, value)
+	return ctrl.{{ $feature.FeatureNameCamelCase }}.Create(ctx, value)
 }
 
-func (ctrl {{ .FeatureNameGo }}Controller) Update(ctx context.Context, value models.{{ .FeatureNameGo }}Model) error {
+func (ctrl {{ $feature | GoType }}Controller) Update(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
 	if err := value.UpdateValidate(); err != nil {
 		return err
 	}
 
-	return ctrl.{{ .FeatureNameCamelCase }}.Update(ctx, value)
+	return ctrl.{{ $feature.FeatureNameCamelCase }}.Update(ctx, value)
 }
 
-func (ctrl {{ .FeatureNameGo }}Controller) Delete(ctx context.Context, id string) error {
-	if err := validation.Validate(id, types.Required("{{ .FeatureNameCamelCase }}ID")); err != nil {
+func (ctrl {{ $feature | GoType }}Controller) Delete(ctx context.Context, id string) error {
+	if err := validation.Validate(id, types.Required("{{ $feature.FeatureNameCamelCase }}ID")); err != nil {
 		return err
 	}
 
-	return ctrl.{{ .FeatureNameCamelCase }}.Delete(ctx, id)
+	return ctrl.{{ $feature.FeatureNameCamelCase }}.Delete(ctx, id)
 }

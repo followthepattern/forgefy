@@ -83,3 +83,13 @@ func ToHumanReadable(name string) string {
 
 	return string(runes)
 }
+
+func ToEnvVariable(name string) string {
+	// Regular expression to match uppercase letters and digits
+	re := regexp.MustCompile(`([a-z0-9])([A-Z])`)
+	snake := re.ReplaceAllString(name, `${1}_${2}`)
+	snake = strings.ToUpper(snake)
+	snake = strings.ReplaceAll(snake, " ", "_")
+	snake = strings.ReplaceAll(snake, "-", "_")
+	return snake
+}

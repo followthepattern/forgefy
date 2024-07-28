@@ -1,3 +1,5 @@
+{{ $app := . -}}
+
 package main
 
 import (
@@ -10,15 +12,15 @@ import (
 
 	"log/slog"
 
-	"github.com/{{ .AppNamePackage }}/accesscontrol"
-	"github.com/{{ .AppNamePackage }}/api"
-	"github.com/{{ .AppNamePackage }}/api/graphql"
-	"github.com/{{ .AppNamePackage }}/api/rest"
-	"github.com/{{ .AppNamePackage }}/config"
-	"github.com/{{ .AppNamePackage }}/container"
-	"github.com/{{ .AppNamePackage }}/controllers"
-	"github.com/{{ .AppNamePackage }}/features/mail"
-	"github.com/{{ .AppNamePackage }}/hostserver"
+	"github.com/{{ $app | PackageName }}/accesscontrol"
+	"github.com/{{ $app | PackageName }}/api"
+	"github.com/{{ $app | PackageName }}/api/graphql"
+	"github.com/{{ $app | PackageName }}/api/rest"
+	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/container"
+	"github.com/{{ $app | PackageName }}/controllers"
+	"github.com/{{ $app | PackageName }}/features/mail"
+	"github.com/{{ $app | PackageName }}/hostserver"
 
 	_ "github.com/lib/pq"
 )

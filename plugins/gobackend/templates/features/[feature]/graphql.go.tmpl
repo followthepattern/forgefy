@@ -1,23 +1,26 @@
-package {{ .FeatureNamePackage }}
+{{ $app := . -}}
+{{ $feature := . -}}
+
+package {{ $feature | PackageName }}
 
 import (
 	"context"
 	"net/http"
 
-	"github.com/{{ .AppNamePackage }}/features/{{ .FeatureNamePackage }}/models"
-	basemodels "github.com/{{ .AppNamePackage }}/models"
-	"github.com/{{ .AppNamePackage }}/types"
+	"github.com/{{ $app | PackageName }}/features/{{ $feature | PackageName }}/models"
+	basemodels "github.com/{{ $app | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/types"
 )
 
-type {{ .FeatureNameGo }}GraphQL struct {
-	ctrl {{ .FeatureNameGo }}Controller
+type {{ $feature | GoType }}GraphQL struct {
+	ctrl {{ $feature | GoType }}Controller
 }
 
-func New{{ .FeatureNameGo }}GraphQL(ctrl {{ .FeatureNameGo }}Controller) {{ .FeatureNameGo }}GraphQL {
-	return {{ .FeatureNameGo }}GraphQL{ctrl: ctrl}
+func New{{ $feature | GoType }}GraphQL(ctrl {{ $feature | GoType }}Controller) {{ $feature | GoType }}GraphQL {
+	return {{ $feature | GoType }}GraphQL{ctrl: ctrl}
 }
 
-func (graphQL {{ .FeatureNameGo }}GraphQL) Single(ctx context.Context, args struct{ Id string }) (*models.{{ .FeatureNameGo }}Model, error) {
+func (graphQL {{ $feature | GoType }}GraphQL) Single(ctx context.Context, args struct{ Id string }) (*models.{{ $feature | GoType }}Model, error) {
 	value, err := graphQL.ctrl.GetByID(ctx, args.Id)
 	if err != nil {
 		return nil, err
@@ -25,12 +28,12 @@ func (graphQL {{ .FeatureNameGo }}GraphQL) Single(ctx context.Context, args stru
 	return value, nil
 }
 
-func (graphQL {{ .FeatureNameGo }}GraphQL) List(ctx context.Context, args struct {
+func (graphQL {{ $feature | GoType }}GraphQL) List(ctx context.Context, args struct {
 	Pagination *basemodels.Pagination
 	Filter     *basemodels.ListFilter
 	OrderBy    *[]basemodels.OrderBy
-}) (*basemodels.ListResponse[models.{{ .FeatureNameGo }}Model], error) {
-	request := models.{{ .FeatureNameGo }}ListRequestParams{}
+}) (*basemodels.ListResponse[models.{{ $feature | GoType }}Model], error) {
+	request := models.{{ $feature | GoType }}ListRequestParams{}
 
 	if args.Pagination != nil {
 		request.Pagination = basemodels.Pagination{
@@ -55,8 +58,8 @@ func (graphQL {{ .FeatureNameGo }}GraphQL) List(ctx context.Context, args struct
 	return results, err
 }
 
-func (graphQL {{ .FeatureNameGo }}GraphQL) Create(ctx context.Context, args struct {
-	Model models.{{ .FeatureNameGo }}Model
+func (graphQL {{ $feature | GoType }}GraphQL) Create(ctx context.Context, args struct {
+	Model models.{{ $feature | GoType }}Model
 }) (*basemodels.ResponseStatus, error) {
 	err := graphQL.ctrl.Create(ctx, args.Model)
 	if err != nil {
@@ -67,9 +70,9 @@ func (graphQL {{ .FeatureNameGo }}GraphQL) Create(ctx context.Context, args stru
 	}, nil
 }
 
-func (graphQL {{ .FeatureNameGo }}GraphQL) Update(ctx context.Context, args struct {
+func (graphQL {{ $feature | GoType }}GraphQL) Update(ctx context.Context, args struct {
 	Id    types.String
-	Model models.{{ .FeatureNameGo }}Model
+	Model models.{{ $feature | GoType }}Model
 }) (*basemodels.ResponseStatus, error) {
 	args.Model.{{ .IDField.FieldNameCamelCaseUpper }} = args.Id
 	err := graphQL.ctrl.Update(ctx, args.Model)
@@ -81,7 +84,7 @@ func (graphQL {{ .FeatureNameGo }}GraphQL) Update(ctx context.Context, args stru
 	}, nil
 }
 
-func (graphQL {{ .FeatureNameGo }}GraphQL) Delete(ctx context.Context, args struct {
+func (graphQL {{ $feature | GoType }}GraphQL) Delete(ctx context.Context, args struct {
 	Id string
 }) (*basemodels.ResponseStatus, error) {
 	err := graphQL.ctrl.Delete(ctx, args.Id)

@@ -1,3 +1,5 @@
+{{ $app := . -}}
+
 package middlewares
 
 import (
@@ -6,8 +8,8 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/{{ .AppNamePackage }}/config"
-	"github.com/{{ .AppNamePackage }}/features/auth"
+	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/features/auth"
 	"github.com/golang-jwt/jwt/v4"
 )
 

@@ -1,9 +1,11 @@
+{{ $app := . -}}
+
 package auth
 
 import (
 	"context"
 
-	"github.com/{{ .AppNamePackage }}/types"
+	"github.com/{{ $app | PackageName }}/types"
 	"github.com/graph-gophers/graphql-go"
 )
 

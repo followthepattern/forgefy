@@ -28,18 +28,6 @@ func (a App) AppNameCapital() string {
 	return strings.ToUpper(a.AppName)
 }
 
-func (a App) AppNamePackage() string {
-	return strings.ToLower(a.AppName)
-}
-
-func (a App) Features() []Feature {
-	features := make([]Feature, len(a.App.Features))
-	for i, feature := range a.App.Features {
-		features[i] = Feature{Feature: feature}
-	}
-	return features
-}
-
 var _ plugins.App = &GoBackendPluginApp{}
 
 type GoBackendPluginApp struct {
@@ -55,14 +43,16 @@ func NewApp() *GoBackendPluginApp {
 		cerbosPort: 3592,
 		dbPort:     5433,
 		parsingFunctions: template.FuncMap{
-			"NameDB":      parsing.NameDB,
-			"TypeDB":      parsing.TypeDB,
+			"DBName":      parsing.DBName,
+			"DBType":      parsing.DBType,
 			"ValueDB":     parsing.ValueDB,
 			"NullableDB":  parsing.NullableDB,
 			"NameGraphQL": parsing.NameGraphQL,
 			"TypeGraphQL": parsing.TypeGraphQL,
 			"GoType":      parsing.GoType,
 			"AsTag":       parsing.AsTag,
+			"AsURL":       parsing.AsURL,
+			"PackageName": parsing.PackageName,
 		},
 	}
 }
@@ -105,6 +95,8 @@ func (plugin *GoBackendPluginApp) Build(pm productmap.ProductMap, app specificat
 	goApp := newApp(app)
 	goApp = plugin.setDefaults(goApp)
 
+	pm.WithFuncMap(plugin.parsingFunctions)
+
 	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, goApp))
 }
 
@@ -144,22 +136,18 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 			file := productmap.NewFile(
 				filepath,
 				string(content)).
-				WithData(goApp).
-				WithFuncMap(b.parsingFunctions)
+				WithData(goApp)
 
 			return pm.Insert(file)
 		}
 
-		for _, feature := range goApp.Features() {
-			newFilePath := strings.ReplaceAll(filepath, "[feature]", feature.FeatureNamePackage())
+		for _, feature := range goApp.Features {
+			newFilePath := strings.ReplaceAll(filepath, "[feature]", parsing.PackageName(feature))
 
 			file := productmap.NewFile(
 				newFilePath,
 				string(content),
-			).WithData(FeatureTemplateModel{
-				Feature: feature,
-				App:     goApp,
-			}).WithFuncMap(b.parsingFunctions)
+			).WithData(feature)
 
 			err = pm.Insert(file)
 			if err != nil {

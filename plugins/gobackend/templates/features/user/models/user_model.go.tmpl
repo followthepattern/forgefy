@@ -1,8 +1,10 @@
+{{ $app := . -}}
+
 package models
 
 import (
-	basemodels "github.com/{{ .AppNamePackage }}/models"
-	"github.com/{{ .AppNamePackage }}/types"
+	basemodels "github.com/{{ $app | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 

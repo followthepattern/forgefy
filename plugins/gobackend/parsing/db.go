@@ -4,14 +4,31 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/models"
+	"github.com/followthepattern/forgefy/specification/naming"
 )
 
-func NameDB(f models.Field) string {
+func DBName(i interface{}) string {
+	switch tt := i.(type) {
+	case models.Field:
+		return fieldDBName(tt)
+	case specification.Feature:
+		return featureDBName(tt)
+	}
+
+	return "uknown"
+}
+
+func fieldDBName(f models.Field) string {
 	return f.FieldNameSnakeCaseLower()
 }
 
-func TypeDB(f models.Field) string {
+func featureDBName(f specification.Feature) string {
+	return strings.ToLower(naming.ToSnakeCase(f.FeatureName))
+}
+
+func DBType(f models.Field) string {
 	switch f.Type {
 	case "string":
 		return "varchar"

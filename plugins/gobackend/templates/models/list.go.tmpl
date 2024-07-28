@@ -1,6 +1,8 @@
+{{ $app := . -}}
+
 package models
 
-import "github.com/{{ .AppNamePackage }}/types"
+import "github.com/{{ $app | PackageName }}/types"
 
 const (
 	DefaultPageSize = 20

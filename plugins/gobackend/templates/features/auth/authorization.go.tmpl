@@ -1,10 +1,12 @@
+{{ $app := . -}}
+
 package auth
 
 import (
 	"context"
 
-	"github.com/{{ .AppNamePackage }}/accesscontrol"
-	"github.com/{{ .AppNamePackage }}/container"
+	"github.com/{{ $app | PackageName }}/accesscontrol"
+	"github.com/{{ $app | PackageName }}/container"
 )
 
 type AuthorizationService struct {

@@ -1,13 +1,15 @@
+{{ $app := . -}}
+
 package user
 
 import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/{{ .AppNamePackage }}/api/httpresponses"
-	"github.com/{{ .AppNamePackage }}/features/user/models"
-	basemodels "github.com/{{ .AppNamePackage }}/models"
-	"github.com/{{ .AppNamePackage }}/types"
+	"github.com/{{ $app | PackageName }}/api/httpresponses"
+	"github.com/{{ $app | PackageName }}/features/user/models"
+	basemodels "github.com/{{ $app | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/types"
 
 	"github.com/go-chi/chi/v5"
 )

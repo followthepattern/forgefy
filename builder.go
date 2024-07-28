@@ -2,12 +2,16 @@ package forgefy
 
 import (
 	"fmt"
+	"text/template"
 
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/defaults"
 	"github.com/followthepattern/forgefy/specification/models"
+	"github.com/followthepattern/forgefy/specification/naming"
+	"github.com/followthepattern/forgefy/specification/parsing"
+	"github.com/followthepattern/forgefy/specification/types"
 )
 
 type Builder struct {
@@ -42,6 +46,8 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 		return pm, err
 	}
 
+	pm = builder.addParsingFunctions(pm)
+
 	for _, plugin := range builder.plugins {
 		err = plugin.Build(pm, builder.productSpecification)
 		if err != nil {
@@ -57,6 +63,15 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 	}
 
 	return pm, nil
+}
+
+func (builder Builder) addParsingFunctions(pm productmap.ProductMap) productmap.ProductMap {
+	pm.WithFuncMap(template.FuncMap{
+		"Records":     parsing.CreateRecordsFunc(types.Registered),
+		"EnvVariable": naming.ToEnvVariable,
+	})
+
+	return pm
 }
 
 func (builder Builder) addDefaultFiles(_ productmap.ProductMap) error { return nil }

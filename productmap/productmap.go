@@ -1,16 +1,27 @@
 package productmap
 
-import "fmt"
+import (
+	"fmt"
+	"text/template"
+)
 
 type WalkFn func(directoryName string, f File) error
 
 type ProductMap struct {
-	files map[string]File
+	files   map[string]File
+	funcMap template.FuncMap
 }
 
 func NewProductMap() ProductMap {
 	return ProductMap{
-		files: make(map[string]File),
+		files:   make(map[string]File),
+		funcMap: template.FuncMap{},
+	}
+}
+
+func (pm *ProductMap) WithFuncMap(fm template.FuncMap) {
+	for k, v := range fm {
+		pm.funcMap[k] = v
 	}
 }
 
@@ -27,6 +38,7 @@ func (pm *ProductMap) Insert(file File) error {
 		return fmt.Errorf("file %s already exists", file.FilePath())
 	}
 
+	file = file.WithFuncMap(pm.funcMap)
 	pm.files[file.FilePath()] = file
 
 	return nil

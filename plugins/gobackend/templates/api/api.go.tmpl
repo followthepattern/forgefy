@@ -1,3 +1,5 @@
+{{ $app := . -}}
+
 package api
 
 import (
@@ -5,8 +7,8 @@ import (
 
 	"log/slog"
 
-	"github.com/{{ .AppNamePackage }}/api/middlewares"
-	"github.com/{{ .AppNamePackage }}/config"
+	"github.com/{{ $app | PackageName }}/api/middlewares"
+	"github.com/{{ $app | PackageName }}/config"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"

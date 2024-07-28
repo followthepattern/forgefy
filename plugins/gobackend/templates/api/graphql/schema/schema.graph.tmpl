@@ -95,9 +95,9 @@ type UserMutation {
 	delete(id: String!): ResponseStatus
 }
 
-{{- range .Features }}
+{{- range $feature := .Features }}
 
-type {{ .FeatureNameGraphQL }} {
+type {{ $feature | NameGraphQL }} {
 	{{- range $field := .Fields }}
 	{{ $field | NameGraphQL }}: {{ $field | TypeGraphQL }}!
 	{{- end }}
@@ -107,33 +107,33 @@ type {{ .FeatureNameGraphQL }} {
 	updatedAt: Time!
 }
 
-input Create{{ .FeatureNameGraphQL }} {
+input Create{{ $feature | NameGraphQL }} {
 	{{- range $field := .Fields }}
 	{{ $field | NameGraphQL }}: {{ $field | TypeGraphQL }}!
 	{{- end }}
 }
 
-input Update{{ .FeatureNameGraphQL }} {
+input Update{{ $feature | NameGraphQL }} {
 	{{- range $field := .Fields }}
 	{{ $field | NameGraphQL }}: {{ $field | TypeGraphQL }}!
 	{{- end }}
 }
 
-type {{ .FeatureNameGraphQL }}ListResponse {
+type {{ $feature | NameGraphQL }}ListResponse {
 	count: Int64!
 	pageSize: Uint!
 	page: Uint!
-	data: [{{ .FeatureNameGraphQL }}!]!
+	data: [{{ $feature | NameGraphQL }}!]!
 }
 
-type {{ .FeatureNameGraphQL }}Query {
-	single(id: String!): {{ .FeatureNameGraphQL }}
-	list(pagination: Pagination, filter: ListFilter, orderBy: [OrderBy!]): {{ .FeatureNameGraphQL }}ListResponse
+type {{ $feature | NameGraphQL }}Query {
+	single(id: String!): {{ $feature | NameGraphQL }}
+	list(pagination: Pagination, filter: ListFilter, orderBy: [OrderBy!]): {{ $feature | NameGraphQL }}ListResponse
 }
 
-type {{ .FeatureNameGraphQL }}Mutation {
-	create(model: Create{{ .FeatureNameGraphQL }}!): ResponseStatus
-	update(id: String!, model: Update{{ .FeatureNameGraphQL }}!): ResponseStatus
+type {{ $feature | NameGraphQL }}Mutation {
+	create(model: Create{{ $feature | NameGraphQL }}!): ResponseStatus
+	update(id: String!, model: Update{{ $feature | NameGraphQL }}!): ResponseStatus
 	delete(id: String!): ResponseStatus
 }
 
@@ -147,15 +147,15 @@ schema {
 type Query {
 	auth: AuthQuery!
 	users: UserQuery!
-{{- range .Features }}
-	{{ .FeatureNameCamelCase }}s: {{ .FeatureNameGraphQL }}Query!
+{{- range $feature := .Features }}
+	{{ .FeatureNameCamelCase }}s: {{ $feature | NameGraphQL }}Query!
 {{- end }}
 }
 
 type Mutation {
 	authentication: AuthMutation!
 	users: UserMutation!
-{{- range .Features }}
-	{{ .FeatureNameCamelCase }}s: {{ .FeatureNameGraphQL }}Mutation!
+{{- range $feature := .Features }}
+	{{ .FeatureNameCamelCase }}s: {{ $feature | NameGraphQL }}Mutation!
 {{- end }}
 }
