@@ -8,8 +8,8 @@ export interface NavigationItem {
 
 export const navigationItems: NavigationItem[] = [
     { name: 'Users', href: '/users', icon: FolderIcon },
-    {{- range .Features }}
-    { name: '{{ .FeatureHumanReadableName }}s', href: '/{{ .FeatureNameURL}}s', icon: FolderIcon },
+    {{- range $feature := .Features }}
+    { name: '{{ .FeatureHumanReadableName }}s', href: '/{{ $feature | URL }}s', icon: FolderIcon },
     {{- end }}
 ]
 

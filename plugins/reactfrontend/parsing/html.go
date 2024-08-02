@@ -1,6 +1,12 @@
 package parsing
 
-import "github.com/followthepattern/forgefy/specification/models"
+import (
+	"strings"
+
+	"github.com/followthepattern/forgefy/specification"
+	"github.com/followthepattern/forgefy/specification/models"
+	"github.com/followthepattern/forgefy/specification/naming"
+)
 
 func HTMLType(f models.Field) string {
 	switch f.Type {
@@ -8,4 +14,8 @@ func HTMLType(f models.Field) string {
 		return "text"
 	}
 	return "input"
+}
+
+func URL(f specification.Feature) string {
+	return strings.ToLower(naming.ToSnakeCase(f.FeatureName))
 }

@@ -1,4 +1,5 @@
-{{ $idField := . | IDField -}}
+{{ $feature := . -}}
+{{ $idField := $feature | IDField -}}
 import SectionHeader from '../components/listPage/sectionHeader/sectionHeader';
 import List from '../components/listPage/listPage';
 import { ListPageComponentProperties } from '../components/listPage/listPageWrapper/listPageWrapper';
@@ -9,7 +10,7 @@ import { {{ .FeatureNameCamelCaseUpper }} } from './model';
 import { ToStringOrDefault } from '@/lib/strings';
 
 export const RESOURCE_NAME = "{{ .FeatureHumanReadableName }}"
-export const RESOURCE_URL = "/{{ .FeatureNameURL }}s"
+export const RESOURCE_URL = "/{{ $feature | URL }}s"
 
 const sortByLables: SortLabel[] = [{{- range .Fields }}
   {
@@ -21,11 +22,11 @@ const sortByLables: SortLabel[] = [{{- range .Fields }}
 ];
 
 function {{ .FeatureNameCamelCase }}ViewLink(value: {{ .FeatureNameCamelCaseUpper }}): string {
-  return `/{{ .FeatureNameURL }}s/${value.{{ $idField.FieldNameCamelCase }}}`
+  return `/{{ $feature | URL }}s/${value.{{ $idField.FieldNameCamelCase }}}`
 }
 
 function {{ .FeatureNameCamelCase }}EditLink(value: {{ .FeatureNameCamelCaseUpper }}): string {
-  return `/{{ .FeatureNameURL }}s/${value.{{ $idField.FieldNameCamelCase }}}/edit`
+  return `/{{ $feature | URL }}s/${value.{{ $idField.FieldNameCamelCase }}}/edit`
 }
 
 function getCreateTableProperties(): CreateTableProperties<{{ .FeatureNameCamelCaseUpper }}> {

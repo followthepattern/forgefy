@@ -1,5 +1,7 @@
-export const getSingle{{ .FeatureNameGraphQL }} = `
-query GetSingle{{ .FeatureNameGraphQL }}($id: String!) {
+{{ $feature := . -}}
+
+export const getSingle{{ $feature | GraphQLName }} = `
+query GetSingle{{ $feature | GraphQLName }}($id: String!) {
 	{{ .FeatureNameCamelCase }}s {
 		single (id: $id) {
 		{{- range $field := .Fields }}
@@ -9,8 +11,8 @@ query GetSingle{{ .FeatureNameGraphQL }}($id: String!) {
 	}
 }`
 
-export const get{{ .FeatureNameGraphQL }}s = `
-query Get{{ .FeatureNameGraphQL }}s(
+export const get{{ $feature | GraphQLName }}s = `
+query Get{{ $feature | GraphQLName }}s(
 	$pageSize: Uint
 	$page: Uint
 	$search: String
