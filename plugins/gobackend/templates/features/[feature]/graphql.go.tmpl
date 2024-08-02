@@ -1,5 +1,6 @@
 {{ $app := . -}}
 {{ $feature := . -}}
+{{ $idField := $feature | IDField -}}
 
 package {{ $feature | PackageName }}
 
@@ -74,7 +75,7 @@ func (graphQL {{ $feature | GoType }}GraphQL) Update(ctx context.Context, args s
 	Id    types.String
 	Model models.{{ $feature | GoType }}Model
 }) (*basemodels.ResponseStatus, error) {
-	args.Model.{{ .IDField.FieldNameCamelCaseUpper }} = args.Id
+	args.Model.{{ $idField.FieldNameCamelCaseUpper }} = args.Id
 	err := graphQL.ctrl.Update(ctx, args.Model)
 	if err != nil {
 		return nil, err

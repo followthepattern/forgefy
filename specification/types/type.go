@@ -30,11 +30,12 @@ func (t TypeRegistry) GetType(name string) Type {
 }
 
 var Registered = TypeRegistry{
-	"boolean": Boolean,
-	"number":  Number,
-	"id":      ID,
-	"uuid":    UUID,
-	"string":  String,
-	"text":    Text,
-	"time":    Time,
+	"undefined": Undefined,
+	"boolean":   Boolean,
+	"number":    Number,
+	"id":        ID,
+	"uuid":      UUID,
+	"string":    String,
+	"text":      Text,
+	"time":      Time,
 }

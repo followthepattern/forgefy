@@ -1,5 +1,6 @@
 {{ $app := . -}}
 {{ $feature := . -}}
+{{ $idField := $feature | IDField }}
 
 package {{ $feature | PackageName }}
 
@@ -99,7 +100,7 @@ func (repo {{ $feature | GoType }}Database) Update(model models.{{ $feature | Go
 
 	_, err := repo.db.Update({{ $feature | GoType }}Table).
 		Set(model).
-		Where(I("id").Eq(model.{{ .IDField.FieldNameCamelCaseUpper }})).
+		Where(I("id").Eq(model.{{ $idField.FieldNameCamelCaseUpper }})).
 		Executor().
 		Exec()
 
@@ -109,7 +110,7 @@ func (repo {{ $feature | GoType }}Database) Update(model models.{{ $feature | Go
 func (repo {{ $feature | GoType }}Database) Delete(id string) error {
 	res, err := repo.db.
 		Delete({{ $feature | GoType }}Table).
-		Where(C("{{ .IDField | DBName }}").Eq(id)).
+		Where(C("{{ $idField | DBName }}").Eq(id)).
 		Executor().
 		Exec()
 

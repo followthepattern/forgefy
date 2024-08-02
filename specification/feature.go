@@ -28,10 +28,6 @@ func (f Feature) FeatureHumanReadableName() string {
 	return naming.CapitalizeFirst(f.FeatureName)
 }
 
-func (f Feature) IDField() models.Field {
-	return f.Fields[0]
-}
-
 func (f Feature) FeatureNameDir() string {
 	return strings.ToLower(naming.ToSnakeCase(f.FeatureName))
 }

@@ -1,5 +1,6 @@
 {{ $app := . -}}
 {{ $feature := . -}}
+{{ $idField := $feature | IDField -}}
 
 package {{ $feature | PackageName }}
 
@@ -58,14 +59,14 @@ func (service {{ $feature | GoType }}Service) Create(ctx context.Context, value 
 		return err
 	}
 
-	value.{{ .IDField.FieldNameCamelCaseUpper }} = types.StringFrom(uuid.NewString())
+	value.{{ $idField.FieldNameCamelCaseUpper }} = types.StringFrom(uuid.NewString())
 	value.Userlog.CreationUserID = types.StringFrom(userID)
 
 	return service.{{ .FeatureNameCamelCase }}Repository.Create([]models.{{ $feature | GoType }}Model{value})
 }
 
 func (service {{ $feature | GoType }}Service) Update(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
-	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.UPDATE, value.{{ .IDField.FieldNameCamelCaseUpper }}.Data)
+	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.UPDATE, value.{{ $idField.FieldNameCamelCaseUpper }}.Data)
 	if err != nil {
 		return err
 	}

@@ -69,6 +69,7 @@ func (builder Builder) addParsingFunctions(pm productmap.ProductMap) productmap.
 	pm.WithFuncMap(template.FuncMap{
 		"Records":     parsing.CreateRecordsFunc(types.Registered),
 		"EnvVariable": naming.ToEnvVariable,
+		"IDField":     parsing.CreateFindIDFunc(types.Registered),
 	})
 
 	return pm

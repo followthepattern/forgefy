@@ -1,5 +1,6 @@
 {{ $app := . -}}
 {{ $feature := . }}
+{{ $idField := $feature | IDField -}}
 
 package models
 
@@ -17,7 +18,7 @@ type {{ $feature | GoType }}Model struct {
 }
 
 func (m {{ $feature | GoType }}Model) IsDefault() bool {
-	return m.{{ .IDField.FieldNameCamelCaseUpper }}.Len() < 1
+	return m.{{ $idField.FieldNameCamelCaseUpper }}.Len() < 1
 }
 
 func (m {{ $feature | GoType }}Model) CreateValidate() error {
@@ -30,7 +31,7 @@ func (m {{ $feature | GoType }}Model) CreateValidate() error {
 
 func (m {{ $feature | GoType }}Model) UpdateValidate() error {
 	return validation.ValidateStruct(&m,
-		validation.Field(&m.{{ .IDField.FieldNameCamelCaseUpper }}, validation.Required),
+		validation.Field(&m.{{ $idField.FieldNameCamelCaseUpper }}, validation.Required),
 	)
 }
 

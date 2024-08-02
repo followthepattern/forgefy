@@ -1,3 +1,4 @@
+{{ $idField := . | IDField -}}
 import SectionHeader from '../components/listPage/sectionHeader/sectionHeader';
 import List from '../components/listPage/listPage';
 import { ListPageComponentProperties } from '../components/listPage/listPageWrapper/listPageWrapper';
@@ -20,11 +21,11 @@ const sortByLables: SortLabel[] = [{{- range .Fields }}
 ];
 
 function {{ .FeatureNameCamelCase }}ViewLink(value: {{ .FeatureNameCamelCaseUpper }}): string {
-  return `/{{ .FeatureNameURL }}s/${value.{{ .IDField.FieldNameCamelCase }}}`
+  return `/{{ .FeatureNameURL }}s/${value.{{ $idField.FieldNameCamelCase }}}`
 }
 
 function {{ .FeatureNameCamelCase }}EditLink(value: {{ .FeatureNameCamelCaseUpper }}): string {
-  return `/{{ .FeatureNameURL }}s/${value.{{ .IDField.FieldNameCamelCase }}}/edit`
+  return `/{{ .FeatureNameURL }}s/${value.{{ $idField.FieldNameCamelCase }}}/edit`
 }
 
 function getCreateTableProperties(): CreateTableProperties<{{ .FeatureNameCamelCaseUpper }}> {

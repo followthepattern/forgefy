@@ -1,5 +1,6 @@
 {{ $app := . -}}
 {{ $feature := . -}}
+{{ $idField := $feature | IDField -}}
 
 package {{ $feature | PackageName }}
 
@@ -82,7 +83,7 @@ func (service {{ $feature | GoType }}Rest) Update(w http.ResponseWriter, r *http
 	}
 
 	id := r.URL.Query().Get("id")
-	value.{{ .IDField.FieldNameCamelCaseUpper }} = types.StringFrom(id)
+	value.{{ $idField.FieldNameCamelCaseUpper }} = types.StringFrom(id)
 
 	err = service.{{ .FeatureNameCamelCase }}.Update(r.Context(), value)
 	if err != nil {
