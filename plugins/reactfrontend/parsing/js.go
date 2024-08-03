@@ -1,13 +1,18 @@
 package parsing
 
-import "github.com/followthepattern/forgefy/specification/models"
+import (
+	"github.com/followthepattern/forgefy/specification/models"
+	"github.com/followthepattern/forgefy/specification/types"
+)
 
-func JSType(f models.Field) string {
-	switch f.Type {
-	case "string":
-		return "string"
-	case "int":
-		return "number"
+func CreateJSType(t types.TypeRegistry) func(f models.Field) string {
+	return func(f models.Field) string {
+		switch t.GetType(f.Type) {
+		case types.String:
+			return "string"
+		case types.Number:
+			return "number"
+		}
+		return f.Type
 	}
-	return f.Type
 }

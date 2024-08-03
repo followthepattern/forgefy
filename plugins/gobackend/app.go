@@ -12,6 +12,7 @@ import (
 	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
+	"github.com/followthepattern/forgefy/specification/types"
 )
 
 type App struct {
@@ -44,12 +45,12 @@ func NewApp() *GoBackendPluginApp {
 		dbPort:     5433,
 		parsingFunctions: template.FuncMap{
 			"DBName":      parsing.DBName,
-			"DBType":      parsing.DBType,
+			"DBType":      parsing.CreateDBType(types.Registered),
 			"ValueDB":     parsing.ValueDB,
 			"NullableDB":  parsing.NullableDB,
 			"NameGraphQL": parsing.NameGraphQL,
-			"TypeGraphQL": parsing.TypeGraphQL,
-			"GoType":      parsing.GoType,
+			"TypeGraphQL": parsing.CreateTypeGraphQL(types.Registered),
+			"GoType":      parsing.CreateGoType(types.Registered),
 			"AsTag":       parsing.AsTag,
 			"AsURL":       parsing.AsURL,
 			"PackageName": parsing.PackageName,

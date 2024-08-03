@@ -13,6 +13,7 @@ import (
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/naming"
+	"github.com/followthepattern/forgefy/specification/types"
 )
 
 var _ plugins.App = &ReactFrontend{}
@@ -28,7 +29,7 @@ func NewApp() *ReactFrontend {
 		port:         3000,
 		tailwindPort: 9999,
 		parsingFunctions: template.FuncMap{
-			"JSType":      parsing.JSType,
+			"JSType":      parsing.CreateJSType(types.Registered),
 			"HTMLType":    parsing.HTMLType,
 			"URL":         parsing.URL,
 			"GraphQLName": parsing.GraphQLName,

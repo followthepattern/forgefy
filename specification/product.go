@@ -52,10 +52,11 @@ func constructProduct(p Product) Product {
 	commonFeatures := p.Features
 	for i := 0; i < len(p.Apps); i++ {
 		p.Apps[i].Product = p
+		p.Apps[i].setDefaults()
+
 		appSpecificFeatures := p.Apps[i].Features
 
 		sum := append(commonFeatures, appSpecificFeatures...)
-
 		features := make([]Feature, len(sum))
 
 		for index, feature := range sum {
@@ -63,7 +64,6 @@ func constructProduct(p Product) Product {
 			features[index] = feature
 		}
 
-		p.Apps[i].setDefaults()
 		p.Apps[i].Features = features
 	}
 

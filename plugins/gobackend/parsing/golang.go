@@ -6,27 +6,30 @@ import (
 	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/naming"
+	"github.com/followthepattern/forgefy/specification/types"
 )
 
-func GoType(i interface{}) string {
-	switch tt := i.(type) {
-	case models.Field:
-		return goFieldType(tt)
-	case specification.Feature:
-		return goFeatureType(tt)
+func CreateGoType(t types.TypeRegistry) func(i interface{}) string {
+	return func(i interface{}) string {
+		switch tt := i.(type) {
+		case models.Field:
+			return goFieldType(t, tt)
+		case specification.Feature:
+			return goFeatureType(tt)
+		}
+		return "unknown"
 	}
-	return "unknown"
 }
 
 func goFeatureType(f specification.Feature) string {
 	return naming.ToUpperCamelCase(f.FeatureName)
 }
 
-func goFieldType(f models.Field) string {
-	switch f.Type {
-	case "string":
+func goFieldType(t types.TypeRegistry, f models.Field) string {
+	switch t.GetType(f.Type) {
+	case types.String:
 		return "types.String"
-	case "int":
+	case types.Number:
 		return "types.Int64"
 	}
 	return f.Type

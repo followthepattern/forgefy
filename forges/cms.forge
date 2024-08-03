@@ -22,7 +22,7 @@ features:
       - name: LastName
         type: string
       - name: Age
-        type: int
+        type: number
   - name: product
     fields:
       - name: ID
@@ -32,7 +32,7 @@ features:
       - name: Type
         type: string
       - name: Price
-        type: int
+        type: number
   - name: task
     fields:
       - name: ID

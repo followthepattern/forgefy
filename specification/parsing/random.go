@@ -1,20 +1,42 @@
 package parsing
 
 import (
+	"fmt"
 	"strings"
 
+	"github.com/followthepattern/forgefy/datagenerator"
 	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/defaults"
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/types"
+	"github.com/google/uuid"
 )
+
+func RandomValue(t types.TypeRegistry, f models.Field) string {
+	switch t.GetType(f.Type) {
+	case types.Boolean:
+		return fmt.Sprintf("%v", datagenerator.RandomBool())
+	case types.Number:
+		return fmt.Sprintf("%v", datagenerator.RandomInt())
+	case types.ID:
+		return uuid.NewString()
+	case types.String:
+		return datagenerator.String(10)
+	case types.UUID:
+		return uuid.NewString()
+	case types.Undefined:
+		return types.UNDEFINED_PLACEHOLDER
+	}
+
+	return datagenerator.String(10)
+}
 
 func CreateRandomRecordsFunc(t types.TypeRegistry) func(f specification.Feature) []models.Record {
 	return func(f specification.Feature) (records []models.Record) {
 		for i := 0; i < f.CountOfRandomValues; i++ {
 			record := models.Record{}
 			for _, field := range f.Fields {
-				field.Value = field.RandomValue()
+				field.Value = RandomValue(t, field)
 				record.Fields = append(record.Fields, field)
 			}
 			record.Fields = append(record.Fields, defaults.DefaultUserlog(defaults.AdminUser()).ToFields()...)

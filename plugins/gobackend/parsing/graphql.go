@@ -6,6 +6,7 @@ import (
 	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/naming"
+	"github.com/followthepattern/forgefy/specification/types"
 )
 
 func PackageName(i interface{}) string {
@@ -45,12 +46,14 @@ func featureGraphQLName(f specification.Feature) string {
 	return naming.ToUpperCamelCase(f.FeatureName)
 }
 
-func TypeGraphQL(f models.Field) string {
-	switch f.Type {
-	case "string":
-		return "String"
-	case "int":
-		return "Int64"
+func CreateTypeGraphQL(t types.TypeRegistry) func(models.Field) string {
+	return func(f models.Field) string {
+		switch t.GetType(f.Type) {
+		case types.String:
+			return "String"
+		case types.Number:
+			return "Int64"
+		}
+		return naming.ToUpperCamelCase(f.Type)
 	}
-	return naming.ToUpperCamelCase(f.Type)
 }

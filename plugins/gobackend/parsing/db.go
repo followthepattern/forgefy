@@ -7,6 +7,7 @@ import (
 	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/naming"
+	"github.com/followthepattern/forgefy/specification/types"
 )
 
 func DBName(i interface{}) string {
@@ -28,16 +29,18 @@ func featureDBName(f specification.Feature) string {
 	return strings.ToLower(naming.ToSnakeCase(f.FeatureName))
 }
 
-func DBType(f models.Field) string {
-	switch f.Type {
-	case "string":
-		return "varchar"
-	case "bool":
-		return "boolean"
-	case "int":
-		return "integer"
+func CreateDBType(t types.TypeRegistry) func(f models.Field) string {
+	return func(f models.Field) string {
+		switch t.GetType(f.Type) {
+		case types.String:
+			return "varchar"
+		case types.Boolean:
+			return "boolean"
+		case types.Number:
+			return "integer"
+		}
+		return "unknown"
 	}
-	return "unknown"
 }
 
 func ValueDB(f models.Field) string {

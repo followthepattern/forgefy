@@ -30,3 +30,7 @@ func RandomAge() int {
 func RandomInt() int {
 	return seededRand.Intn(100)
 }
+
+func RandomBool() bool {
+	return seededRand.Int()%2 == 0
+}
