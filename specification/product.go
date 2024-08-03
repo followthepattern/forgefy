@@ -49,15 +49,22 @@ func UnmarshalYaml(data []byte) (p Product, err error) {
 }
 
 func constructProduct(p Product) Product {
+	commonFeatures := p.Features
 	for i := 0; i < len(p.Apps); i++ {
 		p.Apps[i].Product = p
-		p.Apps[i].Features = append(p.Features, p.Apps[i].Features...)
+		appSpecificFeatures := p.Apps[i].Features
+
+		sum := append(commonFeatures, appSpecificFeatures...)
+
+		features := make([]Feature, len(sum))
+
+		for index, feature := range sum {
+			feature.App = p.Apps[i]
+			features[index] = feature
+		}
 
 		p.Apps[i].setDefaults()
-
-		for j := 0; j < len(p.Apps[i].Features); j++ {
-			p.Apps[i].Features[j].App = p.Apps[i]
-		}
+		p.Apps[i].Features = features
 	}
 
 	return p
