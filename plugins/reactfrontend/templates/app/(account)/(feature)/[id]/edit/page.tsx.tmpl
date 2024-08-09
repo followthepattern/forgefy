@@ -16,6 +16,9 @@ import Input from "@/app/(account)/components/inputFields/input";
 {{if $feature | HasNumber -}}
 import Number from "@/app/(account)/components/inputFields/number";
 {{ end -}}
+{{if $feature | HasBoolean -}}
+import Checkbox from "@/app/(account)/components/inputFields/checkbox";
+{{ end -}}
 import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 
@@ -91,20 +94,32 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                         <Label htmlFor="{{ .FieldNameCamelCase }}">
                             {{ .FieldNameHumanReadable }}
                         </Label>
-                        {{if $field | IsNumber | not -}}
-                        <Input
-                            {...register("{{ .FieldNameCamelCase }}")}
-                            type="{{ $field | HTMLType }}"
-                            id="{{ .FieldNameCamelCase }}"
-                            defaultValue={data?.{{ .FieldNameCamelCase }}}
-                        />{{- end -}}
-                        {{if $field | IsNumber -}}
+                        {{- if $field | IsNumber }}
                         <Number
                             {...register("{{ .FieldNameCamelCase }}")}
                             type="{{ $field | HTMLType }}"
                             id="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
                         />{{- end }}
+                        {{- if $field | IsBoolean }}
+                        <Checkbox
+                            {...register("{{ .FieldNameCamelCase }}")}
+                            checked={data?.{{ .FieldNameCamelCase }}}
+                            id="{{ .FieldNameCamelCase }}"
+                        />{{- end }}
+                        {{- if $field | IsString }}
+                        <Input
+                            {...register("{{ .FieldNameCamelCase }}")}
+                            id="{{ .FieldNameCamelCase }}"
+                            defaultValue={data?.{{ .FieldNameCamelCase }}}
+                        />{{- end}}
+                        {{- if $field | IsUndefined -}}
+                        <Input
+                            {...register("{{ .FieldNameCamelCase }}")}
+                            type="{{ $field | HTMLType }}"
+                            id="{{ .FieldNameCamelCase }}"
+                            defaultValue={data?.{{ .FieldNameCamelCase }}}
+                        />{{- end}}
                     </div>
                 {{- end }}
                 </GridFields>

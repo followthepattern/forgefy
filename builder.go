@@ -67,8 +67,13 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 
 func (builder Builder) addParsingFunctions(pm productmap.ProductMap) productmap.ProductMap {
 	pm.WithFuncMap(template.FuncMap{
+		"IsUndefined": parsing.CreateIsUndefined(types.Registered),
+		"IsBoolean":   parsing.CreateIsBoolean(types.Registered),
+		"HasBoolean":  parsing.CreateHasBoolean(types.Registered),
 		"IsNumber":    parsing.CreateIsNumber(types.Registered),
 		"HasNumber":   parsing.CreateHasNumber(types.Registered),
+		"IsString":    parsing.CreateIsString(types.Registered),
+		"HasString":   parsing.CreateHasString(types.Registered),
 		"Records":     parsing.CreateRecordsFunc(types.Registered),
 		"EnvVariable": naming.ToEnvVariable,
 		"IDField":     parsing.CreateFindIDFunc(types.Registered),

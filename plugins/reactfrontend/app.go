@@ -30,7 +30,7 @@ func NewApp() *ReactFrontend {
 		tailwindPort: 9999,
 		parsingFunctions: template.FuncMap{
 			"JSType":      parsing.CreateJSType(types.Registered),
-			"HTMLType":    parsing.HTMLType,
+			"HTMLType":    parsing.CreateHTMLType(types.Registered),
 			"URL":         parsing.URL,
 			"GraphQLName": parsing.GraphQLName,
 		},

@@ -17,6 +17,8 @@ features:
         type: string
       - name: Price
         type: number
+      - name: Active
+        type: boolean
   - name: task
     fields:
       - name: Id

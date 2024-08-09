@@ -27,10 +27,12 @@ func goFeatureType(f specification.Feature) string {
 
 func goFieldType(t types.TypeRegistry, f models.Field) string {
 	switch t.GetType(f.Type) {
-	case types.String:
-		return "types.String"
+	case types.Boolean:
+		return "types.Bool"
 	case types.Number:
 		return "types.Int64"
+	case types.String:
+		return "types.String"
 	}
 	return f.Type
 }
