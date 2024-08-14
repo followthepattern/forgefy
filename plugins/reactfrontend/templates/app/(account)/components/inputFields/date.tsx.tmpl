@@ -1,0 +1,98 @@
+import React from "react";
+import { Button, Calendar, CalendarCell, CalendarGrid, CalendarGridBody, CalendarGridHeader, CalendarHeaderCell, DateInput, DatePicker as AriaDatePicker, DateSegment, Dialog, Group, Heading, Popover } from 'react-aria-components';
+import type { ButtonProps, PopoverProps } from 'react-aria-components';
+import { Control, Controller, FieldValues, useForm } from "react-hook-form";
+
+interface DateProperties extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
+    control: Control<FieldValues>
+}
+
+const Date = (props: DateProperties) => {
+    return (
+        <Controller
+            name={props.name?? ""}
+            control={props.control}
+            render={({field}) => {
+                return <AriaDatePicker className="group flex flex-col gap-1 w-[200px]"
+                    {...field}
+                >
+                    <Group className="flex pl-3 text-gray-700 transition rounded-lg shadow-md bg-white/90 focus-within:bg-white group-open:bg-white focus-visible:ring-2 ring-black">
+                        <DateInput className="flex flex-1 py-2">
+                            {(segment) => (
+                                <DateSegment
+                                    segment={segment}
+                                    className="px-0.5 tabular-nums outline-none rounded-sm focus:bg-blue-700 focus:text-white caret-transparent placeholder-shown:italic"
+                                />
+                            )}
+                        </DateInput>
+                        <Button className="flex items-center px-3 text-gray-700 transition bg-transparent border-0 border-l border-solid rounded-r-lg outline-none border-l-purple-200 pressed:bg-purple-100 focus-visible:ring-2 ring-black">
+                            up
+                        </Button>
+                    </Group>
+                    <MyPopover>
+                        <Dialog className="p-6 text-gray-600">
+                            <Calendar>
+                                <header className="flex items-center w-full gap-1 px-1 pb-4 font-serif">
+                                    <Heading className="flex-1 ml-2 text-2xl font-semibold" />
+                                    <RoundButton slot="previous">
+                                        left
+                                    </RoundButton>
+                                    <RoundButton slot="next">
+                                        right
+                                    </RoundButton>
+                                </header>
+                                <CalendarGrid className="border-separate border-spacing-1">
+                                    <CalendarGridHeader>
+                                        {(day) => (
+                                            <CalendarHeaderCell className="text-xs font-semibold text-gray-500">
+                                                {day}
+                                            </CalendarHeaderCell>
+                                        )}
+                                    </CalendarGridHeader>
+                                    <CalendarGridBody>
+                                        {(date) => (
+                                            <CalendarCell
+                                                date={date}
+                                                className="flex items-center justify-center rounded-full outline-none cursor-default w-9 h-9 data-[outside-month]:text-gray-300 hover:bg-gray-100 data-[pressed]:bg-gray-200 data-[selected]:bg-violet-700 data-[selected]:text-white focus-visible:ring ring-violet-600/70 ring-offset-2"
+                                            />
+                                        )}
+                                    </CalendarGridBody>
+                                </CalendarGrid>
+                            </Calendar>
+                        </Dialog>
+                    </MyPopover>
+                </AriaDatePicker>
+            }}
+        />
+    );
+};
+
+function RoundButton(props: ButtonProps) {
+    return (
+        <Button
+            {...props}
+            className="flex items-center justify-center text-gray-600 bg-transparent border-0 rounded-full outline-none cursor-default w-9 h-9 hover:bg-gray-100 pressed:bg-gray-200 focus-visible:ring ring-violet-600/70 ring-offset-2"
+        />
+    );
+}
+
+function MyPopover(props: PopoverProps) {
+    return (
+        <Popover
+            {...props}
+            className={({ isEntering, isExiting }) => `
+          overflow-auto rounded-lg drop-shadow-lg ring-1 ring-black/10 bg-white
+          ${isEntering
+                    ? 'animate-in fade-in placement-bottom:slide-in-from-top-1 placement-top:slide-in-from-bottom-1 ease-out duration-200'
+                    : ''
+                }
+          ${isExiting
+                    ? 'animate-out fade-out placement-bottom:slide-out-to-top-1 placement-top:slide-out-to-bottom-1 ease-in duration-150'
+                    : ''
+                }
+        `}
+        />
+    );
+}
+
+export default Date;
