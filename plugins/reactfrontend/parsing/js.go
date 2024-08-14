@@ -12,6 +12,9 @@ func CreateJSType(t types.TypeRegistry) func(f models.Field) string {
 			return "string"
 		case types.Number:
 			return "number"
+		case types.DateTime:
+		case types.Date:
+			return "ZonedDateTime"
 		}
 		return f.Type
 	}

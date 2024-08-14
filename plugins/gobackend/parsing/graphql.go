@@ -53,6 +53,9 @@ func CreateTypeGraphQL(t types.TypeRegistry) func(models.Field) string {
 			return "String"
 		case types.Number:
 			return "Int64"
+		case types.Date:
+		case types.DateTime:
+			return "Time"
 		}
 		return naming.ToUpperCamelCase(f.Type)
 	}

@@ -19,6 +19,8 @@ features:
         type: number
       - name: Active
         type: boolean
+      - name: Published
+        type: date
   - name: task
     fields:
       - name: Id

@@ -14,7 +14,8 @@ const (
 	UUID
 	String
 	Text
-	Time
+	DateTime
+	Date
 )
 
 type TypeRegistry map[string]Type
@@ -37,5 +38,6 @@ var Registered = TypeRegistry{
 	"uuid":      UUID,
 	"string":    String,
 	"text":      Text,
-	"time":      Time,
+	"time":      DateTime,
+	"date":      Date,
 }
