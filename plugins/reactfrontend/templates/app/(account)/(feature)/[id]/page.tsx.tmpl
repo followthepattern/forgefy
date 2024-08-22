@@ -46,7 +46,7 @@ export default function {{ .FeatureNameCamelCaseUpper }}() {
                         {{ .FieldNameHumanReadable }}
                     </DataListView.Label>
                     <DataListView.Field>
-                        {data?.{{ .FieldNameCamelCase }}}
+                        {data?.{{ .FieldNameCamelCase }}?.toString()}
                     </DataListView.Field>
                 </DataListView.Row>
             {{- end }}

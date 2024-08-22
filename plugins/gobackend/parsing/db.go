@@ -38,8 +38,8 @@ func CreateDBType(t types.TypeRegistry) func(f models.Field) string {
 			return "boolean"
 		case types.Number:
 			return "integer"
-		case types.Date:
-		case types.DateTime:
+		case types.Date,
+			types.DateTime:
 			return "timestamp"
 		}
 		return "unknown"

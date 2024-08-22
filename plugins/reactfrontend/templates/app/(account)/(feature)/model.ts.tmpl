@@ -1,5 +1,9 @@
+{{ $feature := . -}}
 import { MutationResourceResponse } from "@/graphql/mutation";
 import { QueryResourceResponse } from "@/graphql/query";
+{{if $feature | HasDate -}}
+import { ZonedDateTime } from "@internationalized/date";
+{{- end }}
 
 export interface {{ .FeatureNameCamelCaseUpper }} {
 {{- range $field := .Fields }}

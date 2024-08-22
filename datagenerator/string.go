@@ -34,3 +34,14 @@ func RandomInt() int {
 func RandomBool() bool {
 	return seededRand.Int()%2 == 0
 }
+
+func RandomTime() time.Time {
+	start := time.Date(2019, 1, 1, 0, 0, 0, 0, time.UTC)
+	end := time.Now().AddDate(1, 5, 15)
+
+	duration := end.Sub(start)
+
+	randomDuration := time.Duration(rand.Int63n(int64(duration)))
+
+	return start.Add(randomDuration)
+}

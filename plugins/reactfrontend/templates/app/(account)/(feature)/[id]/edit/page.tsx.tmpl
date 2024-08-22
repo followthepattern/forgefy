@@ -19,6 +19,9 @@ import Number from "@/app/(account)/components/inputFields/number";
 {{if $feature | HasBoolean -}}
 import Checkbox from "@/app/(account)/components/inputFields/checkbox";
 {{ end -}}
+{{if $feature | HasDate -}}
+import Date from "@/app/(account)/components/inputFields/date";
+{{ end -}}
 import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 
@@ -54,7 +57,7 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
         }
     }, [deleteResult])
 
-    const { register, getValues } = useForm<{{ .FeatureNameCamelCaseUpper }}>();
+    const { register, getValues, control } = useForm<{{ .FeatureNameCamelCaseUpper }}>();
 
     if (loading) {
         return (<div>Loading...</div>)
@@ -112,6 +115,12 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                             {...register("{{ .FieldNameCamelCase }}")}
                             id="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
+                        />{{- end}}
+                        {{- if $field | IsDate }}
+                        <Date
+                            name="{{ .FieldNameCamelCase }}"
+                            control={control}
+                            defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
                         />{{- end}}
                         {{- if $field | IsUndefined -}}
                         <Input

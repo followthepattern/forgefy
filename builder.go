@@ -74,6 +74,8 @@ func (builder Builder) addParsingFunctions(pm productmap.ProductMap) productmap.
 		"HasNumber":   parsing.CreateHasNumber(types.Registered),
 		"IsString":    parsing.CreateIsString(types.Registered),
 		"HasString":   parsing.CreateHasString(types.Registered),
+		"IsDate":      parsing.CreateIsDate(types.Registered),
+		"HasDate":     parsing.CreateHasDate(types.Registered),
 		"Records":     parsing.CreateRecordsFunc(types.Registered),
 		"EnvVariable": naming.ToEnvVariable,
 		"IDField":     parsing.CreateFindIDFunc(types.Registered),

@@ -1,12 +1,35 @@
-import { update{{ .FeatureNameCamelCaseUpper }} as graphQL } from "../graphql/mutation";
-import { UpdateMutationResult } from "@/graphql/mutation";
-import { {{ .FeatureNameCamelCaseUpper }}, MutationResponse } from "../model";
-import useUpdate from "@/graphql/hooks/useUpdate";
+{{ $feature := . -}}
 
-export default function useUpdate{{ .FeatureNameCamelCaseUpper }}(): UpdateMutationResult<{{ .FeatureNameCamelCaseUpper }},number | undefined> {
-const parseResult = (data?: MutationResponse | null) : number | undefined  => {
-        return data?.{{ .FeatureNameCamelCase }}s?.update?.code;
+import { update{{ $feature.FeatureNameCamelCaseUpper }} as graphQL } from "../graphql/mutation";
+import { UpdateMutationResult } from "@/graphql/mutation";
+import { {{ $feature.FeatureNameCamelCaseUpper }}, MutationResponse } from "../model";
+import useUpdate from "@/graphql/hooks/useUpdate";
+import { ZonedDateTimeToRFC3339 } from "@/lib/time";
+
+export default function useUpdate{{ .FeatureNameCamelCaseUpper }}(): UpdateMutationResult<{{ $feature.FeatureNameCamelCaseUpper }}, number | undefined> {
+    const parseResult = (data?: MutationResponse | null): number | undefined => {
+        return data?.{{ $feature.FeatureNameCamelCase }}s?.update?.code;
     }
 
-    return useUpdate({parseResult, graphQL})
+    const [execute, { updateResult, updateLoading, updateError }] = useUpdate({ parseResult, graphQL });
+
+    const parseVariable = (id: string, model: {{ $feature.FeatureNameCamelCaseUpper }}) => {
+        const val = {
+            {{ range $field := $feature.Fields }}
+            {{- if $field | IsDate | not -}}
+
+            {{ $field.FieldNameCamelCase }}: model.{{ $field.FieldNameCamelCase }},
+            {{ end -}}
+
+            {{- if $field | IsDate -}}
+            {{ $field.FieldNameCamelCase }}: ZonedDateTimeToRFC3339(model.{{ $field.FieldNameCamelCase }}),
+            {{ end -}}
+
+            {{- end -}}
+        }
+
+        execute(id, val)
+    }
+
+    return [parseVariable, { updateResult, updateLoading, updateError }]
 }

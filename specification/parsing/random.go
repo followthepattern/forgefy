@@ -26,6 +26,9 @@ func RandomValue(t types.TypeRegistry, f models.Field) string {
 		return uuid.NewString()
 	case types.Undefined:
 		return types.UNDEFINED_PLACEHOLDER
+	case types.Date,
+		types.DateTime:
+		return datagenerator.RandomTime().Format("2006-01-02 15:04:05")
 	}
 
 	return datagenerator.String(10)
