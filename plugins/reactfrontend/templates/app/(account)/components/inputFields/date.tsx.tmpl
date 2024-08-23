@@ -19,9 +19,9 @@ const Date = (props: DateProperties) => {
         <Controller
             name={props.name ?? ""}
             control={props.control}
+            defaultValue={defaultCalendarDate}
             render={({ field }) => {
                 return <DatePicker
-                    defaultValue={defaultCalendarDate}
                     {...field}
                 />
             }}
@@ -32,7 +32,6 @@ const Date = (props: DateProperties) => {
 function DatePicker<T extends DateValue>(props: DatePickerProps<T> & React.RefAttributes<HTMLDivElement>) {
     return (
         <AriaDatePicker className="flex flex-col gap-1 group w-[250px]"
-            defaultValue={props.defaultValue}
             {...props}
         >
             <Group className="flex pl-2 mt-2 text-gray-900 transition border rounded-lg bg-white/90 focus-within:bg-white group-open:bg-white ring-1 ring-inset ring-gray-100 focus:ring-0 focus:ring-inset">
