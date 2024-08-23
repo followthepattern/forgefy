@@ -14,7 +14,9 @@ func CreateHTMLType(t types.TypeRegistry) func(models.Field) string {
 		switch t.GetType(f.Type) {
 		case types.Boolean:
 			return "checkbox"
-		case types.String:
+		case types.String,
+			types.Text:
+			return "input"
 		case types.Number:
 			return "text"
 		}

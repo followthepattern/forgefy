@@ -21,6 +21,8 @@ features:
         type: boolean
       - name: Published
         type: date
+      - name: Description
+        type: text
   - name: task
     fields:
       - name: Id

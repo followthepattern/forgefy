@@ -22,6 +22,8 @@ func RandomValue(t types.TypeRegistry, f models.Field) string {
 		return uuid.NewString()
 	case types.String:
 		return datagenerator.String(10)
+	case types.Text:
+		return datagenerator.String(250)
 	case types.UUID:
 		return uuid.NewString()
 	case types.Undefined:

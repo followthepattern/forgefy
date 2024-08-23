@@ -63,6 +63,23 @@ func CreateHasString(t types.TypeRegistry) func(specification.Feature) bool {
 	}
 }
 
+func CreateIsText(t types.TypeRegistry) func(models.Field) bool {
+	return func(f models.Field) bool {
+		return t.GetType(f.Type) == types.Text
+	}
+}
+
+func CreateHasText(t types.TypeRegistry) func(specification.Feature) bool {
+	return func(f specification.Feature) bool {
+		for _, field := range f.Fields {
+			if t.GetType(field.Type) == types.Text {
+				return true
+			}
+		}
+		return false
+	}
+}
+
 func CreateIsDate(t types.TypeRegistry) func(models.Field) bool {
 	return func(f models.Field) bool {
 		return t.GetType(f.Type) == types.Date

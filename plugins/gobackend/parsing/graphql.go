@@ -49,10 +49,11 @@ func featureGraphQLName(f specification.Feature) string {
 func CreateTypeGraphQL(t types.TypeRegistry) func(models.Field) string {
 	return func(f models.Field) string {
 		switch t.GetType(f.Type) {
-		case types.String:
-			return "String"
 		case types.Number:
 			return "Int64"
+		case types.String,
+			types.Text:
+			return "String"
 		case types.Date,
 			types.DateTime:
 			return "Time"

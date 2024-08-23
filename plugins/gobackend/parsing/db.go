@@ -32,12 +32,16 @@ func featureDBName(f specification.Feature) string {
 func CreateDBType(t types.TypeRegistry) func(f models.Field) string {
 	return func(f models.Field) string {
 		switch t.GetType(f.Type) {
-		case types.String:
-			return "varchar"
 		case types.Boolean:
 			return "boolean"
 		case types.Number:
 			return "integer"
+		case types.ID:
+			return "varchar"
+		case types.String:
+			return "varchar"
+		case types.Text:
+			return "varchar"
 		case types.Date,
 			types.DateTime:
 			return "timestamp"

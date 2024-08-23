@@ -13,11 +13,14 @@ import PrimaryButton from "@/app/(account)/components/buttons/primaryButton";
 import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
 import Label from "@/app/(account)/components/labels/label";
 import Input from "@/app/(account)/components/inputFields/input";
+{{if $feature | HasBoolean -}}
+import Checkbox from "@/app/(account)/components/inputFields/checkbox";
+{{ end -}}
 {{if $feature | HasNumber -}}
 import Number from "@/app/(account)/components/inputFields/number";
 {{ end -}}
-{{if $feature | HasBoolean -}}
-import Checkbox from "@/app/(account)/components/inputFields/checkbox";
+{{if $feature | HasText -}}
+import Textarea from "@/app/(account)/components/inputFields/textarea";
 {{ end -}}
 {{if $feature | HasDate -}}
 import Date from "@/app/(account)/components/inputFields/date";
@@ -115,13 +118,19 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                             {...register("{{ .FieldNameCamelCase }}")}
                             id="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
-                        />{{- end}}
+                        />{{- end }}
+                        {{- if $field | IsText }}
+                        <Textarea
+                            name="{{ .FieldNameCamelCase }}"
+                            control={control}
+                            defaultValue={data?.{{ .FieldNameCamelCase }}}
+                        />{{- end }}
                         {{- if $field | IsDate }}
                         <Date
                             name="{{ .FieldNameCamelCase }}"
                             control={control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
-                        />{{- end}}
+                        />{{- end }}
                         {{- if $field | IsUndefined -}}
                         <Input
                             {...register("{{ .FieldNameCamelCase }}")}
