@@ -4,7 +4,12 @@ import { update{{ $feature.FeatureNameCamelCaseUpper }} as graphQL } from "../gr
 import { UpdateMutationResult } from "@/graphql/mutation";
 import { {{ $feature.FeatureNameCamelCaseUpper }}, MutationResponse } from "../model";
 import useUpdate from "@/graphql/hooks/useUpdate";
-import { ZonedDateTimeToRFC3339 } from "@/lib/time";
+{{if $feature | HasTime -}}
+import { TimeToISO8601 } from "@/lib/time";
+{{ end -}}
+{{if $feature | HasDate -}}
+import { CalendarDateTimeToISO8601 } from "@/lib/time";
+{{ end -}}
 
 export default function useUpdate{{ .FeatureNameCamelCaseUpper }}(): UpdateMutationResult<{{ $feature.FeatureNameCamelCaseUpper }}, number | undefined> {
     const parseResult = (data?: MutationResponse | null): number | undefined => {
@@ -16,13 +21,17 @@ export default function useUpdate{{ .FeatureNameCamelCaseUpper }}(): UpdateMutat
     const parseVariable = (id: string, model: {{ $feature.FeatureNameCamelCaseUpper }}) => {
         const val = {
             {{ range $field := $feature.Fields }}
-            {{- if $field | IsDate | not -}}
+            {{- if $field | IsNotTimeBased -}}
 
             {{ $field.FieldNameCamelCase }}: model.{{ $field.FieldNameCamelCase }},
             {{ end -}}
 
             {{- if $field | IsDate -}}
-            {{ $field.FieldNameCamelCase }}: ZonedDateTimeToRFC3339(model.{{ $field.FieldNameCamelCase }}),
+            {{ $field.FieldNameCamelCase }}: CalendarDateTimeToISO8601(model.{{ $field.FieldNameCamelCase }}),
+            {{ end -}}
+
+            {{- if $field | IsTime -}}
+            {{ $field.FieldNameCamelCase }}: TimeToISO8601(model.{{ $field.FieldNameCamelCase }}),
             {{ end -}}
 
             {{- end -}}

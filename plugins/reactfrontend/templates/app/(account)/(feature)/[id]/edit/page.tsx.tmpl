@@ -22,6 +22,9 @@ import Number from "@/app/(account)/components/inputFields/number";
 {{if $feature | HasText -}}
 import Textarea from "@/app/(account)/components/inputFields/textarea";
 {{ end -}}
+{{if $feature | HasTime -}}
+import Time from "@/app/(account)/components/inputFields/time";
+{{ end -}}
 {{if $feature | HasDate -}}
 import Date from "@/app/(account)/components/inputFields/date";
 {{ end -}}
@@ -124,6 +127,12 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                             name="{{ .FieldNameCamelCase }}"
                             control={control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
+                        />{{- end }}
+                        {{- if $field | IsTime }}
+                        <Time
+                            name="{{ .FieldNameCamelCase }}"
+                            control={control}
+                            defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
                         />{{- end }}
                         {{- if $field | IsDate }}
                         <Date

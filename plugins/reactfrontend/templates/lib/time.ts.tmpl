@@ -1,18 +1,15 @@
-import { ZonedDateTime } from "@internationalized/date";
+import { CalendarDateTime, Time } from "@internationalized/date";
 
-
-export function ZonedDateTimeToRFC3339(time: ZonedDateTime | undefined): string {
+export function CalendarDateTimeToISO8601(time: CalendarDateTime | undefined): string {
     if (!time) {
         return ""
     }
 
     if (time.hour === undefined && time.minute === undefined && time.second === undefined) {
-        time = new ZonedDateTime(
+        time = new CalendarDateTime(
             time.year,
             time.month,
             time.day,
-            "",
-            0,
             0,
             0,
             0,
@@ -20,5 +17,21 @@ export function ZonedDateTimeToRFC3339(time: ZonedDateTime | undefined): string 
         )
     }
 
-    return time.toAbsoluteString()
+    return time.toString()
+}
+
+export function TimeToISO8601(time: Time | undefined): string {
+    if (!time) {
+        return ""
+    }
+
+    return new CalendarDateTime(
+        1, 
+        1, 
+        1,
+        time.hour,
+        time.minute,
+        0,
+        0
+    ).toString()
 }

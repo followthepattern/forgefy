@@ -5,7 +5,10 @@ import (
 	"time"
 )
 
-const timeName = "Time"
+const (
+	timeName = "Time"
+	ISO8601  = "2006-01-02T15:04:05"
+)
 
 type Time struct {
 	BaseType[time.Time]
@@ -47,7 +50,7 @@ func (ttype *Time) UnmarshalGraphQL(input interface{}) error {
 		ttype.Set = true
 		return nil
 	case string:
-		data, err := time.Parse(time.RFC3339, input)
+		data, err := time.Parse(ISO8601, input)
 		if err != nil {
 			return err
 		}
@@ -56,7 +59,7 @@ func (ttype *Time) UnmarshalGraphQL(input interface{}) error {
 		ttype.Set = true
 		return nil
 	case []byte:
-		data, err := time.Parse(time.RFC3339, string(input))
+		data, err := time.Parse(ISO8601, string(input))
 		if err != nil {
 			return err
 		}
@@ -91,5 +94,5 @@ func (ttype *Time) UnmarshalGraphQL(input interface{}) error {
 }
 
 func (ttype Time) MarshalJSON() ([]byte, error) {
-	return json.Marshal(ttype.Data)
+	return json.Marshal(ttype.Data.Format(ISO8601))
 }

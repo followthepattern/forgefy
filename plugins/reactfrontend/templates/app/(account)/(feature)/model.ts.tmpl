@@ -1,8 +1,11 @@
 {{ $feature := . -}}
 import { MutationResourceResponse } from "@/graphql/mutation";
 import { QueryResourceResponse } from "@/graphql/query";
+{{if $feature | HasTime -}}
+import { Time } from "@internationalized/date";
+{{- end }}
 {{if $feature | HasDate -}}
-import { ZonedDateTime } from "@internationalized/date";
+import { CalendarDateTime } from "@internationalized/date";
 {{- end }}
 
 export interface {{ .FeatureNameCamelCaseUpper }} {

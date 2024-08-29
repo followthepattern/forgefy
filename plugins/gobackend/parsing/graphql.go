@@ -54,7 +54,8 @@ func CreateTypeGraphQL(t types.TypeRegistry) func(models.Field) string {
 		case types.String,
 			types.Text:
 			return "String"
-		case types.Date,
+		case types.Time,
+			types.Date,
 			types.DateTime:
 			return "Time"
 		}

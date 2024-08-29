@@ -80,6 +80,31 @@ func CreateHasText(t types.TypeRegistry) func(specification.Feature) bool {
 	}
 }
 
+func CreateIsNotTimeBased(t types.TypeRegistry) func(models.Field) bool {
+	return func(f models.Field) bool {
+		return t.GetType(f.Type) != types.Time &&
+			t.GetType(f.Type) != types.Date &&
+			t.GetType(f.Type) != types.DateTime
+	}
+}
+
+func CreateIsTime(t types.TypeRegistry) func(models.Field) bool {
+	return func(f models.Field) bool {
+		return t.GetType(f.Type) == types.Time
+	}
+}
+
+func CreateHasTime(t types.TypeRegistry) func(specification.Feature) bool {
+	return func(f specification.Feature) bool {
+		for _, field := range f.Fields {
+			if t.GetType(field.Type) == types.Time {
+				return true
+			}
+		}
+		return false
+	}
+}
+
 func CreateIsDate(t types.TypeRegistry) func(models.Field) bool {
 	return func(f models.Field) bool {
 		return t.GetType(f.Type) == types.Date

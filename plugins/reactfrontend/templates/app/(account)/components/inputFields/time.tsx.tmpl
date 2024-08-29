@@ -1,0 +1,44 @@
+import React from "react";
+import classNames from "classnames";
+import { Control, Controller } from "react-hook-form";
+import { TimeField, DateInput, DateSegment } from 'react-aria-components';
+import { Time as InternationalizedTime, toTime, parseDateTime } from "@internationalized/date";
+
+interface TimeProps extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
+    control: Control
+}
+
+const Time = (props: TimeProps) => {
+    let defaultTime: InternationalizedTime | undefined;
+
+    if (typeof (props.defaultValue) === "string") {
+        let dateTime = parseDateTime(props.defaultValue)
+        defaultTime = toTime(dateTime);
+    }
+
+    return (
+        <Controller
+            name={props.name ?? ""}
+            control={props.control}
+            defaultValue={defaultTime}
+
+            render={({ field }) => {
+                return (
+                    <TimeField
+                        className={classNames(props.className, "flex flex-col w-20 mt-2 border border-gray-300 rounded-lg ring-1 ring-inset ring-gray-100 placeholder:text-gray-400 focus:ring-0 focus:ring-inset")}
+                        {...field}
+                    >
+                        <DateInput className="flex flex-1 py-2 pl-2">
+                            {segment => <DateSegment
+                                segment={segment}
+                                className="px-0.5 tabular-nums outline-none rounded-sm focus:bg-blue-700 focus:text-white caret-transparent placeholder-shown:italic"
+                            />}
+                        </DateInput>
+                    </TimeField>
+                )
+            }}
+        />
+    )
+}
+
+export default Time;

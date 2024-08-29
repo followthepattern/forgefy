@@ -21,6 +21,8 @@ features:
         type: boolean
       - name: Published
         type: date
+      - name: Publish Time
+        type: time
       - name: Description
         type: text
   - name: task

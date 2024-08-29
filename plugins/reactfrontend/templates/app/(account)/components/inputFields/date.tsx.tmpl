@@ -1,7 +1,7 @@
 import ChevronLeftIcon from "@/app/icons/chevronLeft";
 import ChevronRightIcon from "@/app/icons/chevronRight";
 import ChevronUpIcon from "@/app/icons/chevronUp";
-import { CalendarDate, DateValue, parseAbsoluteToLocal } from "@internationalized/date";
+import { CalendarDate, DateValue, parseDateTime, toCalendarDate } from "@internationalized/date";
 import React from "react";
 import { Button, Calendar, CalendarCell, CalendarGrid, CalendarGridBody, CalendarGridHeader, CalendarHeaderCell, DateInput, DatePicker as AriaDatePicker, DateSegment, Dialog, Group, Heading, Popover } from 'react-aria-components';
 import type { ButtonProps, DatePickerProps, PopoverProps } from 'react-aria-components';
@@ -12,8 +12,12 @@ interface DateProperties extends React.DetailedHTMLProps<React.InputHTMLAttribut
 }
 
 const Date = (props: DateProperties) => {
-    const defaultTime = parseAbsoluteToLocal(props.defaultValue?.toString() ?? "")
-    const defaultCalendarDate = new CalendarDate(defaultTime.year, defaultTime.month, defaultTime.day);
+    let defaultCalendarDate: CalendarDate | undefined;
+
+    if (typeof (props.defaultValue) === "string") {
+        let calendarDateTime = parseDateTime(props.defaultValue)
+        defaultCalendarDate = toCalendarDate(calendarDateTime);
+    }
 
     return (
         <Controller

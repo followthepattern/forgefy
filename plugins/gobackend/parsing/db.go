@@ -42,7 +42,8 @@ func CreateDBType(t types.TypeRegistry) func(f models.Field) string {
 			return "varchar"
 		case types.Text:
 			return "varchar"
-		case types.Date,
+		case types.Time,
+			types.Date,
 			types.DateTime:
 			return "timestamp"
 		}

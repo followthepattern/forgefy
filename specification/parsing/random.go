@@ -3,6 +3,7 @@ package parsing
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/followthepattern/forgefy/datagenerator"
 	"github.com/followthepattern/forgefy/specification"
@@ -28,6 +29,19 @@ func RandomValue(t types.TypeRegistry, f models.Field) string {
 		return uuid.NewString()
 	case types.Undefined:
 		return types.UNDEFINED_PLACEHOLDER
+	case types.Time:
+		randomTime := datagenerator.RandomTime()
+		randomTime = time.Date(
+			1,
+			1,
+			1,
+			randomTime.Hour(),
+			randomTime.Minute(),
+			randomTime.Second(),
+			randomTime.Nanosecond(),
+			randomTime.Location())
+
+		return randomTime.Format("2006-01-02 15:04:05")
 	case types.Date,
 		types.DateTime:
 		return datagenerator.RandomTime().Format("2006-01-02 15:04:05")

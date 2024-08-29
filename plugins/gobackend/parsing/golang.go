@@ -34,7 +34,8 @@ func goFieldType(t types.TypeRegistry, f models.Field) string {
 	case types.String,
 		types.Text:
 		return "types.String"
-	case types.Date,
+	case types.Time,
+		types.Date,
 		types.DateTime:
 		return "types.Time"
 	}
