@@ -1,37 +1,33 @@
-import { CalendarDateTime, Time } from "@internationalized/date";
+import {
+    CalendarDate,
+    Time as IntTime,
+    parseDateTime as parseIntDateTime
+} from "@internationalized/date";
 
-export function CalendarDateTimeToISO8601(time: CalendarDateTime | undefined): string {
-    if (!time) {
-        return ""
-    }
-
-    if (time.hour === undefined && time.minute === undefined && time.second === undefined) {
-        time = new CalendarDateTime(
-            time.year,
-            time.month,
-            time.day,
-            0,
-            0,
-            0,
-            0,
-        )
-    }
-
-    return time.toString()
+export function parseDate(value: string): Date {
+    const date = parseIntDateTime(value);
+    return new Date(date.year, date.month, date.second)
 }
 
-export function TimeToISO8601(time: Time | undefined): string {
-    if (!time) {
-        return ""
-    }
+export function parseTime(value: string): Time {
+    const date = parseIntDateTime(value);
+    return new Time(date.hour, date.minute, date.second);
+}
 
-    return new CalendarDateTime(
-        1, 
-        1, 
-        1,
-        time.hour,
-        time.minute,
-        0,
-        0
-    ).toString()
+export class Date extends CalendarDate {
+    toString(): string {
+        const year = this.year;
+        const month = String(this.month).padStart(2, '0');
+        const day = String(this.day).padStart(2, '0');
+        return `${year}-${month}-${day}T00:00:00`
+    }
+}
+
+export class Time extends IntTime {
+    toString(): string {
+        const hour = String(this.hour).padStart(2, '0');
+        const minute = String(this.minute).padStart(2, '0');
+        const second = String(this.second).padStart(2, '0');
+        return `0001-01-01T${hour}:${minute}:${second}`
+    }
 }

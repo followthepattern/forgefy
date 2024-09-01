@@ -21,19 +21,7 @@ export default function useUpdate{{ .FeatureNameCamelCaseUpper }}(): UpdateMutat
     const parseVariable = (id: string, model: {{ $feature.FeatureNameCamelCaseUpper }}) => {
         const val = {
             {{ range $field := $feature.Fields }}
-            {{- if $field | IsNotTimeBased -}}
-
-            {{ $field.FieldNameCamelCase }}: model.{{ $field.FieldNameCamelCase }},
-            {{ end -}}
-
-            {{- if $field | IsDate -}}
-            {{ $field.FieldNameCamelCase }}: CalendarDateTimeToISO8601(model.{{ $field.FieldNameCamelCase }}),
-            {{ end -}}
-
-            {{- if $field | IsTime -}}
-            {{ $field.FieldNameCamelCase }}: TimeToISO8601(model.{{ $field.FieldNameCamelCase }}),
-            {{ end -}}
-
+            {{ $field.FieldNameCamelCase }}: model.{{ $field.FieldNameCamelCase }}?.toString(),
             {{- end -}}
         }
 

@@ -17,9 +17,8 @@ func CreateJSType(t types.TypeRegistry) func(f models.Field) string {
 			return "number"
 		case types.Time:
 			return "Time"
-		case types.DateTime,
-			types.Date:
-			return "CalendarDateTime"
+		case types.Date:
+			return "Date"
 		}
 		return f.Type
 	}

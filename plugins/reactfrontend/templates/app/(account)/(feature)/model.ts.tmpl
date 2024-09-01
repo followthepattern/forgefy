@@ -5,7 +5,7 @@ import { QueryResourceResponse } from "@/graphql/query";
 import { Time } from "@internationalized/date";
 {{- end }}
 {{if $feature | HasDate -}}
-import { CalendarDateTime } from "@internationalized/date";
+import { Date } from "@internationalized/date";
 {{- end }}
 
 export interface {{ .FeatureNameCamelCaseUpper }} {

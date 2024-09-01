@@ -1,22 +1,21 @@
 import ChevronLeftIcon from "@/app/icons/chevronLeft";
 import ChevronRightIcon from "@/app/icons/chevronRight";
 import ChevronUpIcon from "@/app/icons/chevronUp";
-import { CalendarDate, DateValue, parseDateTime, toCalendarDate } from "@internationalized/date";
+import { Date as CustomDate, parseDate } from "@/lib/time";
 import React from "react";
 import { Button, Calendar, CalendarCell, CalendarGrid, CalendarGridBody, CalendarGridHeader, CalendarHeaderCell, DateInput, DatePicker as AriaDatePicker, DateSegment, Dialog, Group, Heading, Popover } from 'react-aria-components';
 import type { ButtonProps, DatePickerProps, PopoverProps } from 'react-aria-components';
-import { Control, Controller, FieldValues } from "react-hook-form";
+import { Control, Controller, ControllerRenderProps, FieldValues } from "react-hook-form";
 
-interface DateProperties extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
+interface DateFieldProperties extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
     control: Control<FieldValues>
 }
 
-const Date = (props: DateProperties) => {
-    let defaultCalendarDate: CalendarDate | undefined;
+const DateField = (props: DateFieldProperties) => {
+    let defaultCalendarDate: CustomDate | undefined;
 
     if (typeof (props.defaultValue) === "string") {
-        let calendarDateTime = parseDateTime(props.defaultValue)
-        defaultCalendarDate = toCalendarDate(calendarDateTime);
+        defaultCalendarDate = parseDate(props.defaultValue);
     }
 
     return (
@@ -25,18 +24,30 @@ const Date = (props: DateProperties) => {
             control={props.control}
             defaultValue={defaultCalendarDate}
             render={({ field }) => {
+                field.onChange
+
                 return <DatePicker
                     {...field}
+                    defaultValue={defaultCalendarDate}
                 />
             }}
         />
     );
 };
 
-function DatePicker<T extends DateValue>(props: DatePickerProps<T> & React.RefAttributes<HTMLDivElement>) {
+const DatePicker = React.forwardRef((props: DatePickerProps<CustomDate> & React.RefAttributes<HTMLDivElement> & ControllerRenderProps<FieldValues, string>, ref: React.ForwardedRef<HTMLDivElement>) => {
+    const [value, setValue] = React.useState(props.defaultValue)
+
     return (
         <AriaDatePicker className="flex flex-col gap-1 group w-[250px]"
             {...props}
+            ref={ref}
+            value={value}
+            onChange={v => {
+                const date = new CustomDate(v.year, v.month, v.day);
+                props.onChange(date)
+                setValue(date);
+            }}
         >
             <Group className="flex pl-2 mt-2 text-gray-900 transition border rounded-lg bg-white/90 focus-within:bg-white group-open:bg-white ring-1 ring-inset ring-gray-100 focus:ring-0 focus:ring-inset">
                 <DateInput className="flex flex-1 py-2">
@@ -85,7 +96,7 @@ function DatePicker<T extends DateValue>(props: DatePickerProps<T> & React.RefAt
             </CalendarPopover>
         </AriaDatePicker>
     )
-}
+})
 
 function RoundButton(props: ButtonProps) {
     return (
@@ -115,4 +126,4 @@ function CalendarPopover(props: PopoverProps) {
     );
 }
 
-export default Date;
+export default DateField;
