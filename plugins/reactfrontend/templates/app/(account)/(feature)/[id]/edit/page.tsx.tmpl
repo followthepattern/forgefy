@@ -17,16 +17,16 @@ import Input from "@/app/(account)/components/inputFields/input";
 import Checkbox from "@/app/(account)/components/inputFields/checkbox";
 {{ end -}}
 {{if $feature | HasNumber -}}
-import Number from "@/app/(account)/components/inputFields/number";
+import NumberField from "@/app/(account)/components/inputFields/numberfield";
 {{ end -}}
 {{if $feature | HasText -}}
 import Textarea from "@/app/(account)/components/inputFields/textarea";
 {{ end -}}
 {{if $feature | HasTime -}}
-import Time from "@/app/(account)/components/inputFields/time";
+import TimeField from "@/app/(account)/components/inputFields/timefield";
 {{ end -}}
 {{if $feature | HasDate -}}
-import Date from "@/app/(account)/components/inputFields/date";
+import DateField from "@/app/(account)/components/inputFields/datefield";
 {{ end -}}
 import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
@@ -104,10 +104,9 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                             {{ .FieldNameHumanReadable }}
                         </Label>
                         {{- if $field | IsNumber }}
-                        <Number
-                            {...register("{{ .FieldNameCamelCase }}")}
-                            type="{{ $field | HTMLType }}"
-                            id="{{ .FieldNameCamelCase }}"
+                        <NumberField
+                            control={control}
+                            name="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
                         />{{- end }}
                         {{- if $field | IsBoolean }}
@@ -129,13 +128,13 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
                         />{{- end }}
                         {{- if $field | IsTime }}
-                        <Time
+                        <TimeField
                             name="{{ .FieldNameCamelCase }}"
                             control={control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
                         />{{- end }}
                         {{- if $field | IsDate }}
-                        <Date
+                        <DateField
                             name="{{ .FieldNameCamelCase }}"
                             control={control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}

@@ -1,0 +1,38 @@
+import React from "react";
+import classNames from "classnames";
+import { Control, Controller, FieldValues } from "react-hook-form";
+import { NumberField as AriaNumberField, Input, NumberFieldProps } from 'react-aria-components';
+
+interface NumberProperties extends NumberFieldProps, React.RefAttributes<HTMLDivElement> {
+    control: Control<FieldValues>
+}
+
+const NumberField = React.forwardRef((props: NumberProperties, ref:React.ForwardedRef<HTMLDivElement>) => {
+    return (
+        <Controller
+            control={props.control}
+            name={props.name ?? ""}
+            defaultValue={props.defaultValue}
+            render={({ field }) => {
+                return <InputField
+                    {...field}
+                />
+            }}
+        />
+    )
+})
+
+const InputField = React.forwardRef((props: NumberFieldProps & React.RefAttributes<HTMLDivElement>, ref:React.ForwardedRef<HTMLDivElement>) => {
+    return (
+        <AriaNumberField maxValue={Number.MAX_VALUE}
+            ref={ref}
+            {...props}
+        >
+            <Input 
+                className={classNames(props.className, "block w-full p-2 mt-2 border border-gray-300 rounded-lg ring-1 ring-inset ring-gray-100 placeholder:text-gray-400 focus:ring-0 focus:ring-inset")}
+            />
+        </AriaNumberField>
+    )
+})
+
+export default NumberField;

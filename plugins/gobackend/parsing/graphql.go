@@ -50,7 +50,7 @@ func CreateTypeGraphQL(t types.TypeRegistry) func(models.Field) string {
 	return func(f models.Field) string {
 		switch t.GetType(f.Type) {
 		case types.Number:
-			return "Int64"
+			return "Float64"
 		case types.String,
 			types.Text:
 			return "String"

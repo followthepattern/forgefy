@@ -2,10 +2,10 @@
 import { MutationResourceResponse } from "@/graphql/mutation";
 import { QueryResourceResponse } from "@/graphql/query";
 {{if $feature | HasTime -}}
-import { Time } from "@internationalized/date";
+import { Time } from "@/lib/time";
 {{- end }}
 {{if $feature | HasDate -}}
-import { Date } from "@internationalized/date";
+import { Date } from "@/lib/time";
 {{- end }}
 
 export interface {{ .FeatureNameCamelCaseUpper }} {
