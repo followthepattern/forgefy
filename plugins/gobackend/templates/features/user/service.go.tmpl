@@ -6,12 +6,13 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/google/uuid"
 	"github.com/{{ $app | PackageName }}/accesscontrol"
 	"github.com/{{ $app | PackageName }}/container"
 	"github.com/{{ $app | PackageName }}/features/auth"
 	"github.com/{{ $app | PackageName }}/features/user/models"
 	"github.com/{{ $app | PackageName }}/types"
+
+	"github.com/google/uuid"
 )
 
 type UserService struct {

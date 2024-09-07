@@ -1,0 +1,92 @@
+{{ $app := .App -}}
+
+package storage
+
+import (
+	"context"
+	"fmt"
+	"log/slog"
+	"mime/multipart"
+	"os"
+	"path"
+
+	"github.com/{{ $app | PackageName }}/accesscontrol"
+	"github.com/{{ $app | PackageName }}/container"
+	"github.com/{{ $app | PackageName }}/features/auth"
+	"github.com/google/uuid"
+)
+
+type StorageServiceConfig struct {
+	container.Container
+	Storage              Storage
+	AuthorizationService auth.AuthorizationService
+}
+
+type StorageService struct {
+	logger               *slog.Logger
+	authorizationService auth.AuthorizationService
+	storage              Storage
+}
+
+func NewStorageService(cfg StorageServiceConfig) StorageService {
+	return StorageService{
+		logger:               cfg.GetLogger(),
+		authorizationService: cfg.AuthorizationService,
+		storage:              cfg.Storage,
+	}
+}
+
+func (s StorageService) UploadObject(
+	ctx context.Context,
+	resource string,
+	resourceID string,
+	file multipart.File,
+	fileHeader *multipart.FileHeader) (string, error) {
+
+	err := s.authorizationService.AuthorizeWithResource(
+		ctx,
+		resource,
+		resourceID,
+		accesscontrol.UPDATE,
+	)
+	if err != nil {
+		return "", err
+	}
+
+	user, err := auth.GetUserContext(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	filePath := path.Join(resource, resourceID, user.Id.Data, uuid.NewString())
+
+	filePath, err = s.storage.Upload(filePath, file, *fileHeader)
+	if err != nil {
+		return "", err
+	}
+
+	return filePath, nil
+}
+
+func (s StorageService) DownloadObject(
+	ctx context.Context,
+	resource, resourceID, userID, uuID, fileName string) (*os.File, error) {
+	err := s.authorizationService.AuthorizeWithResource(
+		ctx,
+		resource,
+		resourceID,
+		accesscontrol.READ,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	filePath := path.Join(resource, resourceID, userID, uuID, fileName)
+	file, err := s.storage.Download(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("unable to return the file: %s", err.Error())
+	}
+
+	return file, nil
+}

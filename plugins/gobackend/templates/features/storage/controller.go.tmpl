@@ -1,0 +1,86 @@
+{{ $app := .App -}}
+
+package storage
+
+import (
+	"context"
+	"log/slog"
+	"mime/multipart"
+	"os"
+
+	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/container"
+	"github.com/{{ $app | PackageName }}/features/auth"
+	"github.com/{{ $app | PackageName }}/types"
+	validation "github.com/go-ozzo/ozzo-validation"
+)
+
+type StorageController struct {
+	storageService StorageService
+	logger         *slog.Logger
+	cfg            config.Config
+}
+
+func NewStorageController(cont container.Container) StorageController {
+	storageService := NewStorageService(StorageServiceConfig{
+		Container:            cont,
+		Storage:              NewStorage(WithUploadDirectory(DEFAULT_DIRECTORY)),
+		AuthorizationService: auth.NewAuthorizationService(cont, ""),
+	})
+
+	return StorageController{
+		logger:         cont.GetLogger(),
+		cfg:            cont.GetConfig(),
+		storageService: storageService,
+	}
+}
+
+func (s StorageController) UploadObject(
+	ctx context.Context,
+	resource, resourceID string,
+	file multipart.File,
+	fileHeader *multipart.FileHeader,
+) (string, error) {
+	if err := validation.Validate(resource, types.Required("resource")); err != nil {
+		return "", err
+	}
+
+	if err := validation.Validate(resourceID, types.Required("resourceID")); err != nil {
+		return "", err
+	}
+
+	return s.storageService.UploadObject(
+		ctx,
+		resource,
+		resourceID,
+		file,
+		fileHeader,
+	)
+}
+
+func (s StorageController) DownloadObject(
+	ctx context.Context,
+	resource, resourceID, userID, uuID, fileName string) (*os.File, error) {
+
+	if err := validation.Validate(resource, types.Required("resource")); err != nil {
+		return nil, err
+	}
+
+	if err := validation.Validate(resourceID, types.Required("resourceID")); err != nil {
+		return nil, err
+	}
+
+	if err := validation.Validate(userID, types.Required("userID")); err != nil {
+		return nil, err
+	}
+
+	if err := validation.Validate(uuID, types.Required("uuID")); err != nil {
+		return nil, err
+	}
+
+	if err := validation.Validate(fileName, types.Required("fileName")); err != nil {
+		return nil, err
+	}
+
+	return s.storageService.DownloadObject(ctx, resource, resourceID, userID, uuID, fileName)
+}
