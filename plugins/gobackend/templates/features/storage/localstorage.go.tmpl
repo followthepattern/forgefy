@@ -48,7 +48,7 @@ func (l LocalStorage) Upload(directoryPath string, file multipart.File, fileHead
 		return "", err
 	}
 
-	return filePath, nil
+	return path.Join(directoryPath, fileHeader.Filename), nil
 }
 
 func (l LocalStorage) Download(filePath string) (*os.File, error) {
