@@ -38,6 +38,8 @@ func goFieldType(t types.TypeRegistry, f models.Field) string {
 		types.Date,
 		types.DateTime:
 		return "types.Time"
+	case types.File:
+		return "types.String"
 	}
 	return f.Type
 }

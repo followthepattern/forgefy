@@ -25,6 +25,8 @@ features:
         type: time
       - name: Description
         type: text
+      - name: Photo
+        type: file
   - name: task
     fields:
       - name: Id

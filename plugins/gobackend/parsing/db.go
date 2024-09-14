@@ -46,17 +46,23 @@ func CreateDBType(t types.TypeRegistry) func(f models.Field) string {
 			types.Date,
 			types.DateTime:
 			return "timestamp"
+		case types.File:
+			return "varchar"
 		}
 		return "unknown"
 	}
 }
 
 func ValueDB(f models.Field) string {
-	if len(f.Value) == 0 {
+	if len(f.Value) != 0 {
+		return fmt.Sprintf("'%s'", f.Value)
+	}
+
+	if f.Nullable {
 		return "NULL"
 	}
 
-	return fmt.Sprintf("'%s'", f.Value)
+	return `''`
 }
 
 func NullableDB(f models.Field) string {

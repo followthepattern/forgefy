@@ -17,6 +17,7 @@ const (
 	Time
 	Date
 	DateTime
+	File
 )
 
 type TypeRegistry map[string]Type
@@ -42,4 +43,5 @@ var Registered = TypeRegistry{
 	"time":      Time,
 	"date":      Date,
 	"datetime":  DateTime,
+	"file":      File,
 }
