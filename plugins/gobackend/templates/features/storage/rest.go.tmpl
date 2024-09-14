@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"path/filepath"
 
 	"github.com/{{ $app | PackageName }}/api/httpresponses"
@@ -70,13 +71,19 @@ func (server StorageRest) ServeDownload(w http.ResponseWriter, r *http.Request) 
 	uuID := chi.URLParam(r, "uuid")
 	fileName := chi.URLParam(r, "filename")
 
+	decodedFileName, err := url.QueryUnescape(fileName)
+	if err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
 	file, err := server.storageController.DownloadObject(
 		r.Context(),
 		resource,
 		resourceID,
 		userID,
 		uuID,
-		fileName,
+		decodedFileName,
 	)
 	if err != nil {
 		httpresponses.BadRequest(w, err.Error())
