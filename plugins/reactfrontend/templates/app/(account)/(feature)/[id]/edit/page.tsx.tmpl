@@ -4,7 +4,7 @@ import useUpdate{{ .FeatureNameCamelCaseUpper }} from "../../hooks/update{{ .Fea
 import { useForm } from "react-hook-form";
 import useDelete{{ .FeatureNameCamelCaseUpper }} from "../../hooks/delete{{ .FeatureNameCamelCaseUpper }}";
 import { useNavigate, useParams } from "react-router-dom";
-import { RESOURCE_URL } from "../../page";
+import { RESOURCE_NAME, RESOURCE_URL } from "../../const";
 import React, { useEffect } from "react";
 import { {{ .FeatureNameCamelCaseUpper }} } from "../../model";
 import SingleLayout from "@/app/(account)/components/singleView/layout";
@@ -27,6 +27,9 @@ import TimeField from "@/app/(account)/components/inputFields/timefield";
 {{ end -}}
 {{if $feature | HasDate -}}
 import DateField from "@/app/(account)/components/inputFields/datefield";
+{{ end -}}
+{{if $feature | HasFile -}}
+import FileField from "@/app/(account)/components/inputFields/filefield";
 {{ end -}}
 import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
@@ -63,7 +66,7 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
         }
     }, [deleteResult])
 
-    const { register, getValues, control } = useForm<{{ .FeatureNameCamelCaseUpper }}>();
+    const form = useForm<{{ .FeatureNameCamelCaseUpper }}>();
 
     if (loading) {
         return (<div>Loading...</div>)
@@ -78,7 +81,7 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
     }
 
     const onSave = () => {
-        const values = getValues();
+        const values = form.getValues();
 
         toastId.current = toast("Saving...", { autoClose: false })
 
@@ -105,43 +108,58 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                         </Label>
                         {{- if $field | IsNumber }}
                         <NumberField
-                            control={control}
+                            control={form.control}
                             name="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
                         />{{- end }}
                         {{- if $field | IsBoolean }}
                         <Checkbox
-                            {...register("{{ .FieldNameCamelCase }}")}
+                            {...form.register("{{ .FieldNameCamelCase }}")}
                             checked={data?.{{ .FieldNameCamelCase }}}
                             id="{{ .FieldNameCamelCase }}"
                         />{{- end }}
                         {{- if $field | IsString }}
                         <Input
-                            {...register("{{ .FieldNameCamelCase }}")}
+                            {...form.register("{{ .FieldNameCamelCase }}")}
                             id="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
                         />{{- end }}
                         {{- if $field | IsText }}
                         <Textarea
                             name="{{ .FieldNameCamelCase }}"
-                            control={control}
+                            control={form.control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
                         />{{- end }}
                         {{- if $field | IsTime }}
                         <TimeField
                             name="{{ .FieldNameCamelCase }}"
-                            control={control}
+                            control={form.control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
                         />{{- end }}
                         {{- if $field | IsDate }}
                         <DateField
                             name="{{ .FieldNameCamelCase }}"
-                            control={control}
+                            control={form.control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
+                        />{{- end }}
+                        {{- if $field | IsFile }}
+                        <FileField
+                            control={form.control}
+                            name="{{ .FieldNameCamelCase }}"
+                            resource={RESOURCE_NAME.toLowerCase()}
+                            resourceId={data?.id ?? ""}
+                            defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
+                            onChange={e => {
+                                if (!e) {
+                                    form.setValue("{{ .FieldNameCamelCase }}", "");
+                                    return
+                                }
+                                form.setValue("{{ .FieldNameCamelCase }}", e)
+                            }}
                         />{{- end }}
                         {{- if $field | IsUndefined -}}
                         <Input
-                            {...register("{{ .FieldNameCamelCase }}")}
+                            {...form.register("{{ .FieldNameCamelCase }}")}
                             type="{{ $field | HTMLType }}"
                             id="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
@@ -150,7 +168,7 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                 {{- end }}
                 </GridFields>
                 <SingleLayout.Footer className="justify-between">
-                    <div className="flex gap-x-2">
+                    <div className="flex space-x-2">
                         <PrimaryButton onClick={onSave}>Save</PrimaryButton>
                         <SecondaryButton onClick={onCancel}>Cancel</SecondaryButton>
                     </div>

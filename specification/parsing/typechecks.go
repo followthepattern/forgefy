@@ -121,3 +121,20 @@ func CreateHasDate(t types.TypeRegistry) func(specification.Feature) bool {
 		return false
 	}
 }
+
+func CreateIsFile(t types.TypeRegistry) func(models.Field) bool {
+	return func(f models.Field) bool {
+		return t.GetType(f.Type) == types.File
+	}
+}
+
+func CreateHasFile(t types.TypeRegistry) func(specification.Feature) bool {
+	return func(f specification.Feature) bool {
+		for _, field := range f.Fields {
+			if t.GetType(field.Type) == types.File {
+				return true
+			}
+		}
+		return false
+	}
+}

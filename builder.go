@@ -81,6 +81,8 @@ func (builder Builder) addParsingFunctions(pm productmap.ProductMap) productmap.
 		"IsNotTimeBased": parsing.CreateIsNotTimeBased(types.Registered),
 		"IsDate":         parsing.CreateIsDate(types.Registered),
 		"HasDate":        parsing.CreateHasDate(types.Registered),
+		"IsFile":         parsing.CreateIsFile(types.Registered),
+		"HasFile":        parsing.CreateHasFile(types.Registered),
 		"Records":        parsing.CreateRecordsFunc(types.Registered),
 		"EnvVariable":    naming.ToEnvVariable,
 		"IDField":        parsing.CreateFindIDFunc(types.Registered),

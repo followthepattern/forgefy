@@ -73,9 +73,7 @@ const FileComponent = React.forwardRef((props: FileComponentProperties, ref: Rea
                             filePath={file}
                             onDownloadClick={() => { download(file) }}
                             onRemoveClick={() => {
-                                console.info("remove1")
                                 if (props.onChange) {
-                                    console.info("remove2")
                                     props.onChange(null)
                                 }
                                 setFile(undefined);
