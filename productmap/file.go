@@ -14,10 +14,11 @@ type File struct {
 	funcMap  template.FuncMap
 }
 
-func NewFile(filePath string, template string) File {
+func NewFile(filePath string, tmpl string) File {
 	return File{
 		filePath: filePath,
-		template: template,
+		template: tmpl,
+		funcMap:  template.FuncMap{},
 	}
 }
 
@@ -27,7 +28,10 @@ func (f File) WithData(data any) File {
 }
 
 func (f File) WithFuncMap(fm template.FuncMap) File {
-	f.funcMap = fm
+	for k, v := range fm {
+		f.funcMap[k] = v
+	}
+
 	return f
 }
 

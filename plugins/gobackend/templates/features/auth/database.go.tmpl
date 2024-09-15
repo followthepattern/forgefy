@@ -1,11 +1,12 @@
+{{ $app := .App -}}
 package auth
 
 import (
 	"database/sql"
 	"fmt"
 
-	"github.com/{{ .AppNamePackage }}/models"
-	"github.com/{{ .AppNamePackage }}/types"
+	"github.com/{{ $app | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/types"
 	. "github.com/followthepattern/goqu/v9"
 )
 

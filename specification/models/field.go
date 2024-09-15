@@ -1,13 +1,10 @@
 package models
 
 import (
-	"fmt"
 	"strings"
 
-	"github.com/followthepattern/forgefy/datagenerator"
 	"github.com/followthepattern/forgefy/specification/naming"
 	validation "github.com/go-ozzo/ozzo-validation"
-	"github.com/google/uuid"
 )
 
 const IDFieldType = "id"
@@ -53,21 +50,6 @@ func (f Field) FieldNameHumanReadable() string {
 
 func (f Field) FieldNameVarName() string {
 	return strings.ToLower(f.Name)
-}
-
-func (f Field) RandomValue() string {
-	switch f.Type {
-	case "id":
-		return uuid.NewString()
-	case "string":
-		return datagenerator.String(10)
-	case "uuid":
-		return uuid.NewString()
-	case "int":
-		return fmt.Sprint(datagenerator.RandomInt())
-	}
-
-	return datagenerator.String(10)
 }
 
 func (f Field) Validate() error {

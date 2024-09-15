@@ -1,0 +1,106 @@
+import { useTokenStore } from "./store";
+import { BACKEND_URL } from "./config";
+import { useCallback, useState } from "react";
+
+interface UseUploadFile {
+    data: string | null;
+    called: boolean;
+    loading: boolean;
+    error: string | null;
+    execute: (file: File, resource: string, resourceId: string) => void;
+}
+
+export const useUploadFile = (): UseUploadFile => {
+    const { token } = useTokenStore();
+    const uploadBaseURL = `${BACKEND_URL}/storage/upload`;
+
+    const [data, setData] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [called, setCalled] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+
+
+    const fetchData = useCallback(async (file: File, resource: string, resourceId: string) => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const url = `${uploadBaseURL}/${resource}/${resourceId}`;
+
+            setLoading(true);
+
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to upload file: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            setData(result);
+        } catch (err) {
+            console.error(err);
+            setError((err as Error).message);
+        } finally {
+            setLoading(false);
+        }
+
+    }, [])
+
+    const execute = (file: File, resource: string, resourceId: string) => {
+        fetchData(file, resource, resourceId);
+        setCalled(true);
+    }
+
+    return { data, called, loading, error, execute }
+}
+
+export const useStorage = (): {
+    download: (filePath: string) => void
+} => {
+    const { token } = useTokenStore();
+
+    const downloadBaseURL = `${BACKEND_URL}/storage/download`
+
+    return {
+        download: (filePath: string) => {
+            return downloadFile(token, `${downloadBaseURL}/${filePath}`)
+        }
+    }
+}
+
+async function downloadFile(token: string, link: string) {
+    try {
+        const response = await fetch(link, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to download file: ${response.statusText}`);
+        }
+
+        const fileName = link.split(/(\\|\/)/).pop() ?? link;
+
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.target = "_blank"
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+        console.error('Error downloading the file:', error);
+    }
+}

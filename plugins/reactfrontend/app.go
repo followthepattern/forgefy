@@ -12,6 +12,8 @@ import (
 	"github.com/followthepattern/forgefy/plugins/reactfrontend/templates"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
+	"github.com/followthepattern/forgefy/specification/naming"
+	"github.com/followthepattern/forgefy/specification/types"
 )
 
 var _ plugins.App = &ReactFrontend{}
@@ -27,8 +29,9 @@ func NewApp() *ReactFrontend {
 		port:         3000,
 		tailwindPort: 9999,
 		parsingFunctions: template.FuncMap{
-			"JSType":      parsing.JSType,
-			"HTMLType":    parsing.HTMLType,
+			"JSType":      parsing.CreateJSType(types.Registered),
+			"HTMLType":    parsing.CreateHTMLType(types.Registered),
+			"URL":         parsing.URL,
 			"GraphQLName": parsing.GraphQLName,
 		},
 	}
@@ -71,14 +74,6 @@ func (a App) AppNameToPackageName() string {
 	return strings.ToLower(a.AppName)
 }
 
-func (a App) Features() []Feature {
-	features := make([]Feature, len(a.App.Features))
-	for i, feature := range a.App.Features {
-		features[i] = Feature{feature}
-	}
-	return features
-}
-
 func (ReactFrontend) AddDefaultFiles(pm productmap.ProductMap, fs specification.Product) error {
 	return nil
 }
@@ -92,6 +87,10 @@ func (plugin *ReactFrontend) Build(pm productmap.ProductMap, app specification.A
 	reactApp.TailwindPort = plugin.GetNextTailwindPortNumber()
 
 	return fs.WalkDir(dir, ".", plugin.createWalkFn(pm, reactApp))
+}
+
+func ToFileSuffix(f specification.Feature) string {
+	return naming.ToUpperCamelCase(f.FeatureName)
 }
 
 func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App) func(filepath string, d fs.DirEntry, err error) error {
@@ -123,17 +122,15 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 			return pm.Insert(file)
 		}
 
-		for _, feature := range reactApp.Features() {
+		for _, feature := range reactApp.Features {
 			newFilePath := strings.Replace(filepath, "(feature)", feature.FeatureNameDir(), 1)
-			newFilePath = strings.Replace(newFilePath, "(feature)", feature.FeatureToFileSuffix(), 1)
+			newFilePath = strings.Replace(newFilePath, "(feature)", ToFileSuffix(feature), 1)
 
 			file := productmap.NewFile(
 				newFilePath,
 				string(content),
-			).WithData(FeatureTemplateModel{
-				Feature: feature,
-				App:     reactApp,
-			}).WithFuncMap(plugin.parsingFunctions)
+			).WithData(feature).
+				WithFuncMap(plugin.parsingFunctions)
 
 			err = pm.Insert(file)
 			if err != nil {

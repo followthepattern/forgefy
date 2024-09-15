@@ -6,10 +6,10 @@ interface UpdateProperties {
     graphQL: string
 }
 
-export default function useUpdate<T>({parseResult, graphQL}: UpdateProperties): UpdateMutationResult<T,number | undefined> {
+export default function useUpdate<T>({ parseResult, graphQL }: UpdateProperties): UpdateMutationResult<T, number | undefined> {
     const [executeMutation, { data, loading, error }] = useMutation(gql(graphQL));
 
-    const execute = (id: string, model: T) => {
+    const execute = (id: string, model: any) => {
         executeMutation({
             variables: {
                 id: id,

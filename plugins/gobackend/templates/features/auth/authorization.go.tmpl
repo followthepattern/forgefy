@@ -1,10 +1,12 @@
+{{ $app := .App -}}
+
 package auth
 
 import (
 	"context"
 
-	"github.com/{{ .AppNamePackage }}/accesscontrol"
-	"github.com/{{ .AppNamePackage }}/container"
+	"github.com/{{ $app | PackageName }}/accesscontrol"
+	"github.com/{{ $app | PackageName }}/container"
 )
 
 type AuthorizationService struct {
@@ -46,4 +48,24 @@ func (service AuthorizationService) Authorize(ctx context.Context, action string
 	}
 
 	return service.ac.Authorize(ctx, ctxu.Id.Data, action, resourceID, roles...)
+}
+
+func (service AuthorizationService) AuthorizeWithResource(ctx context.Context, resource, resourceID, action string) error {
+	ctxu, err := GetUserContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	roles, err := service.authDatabase.GetRoleIDs(ctxu.Id.Data)
+	if err != nil {
+		return err
+	}
+
+	return service.ac.AuthorizeWithResource(
+		ctx,
+		resource,
+		ctxu.Id.Data,
+		action,
+		resourceID,
+		roles...)
 }

@@ -1,12 +1,14 @@
+{{ $app := .App -}}
+
 package graphql
 
 import (
-	"github.com/{{ .AppNamePackage }}/controllers"
-	"github.com/{{ .AppNamePackage }}/features/auth"
-	"github.com/{{ .AppNamePackage }}/features/user"
-	{{ $AppNameToPackageName := .AppNamePackage }}
-{{- range .Features }}
-	"github.com/{{ $AppNameToPackageName }}/features/{{ .FeatureNamePackage }}"
+	"github.com/{{ $app | PackageName }}/controllers"
+	"github.com/{{ $app | PackageName }}/features/auth"
+	"github.com/{{ $app | PackageName }}/features/user"
+	{{ $AppNameToPackageName := $app | PackageName }}
+{{- range $feature := .Features }}
+	"github.com/{{ $AppNameToPackageName }}/features/{{ $feature | PackageName }}"
 {{- end }}
 )
 
@@ -14,8 +16,8 @@ type Resolver struct {
 	authGraphQL	auth.AuthGraphQL
 	userGraphQL user.UserGraphQL
 
-{{- range .Features }}
-	{{ .FeatureNameCamelCase }}GraphQL	{{ .FeatureNamePackage }}.{{ .FeatureNameGo }}GraphQL
+{{- range $feature := .Features }}
+	{{ .FeatureNameCamelCase }}GraphQL	{{ $feature | PackageName }}.{{ $feature | GoType }}GraphQL
 {{- end }}
 }
 
@@ -23,8 +25,8 @@ func NewResolver(controllers controllers.Controllers) Resolver {
 	authGraphQL := auth.NewAuthGraphQL(controllers.Auth())
 	userGraphQL := user.NewUserGraphQL(controllers.User())
 	
-{{- range .Features }}
-	{{ .FeatureNameCamelCase }}GraphQL := {{ .FeatureNamePackage}}.New{{ .FeatureNameGo }}GraphQL(controllers.{{ .FeatureNameGo }}())
+{{- range $feature := .Features }}
+	{{ $feature.FeatureNameCamelCase }}GraphQL := {{ $feature | PackageName }}.New{{ $feature | GoType }}GraphQL(controllers.{{ $feature | GoType }}())
 {{- end }}
 
 
@@ -50,8 +52,8 @@ func (r Resolver) Users() (user.UserGraphQL, error) {
 	return r.userGraphQL, nil
 }
 
-{{- range .Features }}
-func (r Resolver) {{ .FeatureNameGo }}s() ({{ .FeatureNamePackage }}.{{ .FeatureNameGo }}GraphQL, error) {
-	return r.{{ .FeatureNameCamelCase }}GraphQL, nil
+{{- range $feature := .Features }}
+func (r Resolver) {{ $feature | GoType }}s() ({{ $feature | PackageName }}.{{ $feature | GoType }}GraphQL, error) {
+	return r.{{ $feature.FeatureNameCamelCase }}GraphQL, nil
 }
 {{- end }}

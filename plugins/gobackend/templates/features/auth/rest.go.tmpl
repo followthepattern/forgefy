@@ -1,9 +1,11 @@
+{{- $app := .App -}}
+
 package auth
 
 import (
 	"net/http"
 
-	"github.com/{{ .AppNamePackage }}/api/httpresponses"
+	"github.com/{{ $app | PackageName }}/api/httpresponses"
 	"github.com/go-chi/chi/v5"
 )
 

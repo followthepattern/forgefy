@@ -1,10 +1,12 @@
+{{ $app := .App -}}
+
 package accesscontrol
 
 import (
 	"context"
 	"errors"
 
-	"github.com/backend1/config"
+	"github.com/{{ $app | PackageName }}/config"
 	"github.com/cerbos/cerbos-sdk-go/cerbos"
 )
 
@@ -17,18 +19,6 @@ const (
 	ALLRESOURCE = "ALL"
 	NEW         = "NEW"
 )
-
-type Config struct {
-	Kind   string
-	Cerbos cerbos.Client[*cerbos.GRPCClient, cerbos.PrincipalCtx]
-}
-
-func (c Config) Build() AccessControl {
-	return AccessControl{
-		kind:   c.Kind,
-		cerbos: c.Cerbos,
-	}
-}
 
 type AccessControl struct {
 	kind   string
@@ -61,11 +51,15 @@ func (ac AccessControl) WithKind(kind string) AccessControl {
 }
 
 func (ac AccessControl) Authorize(ctx context.Context, principalID string, action string, resourceID string, roles ...string) error {
+	return ac.AuthorizeWithResource(ctx, ac.kind, principalID, action, resourceID, roles...)
+}
+
+func (ac AccessControl) AuthorizeWithResource(ctx context.Context, resource string, principalID string, action string, resourceID string, roles ...string) error {
 	principal := cerbos.NewPrincipal(principalID, roles...)
 
-	resource := cerbos.NewResource(ac.kind, resourceID)
+	cerbosResource := cerbos.NewResource(resource, resourceID)
 
-	ok, err := ac.cerbos.IsAllowed(ctx, principal, resource, action)
+	ok, err := ac.cerbos.IsAllowed(ctx, principal, cerbosResource, action)
 	if err != nil {
 		return err
 	}

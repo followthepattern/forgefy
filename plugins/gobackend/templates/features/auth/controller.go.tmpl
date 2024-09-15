@@ -1,12 +1,14 @@
+{{ $app := .App -}}
+
 package auth
 
 import (
 	"context"
 	"log/slog"
 
-	"github.com/{{ .AppNamePackage }}/config"
-	"github.com/{{ .AppNamePackage }}/container"
-	"github.com/{{ .AppNamePackage }}/types"
+	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/container"
+	"github.com/{{ $app | PackageName }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 

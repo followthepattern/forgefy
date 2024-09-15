@@ -1,26 +1,30 @@
-package {{ .FeatureNamePackage }}
+{{ $app := .App -}}
+{{ $feature := . -}}
+{{ $idField := $feature | IDField -}}
+
+package {{ $feature | PackageName }}
 
 import (
 	"context"
 	"log/slog"
 
-	"github.com/{{ .AppNamePackage }}/accesscontrol"
-	"github.com/{{ .AppNamePackage }}/container"
-	"github.com/{{ .AppNamePackage }}/features/auth"
-	"github.com/{{ .AppNamePackage }}/features/{{ .FeatureNamePackage }}/models"
-	"github.com/{{ .AppNamePackage }}/types"
+	"github.com/{{ $app | PackageName }}/accesscontrol"
+	"github.com/{{ $app | PackageName }}/container"
+	"github.com/{{ $app | PackageName }}/features/auth"
+	"github.com/{{ $app | PackageName }}/features/{{ $feature | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/types"
 	"github.com/google/uuid"
 )
 
-type {{ .FeatureNameGo }}Service struct {
+type {{ $feature | GoType }}Service struct {
 	authorizationService auth.AuthorizationService
 	logger               *slog.Logger
-	{{ .FeatureNameCamelCase }}Repository	{{ .FeatureNameGo }}Database
+	{{ .FeatureNameCamelCase }}Repository	{{ $feature | GoType }}Database
 }
 
-func New{{ .FeatureNameGo }}Service(cont container.Container, authorizationService auth.AuthorizationService) {{ .FeatureNameGo }}Service {
-	repository := New{{ .FeatureNameGo }}Database(cont.GetDB())
-	service := {{ .FeatureNameGo }}Service{
+func New{{ $feature | GoType }}Service(cont container.Container, authorizationService auth.AuthorizationService) {{ $feature | GoType }}Service {
+	repository := New{{ $feature | GoType }}Database(cont.GetDB())
+	service := {{ $feature | GoType }}Service{
 		authorizationService: authorizationService,
 		{{ .FeatureNameCamelCase }}Repository:    repository,
 		logger:	cont.GetLogger(),
@@ -29,7 +33,7 @@ func New{{ .FeatureNameGo }}Service(cont container.Container, authorizationServi
 	return service
 }
 
-func (service {{ .FeatureNameGo }}Service) GetByID(ctx context.Context, id string) (*models.{{ .FeatureNameGo }}Model, error) {
+func (service {{ $feature | GoType }}Service) GetByID(ctx context.Context, id string) (*models.{{ $feature | GoType }}Model, error) {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, id)
 	if err != nil {
 		return nil, err
@@ -38,7 +42,7 @@ func (service {{ .FeatureNameGo }}Service) GetByID(ctx context.Context, id strin
 	return service.{{ .FeatureNameCamelCase }}Repository.GetByID(id)
 }
 
-func (service {{ .FeatureNameGo }}Service) Get(ctx context.Context, request models.{{ .FeatureNameGo }}ListRequestParams) (*models.{{ .FeatureNameGo }}ListResponse, error) {
+func (service {{ $feature | GoType }}Service) Get(ctx context.Context, request models.{{ $feature | GoType }}ListRequestParams) (*models.{{ $feature | GoType }}ListResponse, error) {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, accesscontrol.ALLRESOURCE)
 	if err != nil {
 		return nil, err
@@ -49,20 +53,20 @@ func (service {{ .FeatureNameGo }}Service) Get(ctx context.Context, request mode
 	return service.{{ .FeatureNameCamelCase }}Repository.Get(request)
 }
 
-func (service {{ .FeatureNameGo }}Service) Create(ctx context.Context, value models.{{ .FeatureNameGo }}Model) error {
+func (service {{ $feature | GoType }}Service) Create(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
 	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.CREATE, accesscontrol.NEW)
 	if err != nil {
 		return err
 	}
 
-	value.{{ .IDField.FieldNameCamelCaseUpper }} = types.StringFrom(uuid.NewString())
+	value.{{ $idField.FieldNameCamelCaseUpper }} = types.StringFrom(uuid.NewString())
 	value.Userlog.CreationUserID = types.StringFrom(userID)
 
-	return service.{{ .FeatureNameCamelCase }}Repository.Create([]models.{{ .FeatureNameGo }}Model{value})
+	return service.{{ .FeatureNameCamelCase }}Repository.Create([]models.{{ $feature | GoType }}Model{value})
 }
 
-func (service {{ .FeatureNameGo }}Service) Update(ctx context.Context, value models.{{ .FeatureNameGo }}Model) error {
-	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.UPDATE, value.{{ .IDField.FieldNameCamelCaseUpper }}.Data)
+func (service {{ $feature | GoType }}Service) Update(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
+	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.UPDATE, value.{{ $idField.FieldNameCamelCaseUpper }}.Data)
 	if err != nil {
 		return err
 	}
@@ -72,7 +76,7 @@ func (service {{ .FeatureNameGo }}Service) Update(ctx context.Context, value mod
 	return service.{{ .FeatureNameCamelCase }}Repository.Update(value)
 }
 
-func (service {{ .FeatureNameGo }}Service) Delete(ctx context.Context, id string) error {
+func (service {{ $feature | GoType }}Service) Delete(ctx context.Context, id string) error {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.DELETE, id)
 	if err != nil {
 		return err

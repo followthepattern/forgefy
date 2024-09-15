@@ -1,0 +1,58 @@
+package storage
+
+import (
+	"fmt"
+	"io"
+	"mime/multipart"
+	"os"
+	"path"
+)
+
+type LocalStorage struct {
+	cfg Config
+}
+
+func (l LocalStorage) Upload(directoryPath string, file multipart.File, fileHeader multipart.FileHeader) (string, error) {
+	if fileHeader.Size > MAX_UPLOAD_SIZE {
+		return "", fmt.Errorf(FileSizeExceedsMaxUploadSize, fileHeader.Filename)
+	}
+
+	_, err := file.Seek(0, io.SeekStart)
+	if err != nil {
+		return "", err
+	}
+
+	finalDirectoryPath := path.Join(
+		l.cfg.uploadDirectory,
+		directoryPath,
+	)
+
+	err = os.MkdirAll(finalDirectoryPath, os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	filePath := path.Join(
+		finalDirectoryPath,
+		fileHeader.Filename)
+
+	f, err := os.Create(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	defer f.Close()
+
+	_, err = io.Copy(f, file)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(directoryPath, fileHeader.Filename), nil
+}
+
+func (l LocalStorage) Download(filePath string) (*os.File, error) {
+	full := path.Join(l.cfg.uploadDirectory, filePath)
+
+	return os.Open(full)
+}

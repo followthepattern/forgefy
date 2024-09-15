@@ -1,3 +1,5 @@
+{{ $app := .App -}}
+
 version: 0.0.0
 organization:
   name: "{{ .AppName }}"
@@ -11,11 +13,11 @@ server:
   ed25519_private_key: ./configs/dev_private.pem
   ed25519_public_key: ./configs/dev_public.pem
 db:
-  host: {{ .AppNamePackage }}_db
+  host: {{ $app | PackageName }}_db
   port: 5432
-  user: {{ .AppNamePackage }}user
+  user: {{ $app | PackageName }}user
   password: dbpass
-  db_name: {{ .AppNamePackage }}
+  db_name: {{ $app | PackageName }}
 mail:
   host: ""
   addr: ""

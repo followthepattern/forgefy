@@ -1,5 +1,12 @@
+{{ $feature := . -}}
 import { MutationResourceResponse } from "@/graphql/mutation";
 import { QueryResourceResponse } from "@/graphql/query";
+{{if $feature | HasTime -}}
+import { Time } from "@/lib/time";
+{{- end }}
+{{if $feature | HasDate -}}
+import { Date } from "@/lib/time";
+{{- end }}
 
 export interface {{ .FeatureNameCamelCaseUpper }} {
 {{- range $field := .Fields }}

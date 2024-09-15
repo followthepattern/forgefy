@@ -1,0 +1,33 @@
+import {
+    CalendarDate,
+    Time as IntTime,
+    parseDateTime as parseIntDateTime
+} from "@internationalized/date";
+
+export function parseDate(value: string): Date {
+    const date = parseIntDateTime(value);
+    return new Date(date.year, date.month, date.second)
+}
+
+export function parseTime(value: string): Time {
+    const date = parseIntDateTime(value);
+    return new Time(date.hour, date.minute, date.second);
+}
+
+export class Date extends CalendarDate {
+    toString(): string {
+        const year = this.year;
+        const month = String(this.month).padStart(2, '0');
+        const day = String(this.day).padStart(2, '0');
+        return `${year}-${month}-${day}T00:00:00`
+    }
+}
+
+export class Time extends IntTime {
+    toString(): string {
+        const hour = String(this.hour).padStart(2, '0');
+        const minute = String(this.minute).padStart(2, '0');
+        const second = String(this.second).padStart(2, '0');
+        return `0001-01-01T${hour}:${minute}:${second}`
+    }
+}

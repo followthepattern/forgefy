@@ -1,23 +1,27 @@
+{{ $app := .App -}}
+{{ $feature := . }}
+{{ $idField := $feature | IDField -}}
+
 package models
 
 import (
-	basemodels "github.com/{{ .AppNamePackage }}/models"
-	"github.com/{{ .AppNamePackage }}/types"
+	basemodels "github.com/{{ $app | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
-type {{ .FeatureNameGo }}Model struct {
+type {{ $feature | GoType }}Model struct {
 	{{- range $field := .Fields }}
-	{{ $field.FieldNameCamelCaseUpper }} {{ $field | GoType }} `db:"{{ $field | NameDB }}" goqu:"omitempty"`
+	{{ $field.FieldNameCamelCaseUpper }} {{ $field | GoType }} `db:"{{ $field | DBName }}" goqu:"omitempty"`
 	{{- end }}
 	basemodels.Userlog
 }
 
-func (m {{ .FeatureNameGo }}Model) IsDefault() bool {
-	return m.{{ .IDField.FieldNameCamelCaseUpper }}.Len() < 1
+func (m {{ $feature | GoType }}Model) IsDefault() bool {
+	return m.{{ $idField.FieldNameCamelCaseUpper }}.Len() < 1
 }
 
-func (m {{ .FeatureNameGo }}Model) CreateValidate() error {
+func (m {{ $feature | GoType }}Model) CreateValidate() error {
 	return validation.ValidateStruct(&m,
 		{{- range .Fields }}
 		validation.Field(&m.{{ .FieldNameCamelCaseUpper }}, validation.Required),
@@ -25,12 +29,12 @@ func (m {{ .FeatureNameGo }}Model) CreateValidate() error {
 	)
 }
 
-func (m {{ .FeatureNameGo }}Model) UpdateValidate() error {
+func (m {{ $feature | GoType }}Model) UpdateValidate() error {
 	return validation.ValidateStruct(&m,
-		validation.Field(&m.{{ .IDField.FieldNameCamelCaseUpper }}, validation.Required),
+		validation.Field(&m.{{ $idField.FieldNameCamelCaseUpper }}, validation.Required),
 	)
 }
 
-type {{ .FeatureNameGo }}ListRequestParams = basemodels.ListRequestParams[basemodels.ListFilter]
+type {{ $feature | GoType }}ListRequestParams = basemodels.ListRequestParams[basemodels.ListFilter]
 
-type {{ .FeatureNameGo }}ListResponse = basemodels.ListResponse[{{ .FeatureNameGo }}Model]
+type {{ $feature | GoType }}ListResponse = basemodels.ListResponse[{{ $feature | GoType }}Model]

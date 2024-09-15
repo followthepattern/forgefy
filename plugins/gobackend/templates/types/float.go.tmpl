@@ -1,0 +1,64 @@
+package types
+
+import "strconv"
+
+const float64Name = "Float64"
+
+type Float64 struct {
+	BaseType[float64]
+}
+
+func NewFloat64(value float64, valid bool) Float64 {
+	base := New[float64](value, true)
+	base.name = float64Name
+	return Float64{
+		BaseType: base,
+	}
+}
+
+func Float64From(value float64) Float64 {
+	return NewFloat64(value, true)
+}
+
+func Float64FromPtr(value *float64) Float64 {
+	base := FromPtr[float64](value)
+	base.name = float64Name
+	return Float64{
+		BaseType: base,
+	}
+}
+
+func (ttype Float64) ImplementsGraphQLType(name string) bool {
+	return float64Name == name
+}
+
+func (ttype *Float64) UnmarshalGraphQL(input interface{}) error {
+	switch input := input.(type) {
+	case int:
+		ttype.Data = float64(input)
+		ttype.Valid = true
+		ttype.Set = true
+		return nil
+	case int32:
+		ttype.Data = float64(input)
+		ttype.Valid = true
+		ttype.Set = true
+		return nil
+	case float64:
+		ttype.Data = input
+		ttype.Valid = true
+		ttype.Set = true
+		return nil
+	case string:
+		value, err := strconv.ParseFloat(input, 64)
+		if err != nil {
+			return err
+		}
+		ttype.Data = float64(value)
+		ttype.Valid = true
+		ttype.Set = true
+		return nil
+	default:
+		return ttype.BaseType.UnmarshalGraphQL(input)
+	}
+}

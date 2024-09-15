@@ -1,15 +1,18 @@
+{{ $app := .App -}}
+
 package user
 
 import (
 	"context"
 	"log/slog"
 
+	"github.com/{{ $app | PackageName }}/accesscontrol"
+	"github.com/{{ $app | PackageName }}/container"
+	"github.com/{{ $app | PackageName }}/features/auth"
+	"github.com/{{ $app | PackageName }}/features/user/models"
+	"github.com/{{ $app | PackageName }}/types"
+
 	"github.com/google/uuid"
-	"github.com/{{ .AppNamePackage }}/accesscontrol"
-	"github.com/{{ .AppNamePackage }}/container"
-	"github.com/{{ .AppNamePackage }}/features/auth"
-	"github.com/{{ .AppNamePackage }}/features/user/models"
-	"github.com/{{ .AppNamePackage }}/types"
 )
 
 type UserService struct {

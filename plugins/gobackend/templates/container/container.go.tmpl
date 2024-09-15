@@ -1,12 +1,14 @@
+{{ $app := .App -}}
+
 package container
 
 import (
 	"database/sql"
 	"log/slog"
 
-	"github.com/{{ .AppNamePackage }}/accesscontrol"
-	"github.com/{{ .AppNamePackage }}/config"
-	"github.com/{{ .AppNamePackage }}/features/mail"
+	"github.com/{{ $app | PackageName }}/accesscontrol"
+	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/features/mail"
 )
 
 type Container struct {

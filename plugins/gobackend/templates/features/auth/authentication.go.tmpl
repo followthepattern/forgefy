@@ -1,3 +1,5 @@
+{{ $app := .App -}}
+
 package auth
 
 import (
@@ -7,11 +9,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/{{ .AppNamePackage }}/config"
-	"github.com/{{ .AppNamePackage }}/features/mail"
-	"github.com/{{ .AppNamePackage }}/features/user/models"
+	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/features/mail"
+	"github.com/{{ $app | PackageName }}/features/user/models"
 
-	"github.com/{{ .AppNamePackage }}/types"
+	"github.com/{{ $app | PackageName }}/types"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"

@@ -1,28 +1,32 @@
-package {{ .FeatureNamePackage }}
+{{ $app := .App -}}
+{{ $feature := . -}}
+{{ $idField := $feature | IDField -}}
+
+package {{ $feature | PackageName }}
 
 import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/{{ .AppNamePackage }}/api/httpresponses"
-	"github.com/{{ .AppNamePackage }}/features/{{ .FeatureNamePackage }}/models"
-	basemodels "github.com/{{ .AppNamePackage }}/models"
-	"github.com/{{ .AppNamePackage }}/types"
+	"github.com/{{ $app | PackageName }}/api/httpresponses"
+	"github.com/{{ $app | PackageName }}/features/{{ $feature | PackageName }}/models"
+	basemodels "github.com/{{ $app | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/types"
 
 	"github.com/go-chi/chi/v5"
 )
 
-type {{ .FeatureNameGo }}Rest struct {
-	{{ .FeatureNameCamelCase }} {{ .FeatureNameGo }}Controller
+type {{ $feature | GoType }}Rest struct {
+	{{ .FeatureNameCamelCase }} {{ $feature | GoType }}Controller
 }
 
-func New{{ .FeatureNameGo }}Rest(ctrl {{ .FeatureNameGo }}Controller) {{ .FeatureNameGo }}Rest {
-	return {{ .FeatureNameGo }}Rest{
+func New{{ $feature | GoType }}Rest(ctrl {{ $feature | GoType }}Controller) {{ $feature | GoType }}Rest {
+	return {{ $feature | GoType }}Rest{
 		{{ .FeatureNameCamelCase }}: ctrl,
 	}
 }
 
-func (service {{ .FeatureNameGo }}Rest) GetByID(w http.ResponseWriter, r *http.Request) {
+func (service {{ $feature | GoType }}Rest) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	result, err := service.{{ .FeatureNameCamelCase }}.GetByID(r.Context(), id)
@@ -34,10 +38,10 @@ func (service {{ .FeatureNameGo }}Rest) GetByID(w http.ResponseWriter, r *http.R
 	httpresponses.Write(w, http.StatusOK, result)
 }
 
-func (service {{ .FeatureNameGo }}Rest) Get(w http.ResponseWriter, r *http.Request) {
+func (service {{ $feature | GoType }}Rest) Get(w http.ResponseWriter, r *http.Request) {
 	search := chi.URLParam(r, "search")
 
-	filter := models.{{ .FeatureNameGo }}ListRequestParams{
+	filter := models.{{ $feature | GoType }}ListRequestParams{
 		Filter: basemodels.ListFilter{
 			Search: types.StringFrom(search),
 		},
@@ -53,8 +57,8 @@ func (service {{ .FeatureNameGo }}Rest) Get(w http.ResponseWriter, r *http.Reque
 	httpresponses.Write(w, http.StatusOK, results)
 }
 
-func (service {{ .FeatureNameGo }}Rest) Create(w http.ResponseWriter, r *http.Request) {
-	var value models.{{ .FeatureNameGo }}Model
+func (service {{ $feature | GoType }}Rest) Create(w http.ResponseWriter, r *http.Request) {
+	var value models.{{ $feature | GoType }}Model
 	err := json.NewDecoder(r.Body).Decode(&value)
 	if err != nil {
 		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
@@ -70,8 +74,8 @@ func (service {{ .FeatureNameGo }}Rest) Create(w http.ResponseWriter, r *http.Re
 	httpresponses.Created(w)
 }
 
-func (service {{ .FeatureNameGo }}Rest) Update(w http.ResponseWriter, r *http.Request) {
-	var value models.{{ .FeatureNameGo }}Model
+func (service {{ $feature | GoType }}Rest) Update(w http.ResponseWriter, r *http.Request) {
+	var value models.{{ $feature | GoType }}Model
 	err := json.NewDecoder(r.Body).Decode(&value)
 	if err != nil {
 		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
@@ -79,7 +83,7 @@ func (service {{ .FeatureNameGo }}Rest) Update(w http.ResponseWriter, r *http.Re
 	}
 
 	id := r.URL.Query().Get("id")
-	value.{{ .IDField.FieldNameCamelCaseUpper }} = types.StringFrom(id)
+	value.{{ $idField.FieldNameCamelCaseUpper }} = types.StringFrom(id)
 
 	err = service.{{ .FeatureNameCamelCase }}.Update(r.Context(), value)
 	if err != nil {

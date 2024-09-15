@@ -72,21 +72,21 @@ export const Routes: RouteObject[] = [
                 path: "users/:id/edit",
                 element: <UserEdit />
             },
-{{- range .Features }}
+{{- range $feature := .Features }}
             {
-                path: "{{ .FeatureNameURL }}s",
+                path: "{{ $feature | URL }}s",
                 element: <ListPageWrapper Component={{ "{" }}{{ .FeatureNameCamelCaseUpper }}s} />,
             },
             {
-                path: "{{ .FeatureNameURL }}s/:id",
+                path: "{{ $feature | URL }}s/:id",
                 element: <{{ .FeatureNameCamelCaseUpper }} />
             },
             {
-                path: "{{ .FeatureNameURL }}s/new",
+                path: "{{ $feature | URL }}s/new",
                 element: <{{ .FeatureNameCamelCaseUpper }}New />
             },
             {
-                path: "{{ .FeatureNameURL }}s/:id/edit",
+                path: "{{ $feature | URL }}s/:id/edit",
                 element: <{{ .FeatureNameCamelCaseUpper }}Edit />
             },
 {{- end }}
