@@ -2,6 +2,8 @@ package productmap
 
 import (
 	"fmt"
+	"maps"
+	"regexp"
 	"text/template"
 )
 
@@ -53,4 +55,12 @@ func (pm *ProductMap) Walk(fn WalkFn) error {
 	}
 
 	return nil
+}
+
+func (pm *ProductMap) Exclude(pattern string) {
+	regexpPattern := regexp.MustCompile(pattern)
+
+	maps.DeleteFunc(pm.files, func(key string, _ File) bool {
+		return regexpPattern.MatchString(key)
+	})
 }

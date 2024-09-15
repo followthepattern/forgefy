@@ -18,7 +18,33 @@ func New() Forgefy {
 	}
 }
 
-func (f Forgefy) Forge(yaml string, fw forgeio.Writer) (string, error) {
+type ForgeConfging struct {
+	exclude string
+}
+
+type ForgeConfigOption interface {
+	apply(f *ForgeConfging)
+}
+
+type ForgeConfigOptionFn func(f *ForgeConfging)
+
+func (fn ForgeConfigOptionFn) apply(f *ForgeConfging) {
+	fn(f)
+}
+
+func WithExclude(exclude string) ForgeConfigOption {
+	return ForgeConfigOptionFn(func(f *ForgeConfging) {
+		f.exclude = exclude
+	})
+}
+
+func (f Forgefy) Forge(yaml string, fw forgeio.Writer, opts ...ForgeConfigOption) (string, error) {
+	forgeConfig := &ForgeConfging{}
+
+	for _, opt := range opts {
+		opt.apply(forgeConfig)
+	}
+
 	productSpecification, err := specification.UnmarshalYaml([]byte(yaml))
 	if err != nil {
 		return "", err
@@ -31,8 +57,12 @@ func (f Forgefy) Forge(yaml string, fw forgeio.Writer) (string, error) {
 		return productSpecification.ProductName, err
 	}
 
-	err = product.Walk(func(folderName string, file productmap.File) error {
-		return fw.Write(file.FilePath(), file.Write)
+	if len(forgeConfig.exclude) != 0 {
+		product.Exclude(forgeConfig.exclude)
+	}
+
+	err = product.Walk(func(filePath string, file productmap.File) error {
+		return fw.Write(filePath, file.Write)
 	})
 
 	return productSpecification.ProductName, err
