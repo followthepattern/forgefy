@@ -15,6 +15,7 @@ import (
 func main() {
 	var file string
 	var outputDir string
+	var exclude string
 
 	var root = &cobra.Command{
 		Use:   "forgefy",
@@ -36,6 +37,7 @@ func main() {
 
 	root.Flags().StringVarP(&file, "file", "f", "", "filepath to the forge file")
 	root.Flags().StringVarP(&outputDir, "output", "o", "", "output directory path")
+	root.Flags().StringVarP(&exclude, "exclude", "i", "", "specify regex to exclude certain files from forging")
 
 	if err := root.Execute(); err != nil {
 		fmt.Println(err.Error())
@@ -54,7 +56,11 @@ func main() {
 
 	fw := forgeio.NewFileWriter(outputDir)
 
-	productName, err := f.Forge(string(forgeFile), fw)
+	productName, err := f.Forge(
+		string(forgeFile),
+		fw,
+		forgefy.WithExclude(exclude))
+
 	if err != nil {
 		fmt.Printf("during forging %s following error occured: %s", productName, err.Error())
 		os.Exit(1)

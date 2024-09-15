@@ -50,4 +50,27 @@ var _ = Describe("Product Map", func() {
 			Expect(err).Should(MatchError("file test/apps/apple.txt already exists"))
 		})
 	})
+
+	Context("Exclude", func() {
+		It("exclude files that matching with regexp", func() {
+			pm := productmap.NewProductMap()
+
+			backendCompose := productmap.NewFile("apps/backend1/docker-compose.yaml", "apple content")
+			rootCompose := productmap.NewFile("docker-compose.yaml", "apple content")
+
+			err := pm.Insert(backendCompose)
+			Expect(err).Should(Succeed())
+
+			err = pm.Insert(rootCompose)
+			Expect(err).Should(Succeed())
+
+			pm.Exclude("^docker-compose\\.yaml")
+
+			exists := pm.Exists("apps/backend1/docker-compose.yaml")
+			Expect(exists).Should(BeTrue())
+
+			exists = pm.Exists("docker-compose.yaml")
+			Expect(exists).Should(BeFalse())
+		})
+	})
 })
