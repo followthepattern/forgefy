@@ -1,3 +1,4 @@
+{{ $feature := . -}}
 import { useForm } from "react-hook-form";
 import useCreate{{ .FeatureNameCamelCaseUpper }} from "../hooks/create{{ .FeatureNameCamelCaseUpper }}";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +12,26 @@ import Input from "../../components/inputFields/input";
 import SecondaryButton from "../../components/buttons/secondaryButton";
 import PrimaryButton from "../../components/buttons/primaryButton";
 
-export default function {{ .FeatureNameCamelCaseUpper }}New() {
+{{- if $feature | HasBoolean -}}
+import Checkbox from "@/app/(account)/components/inputFields/checkbox";
+{{ end -}}
+{{if $feature | HasNumber -}}
+import NumberField from "@/app/(account)/components/inputFields/numberfield";
+{{ end -}}
+{{if $feature | HasText -}}
+import Textarea from "@/app/(account)/components/inputFields/textarea";
+{{ end -}}
+{{if $feature | HasTime -}}
+import TimeField from "@/app/(account)/components/inputFields/timefield";
+{{ end -}}
+{{if $feature | HasDate -}}
+import DateField from "@/app/(account)/components/inputFields/datefield";
+{{ end -}}
+{{if $feature | HasFile -}}
+import FileField from "@/app/(account)/components/inputFields/filefield";
+{{ end }}
+
+export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
     const [executeMutation, { createLoading, createError, createResult }] = useCreate{{ .FeatureNameCamelCaseUpper }}();
 
     const navigate = useNavigate();
@@ -23,17 +43,14 @@ export default function {{ .FeatureNameCamelCaseUpper }}New() {
 
     }, [createResult])
 
-    const { register, getValues } = useForm<{{ .FeatureNameCamelCaseUpper }}>();
+    const form = useForm<{{ .FeatureNameCamelCaseUpper }}>();
 
     const onCreate = () => {
-        const values = getValues();
+        const values = form.getValues();
 
-        executeMutation({
-        {{- range .Fields }}
-            {{ .FieldNameCamelCase }}: values.{{ .FieldNameCamelCase }},
-        {{- end }}
-        })
+        executeMutation(values);
     }
+    
 
     const onCancel = () => {
         navigate(RESOURCE_URL)
@@ -44,16 +61,62 @@ export default function {{ .FeatureNameCamelCaseUpper }}New() {
             <SingleLayout.Title>New {{ .FeatureNameCamelCaseUpper }}</SingleLayout.Title>
             <form>
                 <GridFields className="py-6">
-                {{- range $field := .Fields }}
+                {{- range $field := $feature.Fields | NoneID }}
                     <div className="sm:col-span-2">
-                        <Label htmlFor="title">
+                        <Label htmlFor="{{ .FieldNameCamelCase }}">
                             {{ .FieldNameHumanReadable }}
                         </Label>
+                        {{- if $field | IsNumber }}
+                        <NumberField
+                            control={form.control}
+                            name="{{ .FieldNameCamelCase }}"
+                        />{{- end }}
+                        {{- if $field | IsBoolean }}
+                        <Checkbox
+                            {...form.register("{{ .FieldNameCamelCase }}")}
+                            id="{{ .FieldNameCamelCase }}"
+                        />{{- end }}
+                        {{- if $field | IsString }}
                         <Input
-                            {...register("{{ .FieldNameCamelCase }}")}
+                            {...form.register("{{ .FieldNameCamelCase }}")}
+                            id="{{ .FieldNameCamelCase }}"
+                        />{{- end }}
+                        {{- if $field | IsText }}
+                        <Textarea
+                            name="{{ .FieldNameCamelCase }}"
+                            control={form.control}
+                        />{{- end }}
+                        {{- if $field | IsTime }}
+                        <TimeField
+                            name="{{ .FieldNameCamelCase }}"
+                            control={form.control}
+                        />{{- end }}
+                        {{- if $field | IsDate }}
+                        <DateField
+                            name="{{ .FieldNameCamelCase }}"
+                            control={form.control}
+                        />{{- end }}
+                        {{- if $field | IsFile }}
+                        <FileField
+                            control={form.control}
+                            name="{{ .FieldNameCamelCase }}"
+                            resource={RESOURCE_URL.toLowerCase()}
+                            resourceId={""}
+                            defaultValue=""
+                            onChange={e => {
+                                if (!e) {
+                                    form.setValue("{{ .FieldNameCamelCase }}", "");
+                                    return
+                                }
+                                form.setValue("{{ .FieldNameCamelCase }}", e)
+                            }}
+                        />{{- end }}
+                        {{- if $field | IsUndefined -}}
+                        <Input
+                            {...form.register("{{ .FieldNameCamelCase }}")}
                             type="{{ $field | HTMLType }}"
                             id="{{ .FieldNameCamelCase }}"
-                        />
+                        />{{- end}}
                     </div>
                 {{- end }}
                 </GridFields>

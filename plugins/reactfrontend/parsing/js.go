@@ -10,7 +10,8 @@ func CreateJSType(t types.TypeRegistry) func(f models.Field) string {
 		switch t.GetType(f.Type) {
 		case types.Boolean:
 			return "boolean"
-		case types.String,
+		case types.ID,
+			types.String,
 			types.Text:
 			return "string"
 		case types.Number:

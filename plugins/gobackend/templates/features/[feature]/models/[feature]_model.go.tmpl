@@ -22,11 +22,7 @@ func (m {{ $feature | GoType }}Model) IsDefault() bool {
 }
 
 func (m {{ $feature | GoType }}Model) CreateValidate() error {
-	return validation.ValidateStruct(&m,
-		{{- range .Fields }}
-		validation.Field(&m.{{ .FieldNameCamelCaseUpper }}, validation.Required),
-		{{- end }}
-	)
+	return validation.ValidateStruct(&m)
 }
 
 func (m {{ $feature | GoType }}Model) UpdateValidate() error {

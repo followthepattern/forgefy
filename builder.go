@@ -67,6 +67,8 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 
 func (builder Builder) addParsingFunctions(pm productmap.ProductMap) productmap.ProductMap {
 	pm.WithFuncMap(template.FuncMap{
+		"IsID":           parsing.CreateIsID(types.Registered),
+		"NoneID":         parsing.CreateNoneID(types.Registered),
 		"IsUndefined":    parsing.CreateIsUndefined(types.Registered),
 		"IsBoolean":      parsing.CreateIsBoolean(types.Registered),
 		"HasBoolean":     parsing.CreateHasBoolean(types.Registered),
