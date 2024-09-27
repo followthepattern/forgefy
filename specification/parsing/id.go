@@ -1,6 +1,8 @@
 package parsing
 
 import (
+	"slices"
+
 	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/types"
@@ -22,5 +24,15 @@ func CreateFindIDFunc(t types.TypeRegistry) func(f specification.Feature) models
 			Name: "<unknown id field>",
 			Type: "unknown",
 		}
+	}
+}
+
+func CreateNoneID(t types.TypeRegistry) func([]models.Field) []models.Field {
+	return func(f []models.Field) []models.Field {
+		copiedFields := slices.Clone(f)
+
+		return slices.DeleteFunc(copiedFields, func(e models.Field) bool {
+			return t.GetType(e.Type) == types.ID
+		})
 	}
 }

@@ -57,13 +57,13 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                     autoClose: 3000,
                 })
             }
-            navigate(RESOURCE_URL);
+            navigate(`/${RESOURCE_URL}`)
         }
     }, [updateResult])
 
     useEffect(() => {
         if (deleteResult && deleteResult > 0) {
-            navigate(RESOURCE_URL);
+            navigate(`/${RESOURCE_URL}`)
         }
     }, [deleteResult])
 
@@ -94,7 +94,7 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
     }
 
     const onCancel = () => {
-        navigate(RESOURCE_URL)
+        navigate(`/${RESOURCE_URL}`)
     }
 
     return (
@@ -148,7 +148,6 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                             control={form.control}
                             name="{{ .FieldNameCamelCase }}"
                             resource={RESOURCE_NAME.toLowerCase()}
-                            resourceId={data?.id ?? ""}
                             defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
                             onChange={e => {
                                 if (!e) {

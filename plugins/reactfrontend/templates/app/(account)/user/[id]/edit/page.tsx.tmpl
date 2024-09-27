@@ -3,7 +3,7 @@ import useUpdateUser from "../../hooks/updateUser";
 import { useForm } from "react-hook-form";
 import useDeleteUser from "../../hooks/deleteUser";
 import { useNavigate, useParams } from "react-router-dom";
-import { RESOURCE_URL } from "../../page";
+import { RESOURCE_URL } from "../../const";
 import React, { useEffect } from "react";
 import { User } from "../../model";
 import SingleLayout from "@/app/(account)/components/singleView/layout";
@@ -37,13 +37,13 @@ export default function UserEdit() {
                     autoClose: 3000,
                 })
             }
-            navigate(RESOURCE_URL);
+            navigate(`/${RESOURCE_URL}`)
         }
     }, [updateResult])
 
     useEffect(() => {
         if (deleteResult && deleteResult > 0) {
-            navigate(RESOURCE_URL);
+            navigate(`/${RESOURCE_URL}`)
         }
     }, [deleteResult])
 
@@ -74,7 +74,7 @@ export default function UserEdit() {
     }
 
     const onCancel = () => {
-        navigate(RESOURCE_URL)
+        navigate(`/${RESOURCE_URL}`)
     }
 
     return (
@@ -82,17 +82,6 @@ export default function UserEdit() {
             <SingleLayout.Title>User: {data?.id}</SingleLayout.Title>
             <form action="">
                 <GridFields className="py-6">
-                    <div className="sm:col-span-2">
-                        <Label htmlFor="id">
-                            Id
-                        </Label>
-                        <Input
-                            {...register("id")}
-                            type="text"
-                            id="id"
-                            defaultValue={data?.id}
-                        />
-                    </div>
                     <div className="sm:col-span-2">
                         <Label htmlFor="email">
                             Email

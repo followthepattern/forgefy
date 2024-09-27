@@ -1,8 +1,6 @@
 package parsing
 
 import (
-	"slices"
-
 	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/types"
@@ -11,16 +9,6 @@ import (
 func CreateIsID(t types.TypeRegistry) func(models.Field) bool {
 	return func(f models.Field) bool {
 		return t.GetType(f.Type) == types.ID
-	}
-}
-
-func CreateNoneID(t types.TypeRegistry) func([]models.Field) []models.Field {
-	return func(f []models.Field) []models.Field {
-		copiedFields := slices.Clone(f)
-
-		return slices.DeleteFunc(copiedFields, func(e models.Field) bool {
-			return t.GetType(e.Type) == types.ID
-		})
 	}
 }
 
@@ -150,6 +138,17 @@ func CreateHasFile(t types.TypeRegistry) func(specification.Feature) bool {
 	return func(f specification.Feature) bool {
 		for _, field := range f.Fields {
 			if t.GetType(field.Type) == types.File {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+func CreateIsType(t types.TypeRegistry) func([]string, models.Field) bool {
+	return func(s []string, f models.Field) bool {
+		for _, v := range s {
+			if t.GetType(f.Type) == t.GetType(v) {
 				return true
 			}
 		}

@@ -12,7 +12,7 @@ export interface CreateTableProperties<T> {
     headerColumns: string[]
     getEditLink: (entity: T) => string
     getViewLink: (entity: T) => string
-    getCells: (entity: T) => string[]
+    getCells: (entity: T) => (string | undefined)[]
 }
 
 export default function CreateTable<T extends Entity>({

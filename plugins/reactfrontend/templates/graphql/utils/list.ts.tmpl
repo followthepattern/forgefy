@@ -10,7 +10,7 @@ export interface ListQueryParams {
 	orderBy?: OrderBy[]
 }
 
-export interface ListResponse<T> {
+export class ListResponse<T> {
 	count?: number
 	page?: number
 	pageSize?: number

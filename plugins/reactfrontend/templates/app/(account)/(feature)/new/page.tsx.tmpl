@@ -38,7 +38,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
 
     useEffect(() => {
         if (createResult && createResult > 0) {
-            navigate(RESOURCE_URL);
+            navigate(`/${RESOURCE_URL}`)
         }
 
     }, [createResult])
@@ -53,7 +53,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
     
 
     const onCancel = () => {
-        navigate(RESOURCE_URL)
+        navigate(`/${RESOURCE_URL}`)
     }
 
     return (
@@ -101,7 +101,6 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                             control={form.control}
                             name="{{ .FieldNameCamelCase }}"
                             resource={RESOURCE_URL.toLowerCase()}
-                            resourceId={""}
                             defaultValue=""
                             onChange={e => {
                                 if (!e) {

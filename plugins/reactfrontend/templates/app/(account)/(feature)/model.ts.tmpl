@@ -1,23 +1,51 @@
 {{ $feature := . -}}
+{{- $typeName := $feature.FeatureNameCamelCaseUpper -}}
+{{- $varName := $feature.FeatureNameCamelCase -}}
+
 import { MutationResourceResponse } from "@/graphql/mutation";
 import { QueryResourceResponse } from "@/graphql/query";
 {{if $feature | HasTime -}}
-import { Time } from "@/lib/time";
+import { parseTime, Time } from "@/lib/time";
 {{- end }}
 {{if $feature | HasDate -}}
-import { Date } from "@/lib/time";
+import { parseDate, Date } from "@/lib/time";
 {{- end }}
 
-export interface {{ .FeatureNameCamelCaseUpper }} {
+export class {{ $typeName }} {
+	constructor(v: {{ $typeName }}Response) {
+		{{- range $field := .Fields }}
+			{{ if $field | IsType (slist "boolean" "number" "time" "date") | not -}}
+			this.{{ .FieldNameCamelCase }} = v.{{ .FieldNameCamelCase }};
+			{{- end -}}
+			{{ if $field | IsBoolean -}}
+			this.{{ .FieldNameCamelCase }} = Boolean(v.{{ .FieldNameCamelCase }});
+			{{- end -}}
+			{{ if $field | IsNumber -}}
+			this.{{ .FieldNameCamelCase }} = Number(v.{{ .FieldNameCamelCase }});
+			{{- end -}}
+			{{ if $field | IsTime -}}
+			this.{{ .FieldNameCamelCase }} = parseTime(v.{{ .FieldNameCamelCase }});
+			{{- end -}}
+			{{ if $field | IsDate -}}
+			this.{{ .FieldNameCamelCase }} = parseDate(v.{{ .FieldNameCamelCase }});
+			{{- end -}}
+		{{- end -}}
+	}
 {{- range $field := .Fields }}
 	{{ .FieldNameCamelCase }}?: {{ $field | JSType }}
-{{- end}}
+{{- end }}
+}
+
+export interface {{ $typeName }}Response {
+{{- range $field := .Fields }}
+	{{ .FieldNameCamelCase }}?: string
+{{- end }}
 }
 
 export interface MutationResponse {
-    {{ .FeatureNameCamelCase }}s: MutationResourceResponse
+    {{ $varName }}s: MutationResourceResponse
 }
 
 export interface QueryResponse {
-	{{ .FeatureNameCamelCase }}s?: QueryResourceResponse<{{ .FeatureNameCamelCaseUpper }}>
+	{{ $varName }}s?: QueryResourceResponse<{{ $typeName }}Response>
 }

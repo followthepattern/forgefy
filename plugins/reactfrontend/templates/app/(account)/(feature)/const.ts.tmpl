@@ -1,4 +1,4 @@
 {{- $feature := . -}}
 
 export const RESOURCE_NAME = "{{ $feature.FeatureHumanReadableName }}"
-export const RESOURCE_URL = "/{{ $feature | URL }}s"
+export const RESOURCE_URL = "{{ $feature | URL }}"

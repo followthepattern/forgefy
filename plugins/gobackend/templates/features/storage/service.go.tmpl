@@ -39,14 +39,15 @@ func NewStorageService(cfg StorageServiceConfig) StorageService {
 func (s StorageService) UploadObject(
 	ctx context.Context,
 	resource string,
-	resourceID string,
 	file multipart.File,
 	fileHeader *multipart.FileHeader) (string, error) {
+
+	objectID := uuid.NewString()
 
 	err := s.authorizationService.AuthorizeWithResource(
 		ctx,
 		resource,
-		resourceID,
+		objectID,
 		accesscontrol.UPDATE,
 	)
 	if err != nil {
@@ -58,7 +59,7 @@ func (s StorageService) UploadObject(
 		return "", err
 	}
 
-	filePath := path.Join(resource, resourceID, user.Id.Data, uuid.NewString())
+	filePath := path.Join(resource, user.Id.Data, uuid.NewString())
 
 	filePath, err = s.storage.Upload(filePath, file, *fileHeader)
 	if err != nil {
@@ -70,11 +71,11 @@ func (s StorageService) UploadObject(
 
 func (s StorageService) DownloadObject(
 	ctx context.Context,
-	resource, resourceID, userID, uuID, fileName string) (*os.File, error) {
+	resource, userID, objectID, fileName string) (*os.File, error) {
 	err := s.authorizationService.AuthorizeWithResource(
 		ctx,
 		resource,
-		resourceID,
+		objectID,
 		accesscontrol.READ,
 	)
 
@@ -82,7 +83,7 @@ func (s StorageService) DownloadObject(
 		return nil, err
 	}
 
-	filePath := path.Join(resource, resourceID, userID, uuID, fileName)
+	filePath := path.Join(resource, userID, objectID, fileName)
 	file, err := s.storage.Download(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("unable to return the file: %s", err.Error())

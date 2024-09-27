@@ -29,7 +29,6 @@ function FileField(props: FileFieldProperties) {
 interface FileComponentProperties {
     name: string
     resource: string
-    resourceId: string
     className?: string
     defaultValue?: string
     onChange?: (filePath: string | null) => void
@@ -90,7 +89,7 @@ const FileComponent = React.forwardRef((props: FileComponentProperties, ref: Rea
                         return
                     }
                     let files = Array.from(e);
-                    execute(files[0], props.resource, props.resourceId)
+                    execute(files[0], props.resource)
                 }}>
                 <Button
                     className={classNames(props.className, "mt-2 px-1 py-1 font-semibold text-blue-500 border border-blue-500 rounded-lg hover:bg-blue-50 focus:bg-blue-100")}
@@ -112,7 +111,7 @@ const Attachment = (props: AttachmentProperties) => {
 
     return (
         <div className={classNames(props.className, "flex justify-between w-full px-3 py-2 mt-2 border border-gray-300 rounded-lg ring-1 ring-inset ring-gray-100 placeholder:text-gray-400 focus:ring-0 focus:ring-inset")}>
-            <span>{fileName}</span>
+            <span className="text-ellipsis">{fileName}</span>
             <div className="space-x-2">
                 <DownloadButton onClick={props.onDownloadClick} />
                 <span>|</span>
