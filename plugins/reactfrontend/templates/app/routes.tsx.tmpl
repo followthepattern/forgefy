@@ -3,13 +3,13 @@ import Login from "./(auth)/login/page"
 import Register from "./(auth)/register/page"
 import AuthLayout from "./(auth)/layout"
 import AccountLayout from "./(account)/layout"
-import Users from "./(account)/user/page"
-import User from "./(account)/user/[id]/page"
+import UserList from "./(account)/user/page"
+import UserSingle from "./(account)/user/[id]/page"
 import UserEdit from "./(account)/user/[id]/edit/page"
 import UserNew from "./(account)/user/new/page"
 {{- range .Features }}
-import {{ .FeatureNameCamelCaseUpper }}s from "./(account)/{{ .FeatureNameDir }}/page"
-import {{ .FeatureNameCamelCaseUpper }} from "./(account)/{{ .FeatureNameDir }}/[id]/page"
+import {{ .FeatureNameCamelCaseUpper }}List from "./(account)/{{ .FeatureNameDir }}/page"
+import {{ .FeatureNameCamelCaseUpper }}Single from "./(account)/{{ .FeatureNameDir }}/[id]/page"
 import {{ .FeatureNameCamelCaseUpper }}Edit from "./(account)/{{ .FeatureNameDir }}/[id]/edit/page"
 import {{ .FeatureNameCamelCaseUpper }}New from "./(account)/{{ .FeatureNameDir }}/new/page"
 {{- end }}
@@ -57,36 +57,36 @@ export const Routes: RouteObject[] = [
                 element: <Profile />
             },
             {
-                path: "users",
-                element: <ListPageWrapper Component={Users} />,
+                path: "user",
+                element: <ListPageWrapper Component={UserList} />,
             },
             {
-                path: "users/:id",
-                element: <User />
+                path: "user/:id",
+                element: <UserSingle />
             },
             {
-                path: "users/new",
+                path: "user/new",
                 element: <UserNew />
             },
             {
-                path: "users/:id/edit",
+                path: "user/:id/edit",
                 element: <UserEdit />
             },
 {{- range $feature := .Features }}
             {
-                path: "{{ $feature | URL }}s",
-                element: <ListPageWrapper Component={{ "{" }}{{ .FeatureNameCamelCaseUpper }}s} />,
+                path: "{{ $feature | URL }}",
+                element: <ListPageWrapper Component={{ "{" }}{{ .FeatureNameCamelCaseUpper }}List} />,
             },
             {
-                path: "{{ $feature | URL }}s/:id",
-                element: <{{ .FeatureNameCamelCaseUpper }} />
+                path: "{{ $feature | URL }}/:id",
+                element: <{{ .FeatureNameCamelCaseUpper }}Single />
             },
             {
-                path: "{{ $feature | URL }}s/new",
+                path: "{{ $feature | URL }}/new",
                 element: <{{ .FeatureNameCamelCaseUpper }}New />
             },
             {
-                path: "{{ $feature | URL }}s/:id/edit",
+                path: "{{ $feature | URL }}/:id/edit",
                 element: <{{ .FeatureNameCamelCaseUpper }}Edit />
             },
 {{- end }}

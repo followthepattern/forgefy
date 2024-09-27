@@ -31,7 +31,8 @@ func goFieldType(t types.TypeRegistry, f models.Field) string {
 		return "types.Bool"
 	case types.Number:
 		return "types.Float64"
-	case types.String,
+	case types.ID,
+		types.String,
 		types.Text:
 		return "types.String"
 	case types.Time,

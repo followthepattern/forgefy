@@ -10,7 +10,7 @@ features:
   - name: product
     fields:
       - name: Id
-        type: string
+        type: id
       - name: Name
         type: string
       - name: Type
@@ -30,7 +30,7 @@ features:
   - name: task
     fields:
       - name: Id
-        type: string
+        type: id
       - name: Name
         type: string
       - name: Description
@@ -38,7 +38,7 @@ features:
   - name: image
     fields:
       - name: Id
-        type: string
+        type: id
       - name: Type
         type: string
       - name: Extension

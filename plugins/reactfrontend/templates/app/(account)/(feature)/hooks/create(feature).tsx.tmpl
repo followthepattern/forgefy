@@ -1,3 +1,5 @@
+{{ $feature := . -}}
+
 import { CreateMutationResult, MutationResourceResponse } from "@/graphql/mutation";
 import { {{ .FeatureNameCamelCaseUpper }}, MutationResponse  } from "../model";
 import useCreate from "@/graphql/hooks/useCreate";
@@ -8,5 +10,17 @@ export default function useCreate{{ .FeatureNameCamelCaseUpper }}(): CreateMutat
         return data?.{{ .FeatureNameCamelCase }}s?.create?.code;
     }
 
-    return useCreate<{{ .FeatureNameCamelCaseUpper }}>({parseResult, graphQL})
+    const [execute, { createResult, createLoading, createError}] = useCreate({parseResult, graphQL});
+
+    const parseVariable = (model: {{ $feature.FeatureNameCamelCaseUpper }}) => {
+        const val = {
+            {{ range $field := $feature.Fields | NoneID }}
+            {{ $field.FieldNameCamelCase }}: model.{{ $field.FieldNameCamelCase }}?.toString(),
+            {{- end -}}
+        }
+
+        execute(val)
+    }
+
+    return [parseVariable, { createResult, createLoading, createError }]
 }

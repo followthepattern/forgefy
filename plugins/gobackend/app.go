@@ -47,7 +47,7 @@ func NewApp() *GoBackendPluginApp {
 			"DBName":      parsing.DBName,
 			"DBType":      parsing.CreateDBType(types.Registered),
 			"ValueDB":     parsing.ValueDB,
-			"NullableDB":  parsing.NullableDB,
+			"DBNullable":  parsing.CreateDBNullable(types.Registered),
 			"NameGraphQL": parsing.NameGraphQL,
 			"TypeGraphQL": parsing.CreateTypeGraphQL(types.Registered),
 			"GoType":      parsing.CreateGoType(types.Registered),

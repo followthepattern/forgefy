@@ -37,7 +37,7 @@ func NewStorageController(cont container.Container) StorageController {
 
 func (s StorageController) UploadObject(
 	ctx context.Context,
-	resource, resourceID string,
+	resource string,
 	file multipart.File,
 	fileHeader *multipart.FileHeader,
 ) (string, error) {
@@ -45,14 +45,9 @@ func (s StorageController) UploadObject(
 		return "", err
 	}
 
-	if err := validation.Validate(resourceID, types.Required("resourceID")); err != nil {
-		return "", err
-	}
-
 	return s.storageService.UploadObject(
 		ctx,
 		resource,
-		resourceID,
 		file,
 		fileHeader,
 	)
@@ -60,13 +55,9 @@ func (s StorageController) UploadObject(
 
 func (s StorageController) DownloadObject(
 	ctx context.Context,
-	resource, resourceID, userID, uuID, fileName string) (*os.File, error) {
+	resource, userID, objectID, fileName string) (*os.File, error) {
 
 	if err := validation.Validate(resource, types.Required("resource")); err != nil {
-		return nil, err
-	}
-
-	if err := validation.Validate(resourceID, types.Required("resourceID")); err != nil {
 		return nil, err
 	}
 
@@ -74,7 +65,7 @@ func (s StorageController) DownloadObject(
 		return nil, err
 	}
 
-	if err := validation.Validate(uuID, types.Required("uuID")); err != nil {
+	if err := validation.Validate(objectID, types.Required("objectID")); err != nil {
 		return nil, err
 	}
 
@@ -82,5 +73,5 @@ func (s StorageController) DownloadObject(
 		return nil, err
 	}
 
-	return s.storageService.DownloadObject(ctx, resource, resourceID, userID, uuID, fileName)
+	return s.storageService.DownloadObject(ctx, resource, userID, objectID, fileName)
 }

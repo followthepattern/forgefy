@@ -1,12 +1,32 @@
-import { get{{ .FeatureNameCamelCaseUpper }}s as graphQL } from "../graphql/query";
+{{- $typeName := .FeatureNameCamelCaseUpper -}}
+{{- $varName := .FeatureNameCamelCase -}}
+
+import { get{{ $typeName }}s as graphQL } from "../graphql/query";
 import { ListResponse, ListQueryResult } from "@/graphql/utils/list";
-import { {{ .FeatureNameCamelCaseUpper }}, QueryResponse } from "../model";
+import { {{ $typeName }}, QueryResponse } from "../model";
 import useList from "@/graphql/hooks/useList";
 
-export default function useList{{ .FeatureNameCamelCaseUpper }}(): ListQueryResult<ListResponse<{{ .FeatureNameCamelCaseUpper }}>> {
-    const parseResult = (data?: QueryResponse): ListResponse<{{ .FeatureNameCamelCaseUpper }}> | undefined => {
-        return data?.{{ .FeatureNameCamelCase }}s?.list;
+export default function useList{{ $typeName }}(): ListQueryResult<ListResponse<{{ $typeName }}>> {
+    const parseResult = (data?: QueryResponse): ListResponse<{{ $typeName }}> | undefined => {
+        if (!data?.{{ $varName }}s?.list) {
+            return undefined;
+        }
+
+        var result = new ListResponse<{{ $typeName }}>();
+
+        result.count = data.{{ $varName }}s?.list.count;
+        result.pageSize = data.{{ $varName }}s?.list.pageSize;
+        result.page = data.{{ $varName }}s?.list.page;
+
+        var d = new Array<{{ $typeName }}>();
+
+        data.{{ $varName }}s.list.data?.forEach(element => {
+            d.push(new {{ $typeName}}(element));
+        });
+
+        result.data = d;
+        return result;
     }
 
-    return useList<{{ .FeatureNameCamelCaseUpper }}>({parseResult, graphQL})
+    return useList<{{ $typeName }}>({parseResult, graphQL})
 }

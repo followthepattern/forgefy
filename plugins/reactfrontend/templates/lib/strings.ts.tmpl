@@ -1,7 +1,15 @@
-export const ToStringOrDefault = function (v: any | undefined): string {
-    if (v) {
-        return v.toString()
+import { Date, Time } from "./time";
+
+export const ToHumanReadable = function (v: any | undefined): string {
+    if (!v) {
+        return "";
     }
 
-    return ""
+    if (v instanceof Date) {
+        return v.toDateString();
+    } else if (v instanceof Time) {
+        return v.toTimeString();
+    }
+
+    return v.toString();
 }

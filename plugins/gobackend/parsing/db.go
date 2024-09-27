@@ -65,10 +65,12 @@ func ValueDB(f models.Field) string {
 	return `''`
 }
 
-func NullableDB(f models.Field) string {
-	if f.Nullable || strings.ToLower(f.Type) == models.IDFieldType {
-		return ""
-	}
+func CreateDBNullable(t types.TypeRegistry) func(f models.Field) string {
+	return func(f models.Field) string {
+		if f.Nullable || t.GetType(f.Type) == types.ID {
+			return ""
+		}
 
-	return "NOT NULL"
+		return "NOT NULL"
+	}
 }

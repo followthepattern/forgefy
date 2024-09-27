@@ -42,8 +42,19 @@ func RandomValue(t types.TypeRegistry, f models.Field) string {
 			randomTime.Location())
 
 		return randomTime.Format("2006-01-02 15:04:05")
-	case types.Date,
-		types.DateTime:
+	case types.Date:
+		randomTime := datagenerator.RandomTime()
+		randomTime = time.Date(
+			randomTime.Year(),
+			randomTime.Month(),
+			randomTime.Day(),
+			0,
+			0,
+			0,
+			0,
+			randomTime.Location())
+		return randomTime.Format("2006-01-02 15:04:05")
+	case types.DateTime:
 		return datagenerator.RandomTime().Format("2006-01-02 15:04:05")
 	case types.File:
 		return ""

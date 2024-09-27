@@ -67,6 +67,10 @@ func (builder Builder) Build(plugins ...plugins.Plugin) (productmap.ProductMap, 
 
 func (builder Builder) addParsingFunctions(pm productmap.ProductMap) productmap.ProductMap {
 	pm.WithFuncMap(template.FuncMap{
+		"slist":          parsing.SList,
+		"IsID":           parsing.CreateIsID(types.Registered),
+		"NoneID":         parsing.CreateNoneID(types.Registered),
+		"TableView":      parsing.CreateTableView(types.Registered),
 		"IsUndefined":    parsing.CreateIsUndefined(types.Registered),
 		"IsBoolean":      parsing.CreateIsBoolean(types.Registered),
 		"HasBoolean":     parsing.CreateHasBoolean(types.Registered),
@@ -86,6 +90,7 @@ func (builder Builder) addParsingFunctions(pm productmap.ProductMap) productmap.
 		"Records":        parsing.CreateRecordsFunc(types.Registered),
 		"EnvVariable":    naming.ToEnvVariable,
 		"IDField":        parsing.CreateFindIDFunc(types.Registered),
+		"IsType":         parsing.CreateIsType(types.Registered),
 	})
 
 	return pm

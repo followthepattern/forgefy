@@ -7,7 +7,7 @@ import { SortLabel, SetPageParams, SetSearchPatternParams, SetSortPatternParrams
 import useList{{ .FeatureNameCamelCaseUpper }} from './hooks/list{{ .FeatureNameCamelCaseUpper }}';
 import CreateTable, { CreateTableProperties } from '../components/listPage/table/table';
 import { {{ .FeatureNameCamelCaseUpper }} } from './model';
-import { ToStringOrDefault } from '@/lib/strings';
+import { ToHumanReadable } from '@/lib/strings';
 import { RESOURCE_NAME, RESOURCE_URL } from './const';
 
 const sortByLables: SortLabel[] = [{{- range .Fields }}
@@ -20,19 +20,19 @@ const sortByLables: SortLabel[] = [{{- range .Fields }}
 ];
 
 function {{ .FeatureNameCamelCase }}ViewLink(value: {{ .FeatureNameCamelCaseUpper }}): string {
-  return `/{{ $feature | URL }}s/${value.{{ $idField.FieldNameCamelCase }}}`
+  return `/{{ $feature | URL }}/${value.{{ $idField.FieldNameCamelCase }}}`
 }
 
 function {{ .FeatureNameCamelCase }}EditLink(value: {{ .FeatureNameCamelCaseUpper }}): string {
-  return `/{{ $feature | URL }}s/${value.{{ $idField.FieldNameCamelCase }}}/edit`
+  return `/{{ $feature | URL }}/${value.{{ $idField.FieldNameCamelCase }}}/edit`
 }
 
 function getCreateTableProperties(): CreateTableProperties<{{ .FeatureNameCamelCaseUpper }}> {
   return {
-    headerColumns: [{{- range .Fields }}"{{ .FieldNameHumanReadable }}", {{- end }}],
+    headerColumns: [{{- range .Fields | TableView }}"{{ .FieldNameHumanReadable }}", {{- end }}],
     getViewLink: {{ .FeatureNameCamelCase }}ViewLink,
     getEditLink: {{ .FeatureNameCamelCase }}EditLink,
-    getCells: (entity) => [{{- range .Fields }}ToStringOrDefault(entity.{{ .FieldNameCamelCase }}), {{- end }}]
+    getCells: (entity) => [{{- range $field := $feature.Fields | TableView }}ToHumanReadable(entity.{{ $field.FieldNameCamelCase }}), {{- end }}]
   }
 }
 

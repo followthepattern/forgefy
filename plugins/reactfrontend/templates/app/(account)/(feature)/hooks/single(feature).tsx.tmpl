@@ -1,12 +1,19 @@
-import useSingle from "@/graphql/hooks/useSingle";
-import { getSingle{{ .FeatureNameCamelCaseUpper }} as graphQL } from "../graphql/query";
-import { SingleQueryResult } from "@/graphql/query";
-import { {{ .FeatureNameCamelCaseUpper }}, QueryResponse } from "../model";
+{{- $typeName := .FeatureNameCamelCaseUpper -}}
+{{- $varName := .FeatureNameCamelCase -}}
 
-export default function useSingle{{ .FeatureNameCamelCaseUpper }}(id: string): SingleQueryResult<{{ .FeatureNameCamelCaseUpper }}> {
-    const parseResult = (data?: QueryResponse): {{ .FeatureNameCamelCaseUpper }} | undefined => {
-        return data?.{{ .FeatureNameCamelCase }}s?.single
+import useSingle from "@/graphql/hooks/useSingle";
+import { getSingle{{ $typeName }} as graphQL } from "../graphql/query";
+import { SingleQueryResult } from "@/graphql/query";
+import { {{ $typeName }}, QueryResponse } from "../model";
+
+export default function useSingle{{ $typeName }}(id: string): SingleQueryResult<{{ $typeName }}> {
+    const parseResult = (data?: QueryResponse): {{ $typeName }} | undefined => {
+        if (!data?.{{ $varName }}s?.single) {
+            return undefined;
+        }
+
+        return new {{ $typeName }}(data?.{{ $varName }}s.single);
     }
 
-    return useSingle<{{ .FeatureNameCamelCaseUpper }}>({id, parseResult, graphQL})
+    return useSingle<{{ $typeName }}>({id, parseResult, graphQL})
 }

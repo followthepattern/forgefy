@@ -6,6 +6,12 @@ import (
 	"github.com/followthepattern/forgefy/specification/types"
 )
 
+func CreateIsID(t types.TypeRegistry) func(models.Field) bool {
+	return func(f models.Field) bool {
+		return t.GetType(f.Type) == types.ID
+	}
+}
+
 func CreateIsUndefined(t types.TypeRegistry) func(models.Field) bool {
 	return func(f models.Field) bool {
 		return t.GetType(f.Type) == types.Undefined
@@ -132,6 +138,17 @@ func CreateHasFile(t types.TypeRegistry) func(specification.Feature) bool {
 	return func(f specification.Feature) bool {
 		for _, field := range f.Fields {
 			if t.GetType(field.Type) == types.File {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+func CreateIsType(t types.TypeRegistry) func([]string, models.Field) bool {
+	return func(s []string, f models.Field) bool {
+		for _, v := range s {
+			if t.GetType(f.Type) == t.GetType(v) {
 				return true
 			}
 		}

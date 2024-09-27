@@ -109,13 +109,13 @@ type {{ $feature | NameGraphQL }} {
 }
 
 input Create{{ $feature | NameGraphQL }} {
-	{{- range $field := .Fields }}
+	{{- range $field := .Fields | NoneID }}
 	{{ $field | NameGraphQL }}: {{ $field | TypeGraphQL }}!
 	{{- end }}
 }
 
 input Update{{ $feature | NameGraphQL }} {
-	{{- range $field := .Fields }}
+	{{- range $field := .Fields | NoneID }}
 	{{ $field | NameGraphQL }}: {{ $field | TypeGraphQL }}!
 	{{- end }}
 }

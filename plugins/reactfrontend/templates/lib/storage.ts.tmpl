@@ -7,7 +7,7 @@ interface UseUploadFile {
     called: boolean;
     loading: boolean;
     error: string | null;
-    execute: (file: File, resource: string, resourceId: string) => void;
+    execute: (file: File, resource: string) => void;
 }
 
 export const useUploadFile = (): UseUploadFile => {
@@ -20,11 +20,11 @@ export const useUploadFile = (): UseUploadFile => {
     const [loading, setLoading] = useState<boolean>(false);
 
 
-    const fetchData = useCallback(async (file: File, resource: string, resourceId: string) => {
+    const fetchData = useCallback(async (file: File, resource: string) => {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const url = `${uploadBaseURL}/${resource}/${resourceId}`;
+            const url = `${uploadBaseURL}/${resource}`;
 
             setLoading(true);
 
@@ -51,8 +51,8 @@ export const useUploadFile = (): UseUploadFile => {
 
     }, [])
 
-    const execute = (file: File, resource: string, resourceId: string) => {
-        fetchData(file, resource, resourceId);
+    const execute = (file: File, resource: string) => {
+        fetchData(file, resource);
         setCalled(true);
     }
 

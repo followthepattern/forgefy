@@ -27,14 +27,13 @@ func NewStorageRest(ctrl StorageController) func(r chi.Router) {
 	}
 
 	return func(r chi.Router) {
-		r.Post("/upload/{resource}/{resourceID}", server.ServeUpload)
-		r.Get("/download/{resource}/{resourceID}/{userID}/{uuid}/{filename}", server.ServeDownload)
+		r.Post("/upload/{resource}", server.ServeUpload)
+		r.Get("/download/{resource}/{userID}/{objectID}/{filename}", server.ServeDownload)
 	}
 }
 
 func (server StorageRest) ServeUpload(w http.ResponseWriter, r *http.Request) {
 	resource := chi.URLParam(r, "resource")
-	resourceID := chi.URLParam(r, "resourceID")
 
 	if err := r.ParseMultipartForm(MAX_MEMORY); err != nil {
 		httpresponses.BadRequest(w, err.Error())
@@ -52,7 +51,6 @@ func (server StorageRest) ServeUpload(w http.ResponseWriter, r *http.Request) {
 	filePath, err := server.storageController.UploadObject(
 		r.Context(),
 		resource,
-		resourceID,
 		file,
 		fileHeader)
 
@@ -66,9 +64,8 @@ func (server StorageRest) ServeUpload(w http.ResponseWriter, r *http.Request) {
 
 func (server StorageRest) ServeDownload(w http.ResponseWriter, r *http.Request) {
 	resource := chi.URLParam(r, "resource")
-	resourceID := chi.URLParam(r, "resourceID")
 	userID := chi.URLParam(r, "userID")
-	uuID := chi.URLParam(r, "uuid")
+	objectID := chi.URLParam(r, "objectID")
 	fileName := chi.URLParam(r, "filename")
 
 	decodedFileName, err := url.QueryUnescape(fileName)
@@ -80,9 +77,8 @@ func (server StorageRest) ServeDownload(w http.ResponseWriter, r *http.Request) 
 	file, err := server.storageController.DownloadObject(
 		r.Context(),
 		resource,
-		resourceID,
 		userID,
-		uuID,
+		objectID,
 		decodedFileName,
 	)
 	if err != nil {
