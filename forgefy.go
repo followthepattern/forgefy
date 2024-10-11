@@ -54,7 +54,7 @@ func (f Forgefy) Forge(yaml string, fw forgeio.Writer, opts ...ForgeConfigOption
 
 	product, err := builder.Build()
 	if err != nil {
-		return productSpecification.ProductName, err
+		return productSpecification.Name, err
 	}
 
 	if len(forgeConfig.exclude) != 0 {
@@ -65,7 +65,7 @@ func (f Forgefy) Forge(yaml string, fw forgeio.Writer, opts ...ForgeConfigOption
 		return fw.Write(filePath, file.Write)
 	})
 
-	return productSpecification.ProductName, err
+	return productSpecification.Name, err
 }
 
 func (f Forgefy) verifyPlugins(_ []plugins.Plugin) error { return nil }

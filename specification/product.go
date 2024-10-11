@@ -11,7 +11,7 @@ import (
 
 type Product struct {
 	ForgeVersion string    `yaml:"forge_version"`
-	ProductName  string    `yaml:"product_name"`
+	Name         string    `yaml:"product_name"`
 	Email        string    `yaml:"email"`
 	Apps         []App     `yaml:"apps"`
 	Features     []Feature `yaml:"features"`
@@ -19,18 +19,18 @@ type Product struct {
 
 func (fs Product) Validate() error {
 	return validation.ValidateStruct(&fs,
-		validation.Field(&fs.ProductName, validation.Required),
+		validation.Field(&fs.Name, validation.Required),
 	)
 }
 
 func (product *Product) setDefaults() {
 	if product.Email == "" {
-		product.Email = fmt.Sprintf("info@%s.com", strings.ToLower(product.ProductName))
+		product.Email = fmt.Sprintf("info@%s.com", strings.ToLower(product.Name))
 	}
 }
 
 func (p Product) ProductNameCamelCase() string {
-	return naming.ToLowerCamelCase(p.ProductName)
+	return naming.ToLowerCamelCase(p.Name)
 }
 
 func UnmarshalYaml(data []byte) (p Product, err error) {

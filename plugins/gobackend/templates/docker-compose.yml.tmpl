@@ -29,7 +29,7 @@ services:
     image: golang:1.22
     hostname: {{ .App.AppNameCamelCase }}_backend
     container_name: {{ .App.AppNameCamelCase }}_backend
-    command: bash -c "go run ./cmd/{{ .App.AppNameCamelCase }}"
+    command: bash -c "go get ./... && go run ./cmd/{{ .App.AppNameCamelCase }}"
     working_dir: /backend
     depends_on:
       - {{ .App.AppNameCamelCase }}_db

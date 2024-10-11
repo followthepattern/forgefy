@@ -24,7 +24,7 @@ apps:
 			fs, err := specification.UnmarshalYaml([]byte(yaml))
 			Expect(err).Should(Succeed())
 
-			Expect(fs.ProductName).Should(Equal("test product"))
+			Expect(fs.Name).Should(Equal("test product"))
 			Expect(fs.ForgeVersion).Should(Equal("0"))
 		})
 	})

@@ -30,7 +30,7 @@ product_name: "test product"
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(productName).Should(Equal("test product"))
 
-			Expect(dummyWriter).Should(forgeio.ContainFiles("docker-compose.yaml"))
+			Expect(dummyWriter).Should(forgeio.ContainFiles("docker-compose.yml"))
 		})
 	})
 })
