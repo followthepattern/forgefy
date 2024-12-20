@@ -3,8 +3,8 @@ package monorepo
 import (
 	"io/fs"
 	"path"
-	"strings"
 
+	"github.com/followthepattern/forgefy/forgeio"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/monorepo/templates"
 	"github.com/followthepattern/forgefy/productmap"
@@ -29,7 +29,11 @@ func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specificatio
 			return err
 		}
 
-		if !strings.HasSuffix(filepath, ".tmpl") {
+		if !forgeio.IsForgeTemplate(filepath) {
+			return nil
+		}
+
+		if forgeio.ExcludeTemplate(filepath, productSpec.ExcludeDagger) {
 			return nil
 		}
 
@@ -38,8 +42,7 @@ func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specificatio
 			return err
 		}
 
-		filepath = strings.TrimSuffix(filepath, ".tmpl")
-
+		filepath = forgeio.CleanFilepath(filepath, forgeio.DAGGER_FILE_TOKEN)
 		filepath = path.Join(templates.RootDirectory(), filepath)
 
 		file := productmap.NewFile(

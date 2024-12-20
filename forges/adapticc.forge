@@ -1,6 +1,7 @@
 
 version: 0
 product_name: "Adapticc"
+exclude_dagger: true
 apps:
   - name: backend1
     type: go-backend
