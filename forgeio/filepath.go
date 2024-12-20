@@ -4,7 +4,7 @@ import "strings"
 
 const (
 	TMPL_SUFFIX       = ".tmpl"
-	DAGGER_FILE_TOKEN = "._dagger_"
+	DAGGER_FILE_TOKEN = "_dagger_"
 )
 
 func IsForgeTemplate(filepath string) bool {

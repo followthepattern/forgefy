@@ -1,0 +1,60 @@
+{{ $app := .App -}}
+
+package main
+
+import (
+	"context"
+	"dagger/{{ $app | PackageName }}/internal/dagger"
+)
+
+type Backend1 struct{}
+
+func (m *Backend1) DB(backend1 *dagger.Directory) *dagger.Service {
+	initSql := backend1.File("tests/integration/testdata/database.sql")
+
+	return dag.Container().
+		From(PostgresImage).
+		WithFile("/docker-entrypoint-initdb.d/database.sql", initSql).
+		WithEnvVariable("POSTGRES_DB", "backend1").
+		WithEnvVariable("POSTGRES_USER", "backend1user").
+		WithEnvVariable("POSTGRES_PASSWORD", "dbpass").
+		WithExposedPort(5432).
+		AsService()
+}
+
+func (m *Backend1) Cerbos(backend1 *dagger.Directory) *dagger.Service {
+	policiesDir := backend1.Directory("policies")
+
+	return dag.Container().
+		From(CerbosImage).
+		WithMountedDirectory("/policies", policiesDir).
+		WithWorkdir("/").
+		WithExec([]string{"/cerbos", "server", "--config=/policies/.cerbos.yaml"}).
+		WithExposedPort(3592).
+		AsService()
+}
+
+func (m *Backend1) Service(backend1 *dagger.Directory) *dagger.Service {
+	dbService := m.DB(backend1)
+	cerbosService := m.Cerbos(backend1)
+
+	return dag.Container().
+		From(GoImage).
+		WithServiceBinding("backend1_db", dbService).
+		WithServiceBinding("backend1_cerbos", cerbosService).
+		WithMountedDirectory("/src", backend1).
+		WithWorkdir("/src").
+		WithExec([]string{
+			"go", "run", "./cmd/backend1",
+		}).
+		WithExposedPort(8080).
+		AsService()
+}
+
+func (m *Backend1) HealthTest(ctx context.Context, backend1 *dagger.Directory) (string, error) {
+	return dag.Container().
+		From(AlpineImage).
+		WithServiceBinding("backend1", m.Service(backend1)).
+		WithExec([]string{"wget", "-O-", "http://backend1:8080/healthcheck"}).
+		Stdout(ctx)
+}

@@ -1,5 +1,7 @@
+{{ $app := .App -}}
+
 {
-  "name": "adapticc",
+  "name": "{{ $app | PackageName }}",
   "engineVersion": "v0.14.0",
   "sdk": "go",
   "source": ".dagger"

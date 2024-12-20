@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	//go:embed *
+	//go:embed * dagger_dagger_/.gitattributes.tmpl dagger_dagger_/.gitignore.tmpl
 	Files embed.FS
 )
 

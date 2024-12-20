@@ -21,7 +21,7 @@ func (MonoRepo) Apps() []plugins.App {
 	return nil
 }
 
-func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specification.Product) error {
+func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specification.Product) (err error) {
 	dir := templates.Files
 
 	return fs.WalkDir(dir, ".", func(filepath string, d fs.DirEntry, err error) error {
@@ -29,11 +29,11 @@ func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specificatio
 			return err
 		}
 
-		if !forgeio.IsForgeTemplate(filepath) {
+		if forgeio.ExcludeTemplate(filepath, productSpec.ExcludeDagger) {
 			return nil
 		}
 
-		if forgeio.ExcludeTemplate(filepath, productSpec.ExcludeDagger) {
+		if !forgeio.IsForgeTemplate(filepath) {
 			return nil
 		}
 

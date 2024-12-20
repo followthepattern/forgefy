@@ -1,0 +1,32 @@
+package main
+
+import (
+	"context"
+	"dagger/adapticc/internal/dagger"
+)
+
+type Cypress struct {
+	adapticc *Adapticc
+}
+
+func (m *Cypress) Login(ctx context.Context, root *dagger.Directory) (string, error) {
+	backend1Dir := root.Directory("apps/backend1")
+	frontend1Dir := root.Directory("apps/frontend1")
+
+	backend1Service := m.adapticc.Backend1().Service(backend1Dir)
+	frontend1Service := m.adapticc.Frontend1().Service(frontend1Dir)
+
+	return dag.Container().
+		From(CypressImage).
+		WithServiceBinding("backend1_backend", backend1Service).
+		WithServiceBinding("frontend1", frontend1Service).
+		WithMountedDirectory("/src", frontend1Dir).
+		WithWorkdir("/src").
+		WithExec([]string{
+			"npm", "install",
+		}).
+		WithExec([]string{
+			"npm", "run", "cypress:run",
+		}).
+		Stdout(ctx)
+}

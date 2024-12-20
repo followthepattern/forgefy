@@ -1,0 +1,24 @@
+package main
+
+import (
+	"dagger/adapticc/internal/dagger"
+	"time"
+)
+
+type Frontend1 struct{}
+
+func (f Frontend1) Service(frontend1 *dagger.Directory) *dagger.Service {
+	return dag.Container().
+		From(CypressImage).
+		WithMountedDirectory("/src", frontend1).
+		WithEnvVariable("CACHEBUSTER", time.Now().String()).
+		WithWorkdir("/src").
+		WithExec([]string{
+			"npm", "install",
+		}).
+		WithExec([]string{
+			"npm", "start",
+		}).
+		WithExposedPort(3000).
+		AsService()
+}
