@@ -6,8 +6,9 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/followthepattern/forgefy/forgeio"
 	"github.com/followthepattern/forgefy/plugins"
-	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
+	monorepo_templates "github.com/followthepattern/forgefy/plugins/monorepo/templates"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend/parsing"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend/templates"
 	"github.com/followthepattern/forgefy/productmap"
@@ -108,9 +109,9 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 			return err
 		}
 
+		filepath = path.Join(monorepo_templates.RootDirectory(), filepath)
+		filepath = forgeio.ReplaceAppName(filepath, reactApp.AppName)
 		filepath = strings.TrimSuffix(filepath, ".tmpl")
-
-		filepath = path.Join(apps.Directory(), reactApp.AppName, filepath)
 
 		if !strings.Contains(filepath, "(feature)") {
 			file := productmap.NewFile(

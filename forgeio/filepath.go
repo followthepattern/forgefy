@@ -5,6 +5,7 @@ import "strings"
 const (
 	TMPL_SUFFIX       = ".tmpl"
 	DAGGER_FILE_TOKEN = "_dagger_"
+	APP_FILE_TOKEN    = "[(application)]"
 )
 
 func IsForgeTemplate(filepath string) bool {
@@ -19,4 +20,8 @@ func CleanFilepath(filepath string, fileToken string) string {
 	filepath = strings.TrimSuffix(filepath, ".tmpl")
 
 	return strings.ReplaceAll(filepath, fileToken, "")
+}
+
+func ReplaceAppName(filepath string, appName string) string {
+	return strings.ReplaceAll(filepath, APP_FILE_TOKEN, appName)
 }
