@@ -1,10 +1,10 @@
 {{ $product := . }}
-{{ $app := .App }}
+{{ $app := .App -}}
 
 package main
 
 import (
-	"dagger/adapticc/internal/dagger"
+	"dagger/{{ $product.Name | LowerSnakeCase }}/internal/dagger"
 	"time"
 )
 

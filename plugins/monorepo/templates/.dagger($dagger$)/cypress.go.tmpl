@@ -7,19 +7,6 @@ import (
 	"dagger/{{ $product.Name | LowerSnakeCase }}/internal/dagger"
 )
 
-func (m *{{ $product.Name | CamelCase }}) Cypress() *Cypress {
-	return &Cypress{
-		{{ $product.Name | LowerCamelCase }}: m,
-	}
-}
-
-{{ range $app := $product.Apps -}}
-func (m *{{ $product.Name | UpperCamelCase }}) {{ $app.AppName | UpperCamelCase }}() *{{ $app.AppName | UpperCamelCase }} {
-	return &{{ $app.AppName | UpperCamelCase }}{}
-}
-
-{{ end -}}
-
 type Cypress struct {
 	{{ $product.Name | LowerCamelCase }} *{{ $product.Name | UpperCamelCase }}
 }
