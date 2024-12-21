@@ -134,7 +134,7 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 
 		for _, feature := range reactApp.Features {
 			file := productmap.NewFile(
-				forgeio.ReplaceFeatureName(filepath, feature.FeatureName),
+				forgeio.ReplaceFeatureName(newFilepath, feature.FeatureName),
 				string(content),
 			).WithData(feature).
 				WithFuncMap(plugin.parsingFunctions)
