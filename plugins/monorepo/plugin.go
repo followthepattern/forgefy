@@ -42,11 +42,12 @@ func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specificatio
 			return err
 		}
 
-		filepath = forgeio.CleanFilepath(filepath, forgeio.DAGGER_FILE_TOKEN)
-		filepath = path.Join(productmap.ROOT_DIRECTORY, filepath)
+		newFilepath := forgeio.CleanFilepath(filepath, forgeio.DAGGER_FILE_TOKEN)
+		newFilepath = forgeio.RemoveTemplateExtension(newFilepath)
+		newFilepath = path.Join(productmap.ROOT_DIRECTORY, newFilepath)
 
 		file := productmap.NewFile(
-			filepath,
+			newFilepath,
 			string(content),
 		).WithData(productSpec)
 

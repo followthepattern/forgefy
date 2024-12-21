@@ -5,6 +5,10 @@ import (
 	"dagger/adapticc/internal/dagger"
 )
 
+func (m *Adapticc) Backend1() *Backend1 {
+	return &Backend1{}
+}
+
 type Backend1 struct{}
 
 func (m *Backend1) DB(backend1 *dagger.Directory) *dagger.Service {

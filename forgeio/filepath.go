@@ -4,7 +4,7 @@ import "strings"
 
 const (
 	TMPL_SUFFIX       = ".tmpl"
-	DAGGER_FILE_TOKEN = "_dagger_"
+	DAGGER_FILE_TOKEN = "($dagger$)"
 	APP_FILE_TOKEN    = "[(application)]"
 )
 
@@ -21,8 +21,6 @@ func RemoveTemplateExtension(filepath string) string {
 }
 
 func CleanFilepath(filepath string, fileToken string) string {
-	filepath = strings.TrimSuffix(filepath, TMPL_SUFFIX)
-
 	return strings.ReplaceAll(filepath, fileToken, "")
 }
 

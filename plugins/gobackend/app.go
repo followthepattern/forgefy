@@ -121,32 +121,43 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 			return nil
 		}
 
+		if forgeio.ExcludeTemplate(filepath, goApp.ExcludeDagger) {
+			return nil
+		}
+
 		content, err := fs.ReadFile(dir, filepath)
 		if err != nil {
 			return err
 		}
 
+		newFilepath := filepath
+
 		if strings.Contains(filepath, forgeio.APP_FILE_TOKEN) {
-			filepath = forgeio.ReplaceAppName(filepath, goApp.AppName)
+			newFilepath = forgeio.ReplaceAppName(newFilepath, goApp.AppName)
 		}
 
-		filepath = forgeio.RemoveTemplateExtension(filepath)
-		filepath = path.Join(productmap.ROOT_DIRECTORY, filepath)
+		newFilepath = forgeio.RemoveTemplateExtension(newFilepath)
+		newFilepath = path.Join(productmap.ROOT_DIRECTORY, newFilepath)
+		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.DAGGER_FILE_TOKEN)
 
-		if !strings.Contains(filepath, "[feature]") {
+		if !strings.Contains(newFilepath, "[feature]") {
 			file := productmap.NewFile(
-				filepath,
+				newFilepath,
 				string(content)).
 				WithData(goApp)
 
-			return pm.Insert(file)
+			err := pm.Insert(file)
+			if err != nil {
+				return err
+			}
+			return nil
 		}
 
 		for _, feature := range goApp.Features {
-			newFilePath := strings.ReplaceAll(filepath, "[feature]", parsing.PackageName(feature))
+			newFilepath := strings.ReplaceAll(newFilepath, "[feature]", parsing.PackageName(feature))
 
 			file := productmap.NewFile(
-				newFilePath,
+				newFilepath,
 				string(content),
 			).WithData(feature)
 
