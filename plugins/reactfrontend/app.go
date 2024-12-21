@@ -122,7 +122,7 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 		newFilepath = path.Join(productmap.ROOT_DIRECTORY, newFilepath)
 		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.DAGGER_FILE_TOKEN)
 
-		if !strings.Contains(newFilepath, "(feature)") {
+		if !strings.Contains(newFilepath, forgeio.FEATURE_TOKEN) {
 			file := productmap.NewFile(
 				newFilepath,
 				string(content),
@@ -133,11 +133,8 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 		}
 
 		for _, feature := range reactApp.Features {
-			newFilepath = strings.Replace(newFilepath, "(feature)", feature.FeatureNameDir(), 1)
-			newFilepath = strings.Replace(newFilepath, "(feature)", ToFileSuffix(feature), 1)
-
 			file := productmap.NewFile(
-				newFilepath,
+				forgeio.ReplaceFeatureName(filepath, feature.FeatureName),
 				string(content),
 			).WithData(feature).
 				WithFuncMap(plugin.parsingFunctions)

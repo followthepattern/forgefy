@@ -1,11 +1,16 @@
 package forgeio
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/followthepattern/forgefy/specification/naming"
+)
 
 const (
 	TMPL_SUFFIX       = ".tmpl"
 	DAGGER_FILE_TOKEN = "($dagger$)"
 	APP_FILE_TOKEN    = "[(application)]"
+	FEATURE_TOKEN     = "[(feature)]"
 )
 
 func IsForgeTemplate(filepath string) bool {
@@ -26,4 +31,8 @@ func CleanFilepath(filepath string, fileToken string) string {
 
 func ReplaceAppName(filepath string, appName string) string {
 	return strings.ReplaceAll(filepath, APP_FILE_TOKEN, appName)
+}
+
+func ReplaceFeatureName(filepath, feature string) string {
+	return strings.ReplaceAll(filepath, FEATURE_TOKEN, naming.ToLowerSnakeCase(feature))
 }
