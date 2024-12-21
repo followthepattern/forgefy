@@ -140,7 +140,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 		newFilepath = path.Join(productmap.ROOT_DIRECTORY, newFilepath)
 		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.DAGGER_FILE_TOKEN)
 
-		if !strings.Contains(newFilepath, "[feature]") {
+		if !strings.Contains(newFilepath, forgeio.FEATURE_TOKEN) {
 			file := productmap.NewFile(
 				newFilepath,
 				string(content)).
@@ -154,10 +154,8 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 		}
 
 		for _, feature := range goApp.Features {
-			newFilepath := strings.ReplaceAll(newFilepath, "[feature]", parsing.PackageName(feature))
-
 			file := productmap.NewFile(
-				newFilepath,
+				forgeio.ReplaceFeatureName(newFilepath, feature.FeatureName),
 				string(content),
 			).WithData(feature)
 
