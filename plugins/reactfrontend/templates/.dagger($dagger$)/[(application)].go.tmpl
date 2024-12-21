@@ -1,3 +1,6 @@
+{{ $product := . }}
+{{ $app := .App }}
+
 package main
 
 import (
@@ -10,13 +13,9 @@ const (
 	CypressImage  = "cypress/included:13.16.1"
 )
 
-type Frontend1 struct{}
+type {{ $app.AppName | UpperCamelCase }} struct{}
 
-func (m *Adapticc) Frontend1() *Frontend1 {
-	return &Frontend1{}
-}
-
-func (f Frontend1) Service(frontend1 *dagger.Directory) *dagger.Service {
+func (f {{ $app.AppName | UpperCamelCase }}) Service(frontend1 *dagger.Directory) *dagger.Service {
 	return dag.Container().
 		From(CypressImage).
 		WithMountedDirectory("/src", frontend1).
