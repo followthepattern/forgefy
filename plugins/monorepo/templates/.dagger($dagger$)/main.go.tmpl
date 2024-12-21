@@ -16,21 +16,6 @@ package main
 
 const (
 	AlpineImage   = "alpine"
-	NodeImage     = "node:21.2.0"
-	GoImage       = "golang:1.22"
-	CypressImage  = "cypress/included:13.16.1"
-	PostgresImage = "postgres:12.21"
-	CerbosImage   = "ghcr.io/cerbos/cerbos:0.39.0"
 )
 
 type Adapticc struct{}
-
-func (m *Adapticc) Frontend1() *Frontend1 {
-	return &Frontend1{}
-}
-
-func (m *Adapticc) Cypress() *Cypress {
-	return &Cypress{
-		adapticc: m,
-	}
-}

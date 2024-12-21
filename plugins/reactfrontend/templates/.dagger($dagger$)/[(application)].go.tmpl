@@ -5,7 +5,16 @@ import (
 	"time"
 )
 
+const (
+	NodeImage     = "node:21.2.0"
+	CypressImage  = "cypress/included:13.16.1"
+)
+
 type Frontend1 struct{}
+
+func (m *Adapticc) Frontend1() *Frontend1 {
+	return &Frontend1{}
+}
 
 func (f Frontend1) Service(frontend1 *dagger.Directory) *dagger.Service {
 	return dag.Container().

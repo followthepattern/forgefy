@@ -5,6 +5,12 @@ import (
 	"dagger/adapticc/internal/dagger"
 )
 
+const (
+	GoImage       = "golang:1.22"
+	PostgresImage = "postgres:12.21"
+	CerbosImage   = "ghcr.io/cerbos/cerbos:0.39.0"
+)
+
 func (m *Adapticc) Backend1() *Backend1 {
 	return &Backend1{}
 }

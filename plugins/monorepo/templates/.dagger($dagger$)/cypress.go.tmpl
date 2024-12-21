@@ -5,6 +5,12 @@ import (
 	"dagger/adapticc/internal/dagger"
 )
 
+func (m *Adapticc) Cypress() *Cypress {
+	return &Cypress{
+		adapticc: m,
+	}
+}
+
 type Cypress struct {
 	adapticc *Adapticc
 }
