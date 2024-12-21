@@ -6,6 +6,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/followthepattern/forgefy/forgeio"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/gobackend/parsing"
 	"github.com/followthepattern/forgefy/plugins/gobackend/templates"
@@ -126,7 +127,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 			return err
 		}
 
-		if strings.Contains(filepath, "(appName)") {
+		if strings.Contains(filepath, forgeio.APP_FILE_TOKEN) {
 			filepath = strings.ReplaceAll(filepath, "(appName)", goApp.AppName)
 		}
 
