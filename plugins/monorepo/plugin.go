@@ -43,7 +43,7 @@ func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specificatio
 		}
 
 		filepath = forgeio.CleanFilepath(filepath, forgeio.DAGGER_FILE_TOKEN)
-		filepath = path.Join(templates.RootDirectory(), filepath)
+		filepath = path.Join(productmap.ROOT_DIRECTORY, filepath)
 
 		file := productmap.NewFile(
 			filepath,

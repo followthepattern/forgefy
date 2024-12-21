@@ -1,0 +1,13 @@
+{{- $product := . -}}
+
+# {{ $product.Name }}
+
+Contains the following applications:
+
+{{ range $app := $product.Apps -}}
+
+## {{ $app.AppName }}
+
+The `{{ $app.AppName }}` application is built using `{{ $app.AppType }}` plugin. It is containerized and can easily be scaled or deployed in cloud environments.
+
+{{ end -}}

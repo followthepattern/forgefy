@@ -16,8 +16,12 @@ func ExcludeTemplate(filepath string, excludeDagger bool) bool {
 	return excludeDagger && strings.Contains(filepath, DAGGER_FILE_TOKEN)
 }
 
+func RemoveTemplateExtension(filepath string) string {
+	return strings.TrimSuffix(filepath, TMPL_SUFFIX)
+}
+
 func CleanFilepath(filepath string, fileToken string) string {
-	filepath = strings.TrimSuffix(filepath, ".tmpl")
+	filepath = strings.TrimSuffix(filepath, TMPL_SUFFIX)
 
 	return strings.ReplaceAll(filepath, fileToken, "")
 }

@@ -10,7 +10,6 @@ import (
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/gobackend/parsing"
 	"github.com/followthepattern/forgefy/plugins/gobackend/templates"
-	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/types"
@@ -118,7 +117,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 			return err
 		}
 
-		if !strings.HasSuffix(filepath, ".tmpl") {
+		if !forgeio.IsForgeTemplate(filepath) {
 			return nil
 		}
 
@@ -128,11 +127,11 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 		}
 
 		if strings.Contains(filepath, forgeio.APP_FILE_TOKEN) {
-			filepath = strings.ReplaceAll(filepath, "(appName)", goApp.AppName)
+			filepath = forgeio.ReplaceAppName(filepath, goApp.AppName)
 		}
 
-		filepath = strings.TrimSuffix(filepath, ".tmpl")
-		filepath = path.Join(apps.Directory(), goApp.AppName, filepath)
+		filepath = forgeio.RemoveTemplateExtension(filepath)
+		filepath = path.Join(productmap.ROOT_DIRECTORY, filepath)
 
 		if !strings.Contains(filepath, "[feature]") {
 			file := productmap.NewFile(

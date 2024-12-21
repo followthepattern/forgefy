@@ -8,7 +8,6 @@ import (
 
 	"github.com/followthepattern/forgefy/forgeio"
 	"github.com/followthepattern/forgefy/plugins"
-	monorepo_templates "github.com/followthepattern/forgefy/plugins/monorepo/templates"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend/parsing"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend/templates"
 	"github.com/followthepattern/forgefy/productmap"
@@ -109,7 +108,7 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 			return err
 		}
 
-		filepath = path.Join(monorepo_templates.RootDirectory(), filepath)
+		filepath = path.Join(productmap.ROOT_DIRECTORY, filepath)
 		filepath = forgeio.ReplaceAppName(filepath, reactApp.AppName)
 		filepath = strings.TrimSuffix(filepath, ".tmpl")
 

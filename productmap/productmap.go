@@ -7,6 +7,8 @@ import (
 	"text/template"
 )
 
+const ROOT_DIRECTORY = ""
+
 type WalkFn func(directoryName string, f File) error
 
 type ProductMap struct {
