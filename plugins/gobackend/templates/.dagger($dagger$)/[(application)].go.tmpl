@@ -1,8 +1,10 @@
+{{ $app := .App -}}
+
 package main
 
 import (
 	"context"
-	"dagger/adapticc/internal/dagger"
+	"dagger/{{ $app | PackageName }}/internal/dagger"
 )
 
 const (
@@ -11,27 +13,27 @@ const (
 	CerbosImage   = "ghcr.io/cerbos/cerbos:0.39.0"
 )
 
-func (m *Adapticc) Backend1() *Backend1 {
-	return &Backend1{}
+func (m *{{ $app.AppName | UpperCamelCase }}) {{ $app.AppName | UpperCamelCase }}() *{{ $app.AppName | UpperCamelCase }} {
+	return &{{ $app.AppName | UpperCamelCase }}{}
 }
 
-type Backend1 struct{}
+type {{ $app.AppName | UpperCamelCase }} struct{}
 
-func (m *Backend1) DB(backend1 *dagger.Directory) *dagger.Service {
-	initSql := backend1.File("tests/integration/testdata/database.sql")
+func (m *{{ $app.AppName | UpperCamelCase }}) DB({{ $app.AppName | LowerCamelCase }} *dagger.Directory) *dagger.Service {
+	initSql := {{ $app.AppName | LowerCamelCase }}.File("tests/integration/testdata/database.sql")
 
 	return dag.Container().
 		From(PostgresImage).
 		WithFile("/docker-entrypoint-initdb.d/database.sql", initSql).
-		WithEnvVariable("POSTGRES_DB", "backend1").
-		WithEnvVariable("POSTGRES_USER", "backend1user").
+		WithEnvVariable("POSTGRES_DB", "{{ $app.AppName | LowerCamelCase }}").
+		WithEnvVariable("POSTGRES_USER", "{{ $app.AppName | LowerCamelCase }}user").
 		WithEnvVariable("POSTGRES_PASSWORD", "dbpass").
 		WithExposedPort(5432).
 		AsService()
 }
 
-func (m *Backend1) Cerbos(backend1 *dagger.Directory) *dagger.Service {
-	policiesDir := backend1.Directory("policies")
+func (m *{{ $app.AppName | UpperCamelCase }}) Cerbos({{ $app.AppName | LowerCamelCase }} *dagger.Directory) *dagger.Service {
+	policiesDir := {{ $app.AppName | LowerCamelCase }}.Directory("policies")
 
 	return dag.Container().
 		From(CerbosImage).
@@ -42,27 +44,27 @@ func (m *Backend1) Cerbos(backend1 *dagger.Directory) *dagger.Service {
 		AsService()
 }
 
-func (m *Backend1) Service(backend1 *dagger.Directory) *dagger.Service {
-	dbService := m.DB(backend1)
-	cerbosService := m.Cerbos(backend1)
+func (m *{{ $app.AppName | UpperCamelCase }}) Service({{ $app.AppName | LowerCamelCase }} *dagger.Directory) *dagger.Service {
+	dbService := m.DB({{ $app.AppName | LowerCamelCase }})
+	cerbosService := m.Cerbos({{ $app.AppName | LowerCamelCase }})
 
 	return dag.Container().
 		From(GoImage).
-		WithServiceBinding("backend1_db", dbService).
-		WithServiceBinding("backend1_cerbos", cerbosService).
-		WithMountedDirectory("/src", backend1).
+		WithServiceBinding("{{ $app.AppName | LowerCamelCase }}_db", dbService).
+		WithServiceBinding("{{ $app.AppName | LowerCamelCase }}_cerbos", cerbosService).
+		WithMountedDirectory("/src", {{ $app.AppName | LowerCamelCase }}).
 		WithWorkdir("/src").
 		WithExec([]string{
-			"go", "run", "./cmd/backend1",
+			"go", "run", "./cmd/{{ $app.AppName | LowerCamelCase }}",
 		}).
 		WithExposedPort(8080).
 		AsService()
 }
 
-func (m *Backend1) HealthTest(ctx context.Context, backend1 *dagger.Directory) (string, error) {
+func (m *{{ $app.AppName | UpperCamelCase }}) HealthTest(ctx context.Context, {{ $app.AppName | LowerCamelCase }} *dagger.Directory) (string, error) {
 	return dag.Container().
 		From(AlpineImage).
-		WithServiceBinding("backend1", m.Service(backend1)).
-		WithExec([]string{"wget", "-O-", "http://backend1:8080/healthcheck"}).
+		WithServiceBinding("{{ $app.AppName | LowerCamelCase }}", m.Service({{ $app.AppName | LowerCamelCase }})).
+		WithExec([]string{"wget", "-O-", "http://{{ $app.AppName | LowerCamelCase }}:8080/healthcheck"}).
 		Stdout(ctx)
 }
