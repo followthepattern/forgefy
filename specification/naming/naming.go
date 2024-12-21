@@ -97,3 +97,7 @@ func ToEnvVariable(name string) string {
 	snake = strings.ReplaceAll(snake, "-", "_")
 	return snake
 }
+
+func ToFileName(value string) string {
+	return strings.ToLower(ToSnakeCase(value))
+}

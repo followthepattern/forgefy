@@ -91,6 +91,11 @@ func (builder Builder) addParsingFunctions(pm productmap.ProductMap) productmap.
 		"EnvVariable":    naming.ToEnvVariable,
 		"IDField":        parsing.CreateFindIDFunc(types.Registered),
 		"IsType":         parsing.CreateIsType(types.Registered),
+		"LowerSnakeCase": naming.ToLowerSnakeCase,
+		"CamelCase":      naming.ToCamelCase,
+		"UpperCamelCase": naming.ToUpperCamelCase,
+		"LowerCamelCase": naming.ToLowerCamelCase,
+		"FileName":       naming.ToFileName,
 	})
 
 	return pm

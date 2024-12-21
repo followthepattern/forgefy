@@ -1,32 +1,35 @@
+{{- $product := . -}}
+
 package main
 
 import (
 	"context"
-	"dagger/adapticc/internal/dagger"
+	"dagger/{{ $product.Name | LowerSnakeCase }}/internal/dagger"
 )
 
-func (m *Adapticc) Cypress() *Cypress {
+func (m *{{ $product.Name | CamelCase }}) Cypress() *Cypress {
 	return &Cypress{
-		adapticc: m,
+		{{ $product.Name | LowerCamelCase }}: m,
 	}
 }
 
 type Cypress struct {
-	adapticc *Adapticc
+	{{ $product.Name | LowerCamelCase }} *{{ $product.Name | UpperCamelCase }}
 }
 
 func (m *Cypress) Login(ctx context.Context, root *dagger.Directory) (string, error) {
-	backend1Dir := root.Directory("apps/backend1")
-	frontend1Dir := root.Directory("apps/frontend1")
+	{{ range $app := $product.Apps -}}
+	{{ $app.AppName | LowerCamelCase }}Dir := root.Directory("apps/{{ $app.AppName | FileName }}")
+	{{ $app.AppName | LowerCamelCase }}Service := m.{{ $product.Name | LowerCamelCase }}.{{ $app.AppName | UpperCamelCase }}().Service({{ $app.AppName | LowerCamelCase }}Dir)
 
-	backend1Service := m.adapticc.Backend1().Service(backend1Dir)
-	frontend1Service := m.adapticc.Frontend1().Service(frontend1Dir)
+	{{ end -}}
 
 	return dag.Container().
 		From(CypressImage).
-		WithServiceBinding("backend1_backend", backend1Service).
-		WithServiceBinding("frontend1", frontend1Service).
-		WithMountedDirectory("/src", frontend1Dir).
+		{{ range $app := $product.Apps -}}
+		WithServiceBinding("{{ $app.AppName | LowerSnakeCase }}", {{ $app.AppName | LowerCamelCase }}Service).
+		{{ end -}}
+		WithMountedDirectory("/src", root.Directory(".dagger/cypress")).
 		WithWorkdir("/src").
 		WithExec([]string{
 			"npm", "install",
