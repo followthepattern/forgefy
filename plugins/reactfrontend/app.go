@@ -99,7 +99,11 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 			return err
 		}
 
-		if !strings.HasSuffix(filepath, ".tmpl") {
+		if !forgeio.IsForgeTemplate(filepath) {
+			return nil
+		}
+
+		if forgeio.ExcludeTemplate(filepath, reactApp.ExcludeDagger) {
 			return nil
 		}
 
@@ -108,13 +112,19 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 			return err
 		}
 
-		filepath = path.Join(productmap.ROOT_DIRECTORY, filepath)
-		filepath = forgeio.ReplaceAppName(filepath, reactApp.AppName)
-		filepath = strings.TrimSuffix(filepath, ".tmpl")
+		newFilepath := filepath
 
-		if !strings.Contains(filepath, "(feature)") {
+		if strings.Contains(newFilepath, forgeio.APP_FILE_TOKEN) {
+			newFilepath = forgeio.ReplaceAppName(newFilepath, reactApp.AppName)
+		}
+
+		newFilepath = forgeio.RemoveTemplateExtension(newFilepath)
+		newFilepath = path.Join(productmap.ROOT_DIRECTORY, newFilepath)
+		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.DAGGER_FILE_TOKEN)
+
+		if !strings.Contains(newFilepath, "(feature)") {
 			file := productmap.NewFile(
-				filepath,
+				newFilepath,
 				string(content),
 			).WithData(reactApp).
 				WithFuncMap(plugin.parsingFunctions)
@@ -123,11 +133,11 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 		}
 
 		for _, feature := range reactApp.Features {
-			newFilePath := strings.Replace(filepath, "(feature)", feature.FeatureNameDir(), 1)
-			newFilePath = strings.Replace(newFilePath, "(feature)", ToFileSuffix(feature), 1)
+			newFilepath = strings.Replace(newFilepath, "(feature)", feature.FeatureNameDir(), 1)
+			newFilepath = strings.Replace(newFilepath, "(feature)", ToFileSuffix(feature), 1)
 
 			file := productmap.NewFile(
-				newFilePath,
+				newFilepath,
 				string(content),
 			).WithData(feature).
 				WithFuncMap(plugin.parsingFunctions)
