@@ -1,7 +1,7 @@
 ---
 server:
-  # httpListenAddr: ":{{ .CerbosPort }}"
-  httpListenAddr: "unix:/sock/cerbos.sock"
+  httpListenAddr: ":{{ .CerbosPort }}"
+  # httpListenAddr: "unix:/sock/cerbos.sock"
   grpcListenAddr: ":{{ .CerbosPort }}"
   apiExplorerEnabled: false
   adminAPI:
