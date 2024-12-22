@@ -23,13 +23,13 @@ func (m *Cypress) Login(ctx context.Context, root *dagger.Directory) (string, er
 		{{ range $app := $product.Apps -}}
 		WithServiceBinding("{{ $app.AppName | LowerSnakeCase }}", {{ $app.AppName | LowerCamelCase }}Service).
 		{{ end -}}
-		WithMountedDirectory("/src", root.Directory(".dagger/cypress")).
-		WithWorkdir("/src").
+		WithMountedDirectory("/cypress", root.Directory(".dagger/cypress")). // TODO: cypress directory
+		WithWorkdir("/cypress").
 		WithExec([]string{
 			"npm", "install",
 		}).
 		WithExec([]string{
-			"npm", "run", "cypress:run",
+			"cypress", "run", "--config-file", "/cypress/cypress.config.ts",
 		}).
 		Stdout(ctx)
 }
