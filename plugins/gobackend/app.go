@@ -12,6 +12,7 @@ import (
 	"github.com/followthepattern/forgefy/plugins/gobackend/templates"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
+	"github.com/followthepattern/forgefy/specification/naming"
 	"github.com/followthepattern/forgefy/specification/types"
 )
 
@@ -155,7 +156,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 
 		for _, feature := range goApp.Features {
 			file := productmap.NewFile(
-				forgeio.ReplaceFeatureName(newFilepath, feature.FeatureName),
+				forgeio.ReplaceFeatureName(newFilepath, naming.ToLowerSnakeCase(feature.FeatureName)),
 				string(content),
 			).WithData(feature)
 

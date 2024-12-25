@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "outDir": "./dist",
     "target": "es6",
     "lib": [
       "dom",
@@ -20,8 +21,11 @@
     "jsx": "react-jsx",
     "baseUrl": "./",
     "paths": {
-      "react-router-dom": ["node_modules/react-router-dom/dist/index"],
+      "react-router-dom": [
+        "node_modules/react-router-dom/dist/index"
+      ],
       "@/*": ["./*"],
-  }
+    }
   },
+  "exclude": ["node_modules", "./dist"]
 }

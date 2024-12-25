@@ -101,3 +101,7 @@ func ToEnvVariable(name string) string {
 func ToFileName(value string) string {
 	return strings.ToLower(ToSnakeCase(value))
 }
+
+func ToNetworkName(value string) string {
+	return strings.ToLower(ToSnakeCase(value))
+}

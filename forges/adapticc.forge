@@ -6,6 +6,7 @@ apps:
     type: go-backend
   - name: frontend1
     type: react-frontend
+    backend: backend1
 features:
   - name: product
     fields:

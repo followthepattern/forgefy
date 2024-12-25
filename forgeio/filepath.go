@@ -2,8 +2,6 @@ package forgeio
 
 import (
 	"strings"
-
-	"github.com/followthepattern/forgefy/specification/naming"
 )
 
 const (
@@ -34,5 +32,5 @@ func ReplaceAppName(filepath string, appName string) string {
 }
 
 func ReplaceFeatureName(filepath, feature string) string {
-	return strings.ReplaceAll(filepath, FEATURE_TOKEN, naming.ToLowerSnakeCase(feature))
+	return strings.ReplaceAll(filepath, FEATURE_TOKEN, feature)
 }

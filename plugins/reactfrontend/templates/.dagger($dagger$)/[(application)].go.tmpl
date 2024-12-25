@@ -25,7 +25,7 @@ func (f {{ $app.AppName | UpperCamelCase }}) Service(frontend1 *dagger.Directory
 			"npm", "install",
 		}).
 		WithExec([]string{
-			"npm", "start",
+			"npm", "run", "dev",
 		}).
 		WithExposedPort(3000).
 		AsService()

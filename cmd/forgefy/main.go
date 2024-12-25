@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/followthepattern/forgefy"
 	"github.com/followthepattern/forgefy/forgeio"
@@ -65,6 +66,9 @@ func main() {
 
 	fw := forgeio.NewFileWriter(outputDir)
 
+	now := time.Now()
+	fmt.Println("starts forging...", now)
+
 	productName, err := f.Forge(
 		string(forgeFile),
 		fw,
@@ -75,5 +79,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("%s is successfully forged to %s", productName, outputDir)
+	fmt.Printf("%s is successfully forged to %s\n", productName, outputDir)
+	fmt.Println(time.Since(now))
 }

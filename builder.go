@@ -96,6 +96,7 @@ func (builder Builder) addParsingFunctions(pm productmap.ProductMap) productmap.
 		"UpperCamelCase": naming.ToUpperCamelCase,
 		"LowerCamelCase": naming.ToLowerCamelCase,
 		"FileName":       naming.ToFileName,
+		"NetworkName":    naming.ToNetworkName,
 	})
 
 	return pm

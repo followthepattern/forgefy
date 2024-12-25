@@ -29,6 +29,9 @@ const TimeField = (props: TimeFieldProps) => {
                         {...field}
                         value={value}
                         onChange={v => {
+                            if (!v) {
+                                return
+                            }
                             const time = new CustomTime(v.hour, v.minute, v.second);
                             field.onChange(time);
                             setValue(time)

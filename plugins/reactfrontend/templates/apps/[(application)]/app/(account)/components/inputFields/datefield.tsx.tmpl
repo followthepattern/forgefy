@@ -43,6 +43,9 @@ const DatePicker = React.forwardRef((props: DatePickerProps<CustomDate> & React.
             ref={ref}
             value={value}
             onChange={v => {
+                if (!v) {
+                    return
+                }
                 const date = new CustomDate(v.year, v.month, v.day);
                 props.onChange(date)
                 setValue(date);

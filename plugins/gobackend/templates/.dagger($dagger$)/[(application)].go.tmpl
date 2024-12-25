@@ -5,7 +5,7 @@ package main
 
 import (
 	"context"
-	"dagger/{{ $product.Name | PackageName }}/internal/dagger"
+	"dagger/{{ $product.Name | LowerSnakeCase }}/internal/dagger"
 )
 
 const (

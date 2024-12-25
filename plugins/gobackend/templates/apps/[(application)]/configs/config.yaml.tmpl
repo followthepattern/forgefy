@@ -24,4 +24,4 @@ mail:
   username: ""
   password: ""
 cerbos:
-  address: "unix:/sock/cerbos.sock"
+  address: "{{ $app.AppName | NetworkName }}_cerbos:3592"
