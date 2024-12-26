@@ -111,7 +111,6 @@ features:
 				"apps/backend/app/(account)/components/headerSidebar/profileMenu.tsx",
 				"apps/backend/app/(account)/photos/hooks/singlePhotos.tsx",
 				"apps/backend/graphql/mutation.ts",
-				"apps/backend/.gitlab-ci.yml",
 				"apps/backend/graphql/hooks/useDelete.tsx",
 				"apps/backend/graphql/utils/list.ts",
 				"apps/backend/app/(account)/photos/hooks/deletePhotos.tsx",
