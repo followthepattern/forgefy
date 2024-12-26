@@ -15,11 +15,10 @@ const (
 
 type {{ $app.AppName | UpperCamelCase }} struct{}
 
-func (f {{ $app.AppName | UpperCamelCase }}) Service(frontend1 *dagger.Directory) *dagger.Service {
+func (f {{ $app.AppName | UpperCamelCase }}) Service({{ $app.AppName | LowerCamelCase }} *dagger.Directory) *dagger.Service {
 	return dag.Container().
 		From(CypressImage).
-		WithMountedDirectory("/src", frontend1).
-		WithEnvVariable("CACHEBUSTER", time.Now().String()).
+		WithMountedDirectory("/src", {{ $app.AppName | LowerCamelCase }}).
 		WithWorkdir("/src").
 		WithExec([]string{
 			"npm", "install",

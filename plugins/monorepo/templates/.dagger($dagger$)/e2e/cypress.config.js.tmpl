@@ -1,5 +1,7 @@
+{{ $app := .App -}}
+
 module.exports = {
   e2e: {
-    baseUrl: 'http://frontend1:3000',
+    baseUrl: 'http://{{ $app.AppName | NetworkName }}:3000',
   },
 }

@@ -52,6 +52,9 @@ func (m *{{ $app.AppName | UpperCamelCase }}) Service({{ $app.AppName | LowerCam
 		WithMountedDirectory("/src", {{ $app.AppName | LowerCamelCase }}).
 		WithWorkdir("/src").
 		WithExec([]string{
+			"go", "mod", "tidy",
+		}).
+		WithExec([]string{
 			"go", "run", "./cmd/{{ $app.AppName | LowerCamelCase }}",
 		}).
 		WithExposedPort(8080).
