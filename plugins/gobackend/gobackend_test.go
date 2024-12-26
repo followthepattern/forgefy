@@ -9,9 +9,11 @@ import (
 )
 
 var _ = Describe("Go Back-end Plugin", func() {
-	var (
+	var dummyWriter forgeio.DummyWriter
+
+	BeforeEach(func() {
 		dummyWriter = forgeio.NewDummyWriter()
-	)
+	})
 
 	Context("Go back-end plugin Forge", func() {
 		var (
@@ -118,6 +120,74 @@ features:
 				"apps/backend/features/auth/controller.go",
 				"apps/backend/types/uint.go",
 				"apps/backend/api/api.go",
+			))
+		})
+	})
+
+	Context("Forging e2e tests using dagger", func() {
+		It("includes dagger files", func() {
+			yaml := `
+version: 0
+product_name: "Test Product Name"
+apps:
+  - name: backend
+    type: go-backend
+features:
+  - name: photos
+    fields:
+      - name: ID
+        type: string
+      - name: Name
+        type: string
+      - name: Type
+        type: string
+`
+
+			f := forgefy.New()
+			f.InstallPlugins(gobackend.Plugin{})
+
+			productName, err := f.Forge(yaml, &dummyWriter)
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(productName).Should(Equal("Test Product Name"))
+
+			Expect(err).Should(Succeed())
+
+			Expect(dummyWriter).Should(forgeio.ContainFiles(
+				".dagger/backend.go",
+				"dagger.json",
+			))
+		})
+
+		It("excludes dagger files", func() {
+			yaml := `
+version: 0
+product_name: "Test Product Name"
+exclude_dagger: true
+apps:
+  - name: backend
+    type: go-backend
+features:
+  - name: photos
+    fields:
+      - name: ID
+        type: string
+      - name: Name
+        type: string
+      - name: Type
+        type: string
+`
+
+			f := forgefy.New()
+			f.InstallPlugins(gobackend.Plugin{})
+
+			productName, err := f.Forge(yaml, &dummyWriter)
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(productName).Should(Equal("Test Product Name"))
+
+			Expect(err).Should(Succeed())
+
+			Expect(dummyWriter).ShouldNot(forgeio.ContainFiles(
+				".dagger/backend.go",
 			))
 		})
 	})
