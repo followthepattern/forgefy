@@ -67,7 +67,6 @@ func main() {
 	fw := forgeio.NewFileWriter(outputDir)
 
 	now := time.Now()
-	fmt.Println("starts forging...", now)
 
 	productName, err := f.Forge(
 		string(forgeFile),
@@ -80,5 +79,5 @@ func main() {
 	}
 
 	fmt.Printf("%s is successfully forged to %s\n", productName, outputDir)
-	fmt.Println(time.Since(now))
+	fmt.Println("forged time", time.Since(now))
 }
