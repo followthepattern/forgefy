@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/followthepattern/forgefy"
 	"github.com/followthepattern/forgefy/forgeio"
@@ -16,6 +17,7 @@ func main() {
 	var file string
 	var outputDir string
 	var exclude string
+	var cleanUp bool
 
 	var root = &cobra.Command{
 		Use:   "forgefy",
@@ -38,10 +40,18 @@ func main() {
 	root.Flags().StringVarP(&file, "file", "f", "", "filepath to the forge file")
 	root.Flags().StringVarP(&outputDir, "output", "o", "", "output directory path")
 	root.Flags().StringVarP(&exclude, "exclude", "i", "", "specify regex to exclude certain files from forging")
+	root.Flags().BoolVarP(&cleanUp, "cleanup", "c", false, "set to true if you want to delete the previous forge")
 
 	if err := root.Execute(); err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
+	}
+
+	if cleanUp {
+		if err := os.RemoveAll(outputDir); err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
 	}
 
 	forgeFile, err := os.ReadFile(file)
@@ -56,6 +66,8 @@ func main() {
 
 	fw := forgeio.NewFileWriter(outputDir)
 
+	now := time.Now()
+
 	productName, err := f.Forge(
 		string(forgeFile),
 		fw,
@@ -66,5 +78,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("%s is successfully forged to %s", productName, outputDir)
+	fmt.Printf("%s is successfully forged to %s\n", productName, outputDir)
+	fmt.Println("forged time", time.Since(now))
 }

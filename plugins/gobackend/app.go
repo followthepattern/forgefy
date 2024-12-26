@@ -6,12 +6,13 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/followthepattern/forgefy/forgeio"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/gobackend/parsing"
 	"github.com/followthepattern/forgefy/plugins/gobackend/templates"
-	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
 	"github.com/followthepattern/forgefy/productmap"
 	"github.com/followthepattern/forgefy/specification"
+	"github.com/followthepattern/forgefy/specification/naming"
 	"github.com/followthepattern/forgefy/specification/types"
 )
 
@@ -117,7 +118,11 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 			return err
 		}
 
-		if !strings.HasSuffix(filepath, ".tmpl") {
+		if !forgeio.IsForgeTemplate(filepath) {
+			return nil
+		}
+
+		if forgeio.ExcludeTemplate(filepath, goApp.ExcludeDagger) {
 			return nil
 		}
 
@@ -126,27 +131,32 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 			return err
 		}
 
-		if strings.Contains(filepath, "(appName)") {
-			filepath = strings.ReplaceAll(filepath, "(appName)", goApp.AppName)
+		newFilepath := filepath
+
+		if strings.Contains(newFilepath, forgeio.APP_FILE_TOKEN) {
+			newFilepath = forgeio.ReplaceAppName(newFilepath, goApp.AppName)
 		}
 
-		filepath = strings.TrimSuffix(filepath, ".tmpl")
-		filepath = path.Join(apps.Directory(), goApp.AppName, filepath)
+		newFilepath = forgeio.RemoveTemplateExtension(newFilepath)
+		newFilepath = path.Join(productmap.ROOT_DIRECTORY, newFilepath)
+		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.DAGGER_FILE_TOKEN)
 
-		if !strings.Contains(filepath, "[feature]") {
+		if !strings.Contains(newFilepath, forgeio.FEATURE_TOKEN) {
 			file := productmap.NewFile(
-				filepath,
+				newFilepath,
 				string(content)).
 				WithData(goApp)
 
-			return pm.Insert(file)
+			err := pm.Insert(file)
+			if err != nil {
+				return err
+			}
+			return nil
 		}
 
 		for _, feature := range goApp.Features {
-			newFilePath := strings.ReplaceAll(filepath, "[feature]", parsing.PackageName(feature))
-
 			file := productmap.NewFile(
-				newFilePath,
+				forgeio.ReplaceFeatureName(newFilepath, naming.ToLowerSnakeCase(feature.FeatureName)),
 				string(content),
 			).WithData(feature)
 

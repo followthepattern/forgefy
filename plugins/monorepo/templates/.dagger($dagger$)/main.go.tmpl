@@ -1,0 +1,22 @@
+{{ $product := . -}}
+
+package main
+
+const (
+	AlpineImage   = "alpine"
+)
+
+type {{ $product.Name | UpperCamelCase }} struct{}
+
+func (m *{{ $product.Name | UpperCamelCase }}) Cypress() *Cypress {
+	return &Cypress{
+		{{ $product.Name | LowerCamelCase }}: m,
+	}
+}
+
+{{ range $app := $product.Apps -}}
+func (m *{{ $product.Name | UpperCamelCase }}) {{ $app.AppName | UpperCamelCase }}() *{{ $app.AppName | UpperCamelCase }} {
+	return &{{ $app.AppName | UpperCamelCase }}{}
+}
+
+{{ end -}}

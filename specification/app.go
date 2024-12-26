@@ -14,6 +14,7 @@ type App struct {
 	Product
 	AppName             string    `yaml:"name"`
 	AppType             AppType   `yaml:"type"`
+	Backend             string    `yaml:"backend"`
 	Features            []Feature `yaml:"features"`
 	AppPort             int       `yaml:"port"`
 	CountOfRandomValues int       `yaml:""`

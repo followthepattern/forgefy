@@ -5,10 +5,6 @@ import (
 )
 
 var (
-	//go:embed *
+	//go:embed * \.dagger\($dagger$)/.gitattributes.tmpl \.dagger\($dagger$)/.gitignore.tmpl
 	Files embed.FS
 )
-
-func RootDirectory() string {
-	return ""
-}

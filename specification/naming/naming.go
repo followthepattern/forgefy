@@ -57,6 +57,10 @@ func ToUpperCamelCase(name string) string {
 	return camelCase
 }
 
+func ToLowerSnakeCase(name string) string {
+	return strings.ToLower(ToSnakeCase(name))
+}
+
 func ToSnakeCase(name string) string {
 	// Regular expression to match uppercase letters and digits
 	re := regexp.MustCompile(`([a-z0-9])([A-Z])`)
@@ -92,4 +96,12 @@ func ToEnvVariable(name string) string {
 	snake = strings.ReplaceAll(snake, " ", "_")
 	snake = strings.ReplaceAll(snake, "-", "_")
 	return snake
+}
+
+func ToFileName(value string) string {
+	return strings.ToLower(ToSnakeCase(value))
+}
+
+func ToNetworkName(value string) string {
+	return strings.ToLower(ToSnakeCase(value))
 }

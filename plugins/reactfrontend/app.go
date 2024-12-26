@@ -6,8 +6,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/followthepattern/forgefy/forgeio"
 	"github.com/followthepattern/forgefy/plugins"
-	"github.com/followthepattern/forgefy/plugins/monorepo/templates/apps"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend/parsing"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend/templates"
 	"github.com/followthepattern/forgefy/productmap"
@@ -99,7 +99,11 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 			return err
 		}
 
-		if !strings.HasSuffix(filepath, ".tmpl") {
+		if !forgeio.IsForgeTemplate(filepath) {
+			return nil
+		}
+
+		if forgeio.ExcludeTemplate(filepath, reactApp.ExcludeDagger) {
 			return nil
 		}
 
@@ -108,13 +112,19 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 			return err
 		}
 
-		filepath = strings.TrimSuffix(filepath, ".tmpl")
+		newFilepath := filepath
 
-		filepath = path.Join(apps.Directory(), reactApp.AppName, filepath)
+		if strings.Contains(newFilepath, forgeio.APP_FILE_TOKEN) {
+			newFilepath = forgeio.ReplaceAppName(newFilepath, reactApp.AppName)
+		}
 
-		if !strings.Contains(filepath, "(feature)") {
+		newFilepath = forgeio.RemoveTemplateExtension(newFilepath)
+		newFilepath = path.Join(productmap.ROOT_DIRECTORY, newFilepath)
+		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.DAGGER_FILE_TOKEN)
+
+		if !strings.Contains(newFilepath, forgeio.FEATURE_TOKEN) {
 			file := productmap.NewFile(
-				filepath,
+				newFilepath,
 				string(content),
 			).WithData(reactApp).
 				WithFuncMap(plugin.parsingFunctions)
@@ -123,11 +133,13 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 		}
 
 		for _, feature := range reactApp.Features {
-			newFilePath := strings.Replace(filepath, "(feature)", feature.FeatureNameDir(), 1)
-			newFilePath = strings.Replace(newFilePath, "(feature)", ToFileSuffix(feature), 1)
+			newDir, newFile := path.Split(newFilepath)
+
+			newDir = forgeio.ReplaceFeatureName(newDir, naming.ToLowerCamelCase(feature.FeatureName))
+			newFile = forgeio.ReplaceFeatureName(newFile, naming.ToUpperCamelCase(feature.FeatureName))
 
 			file := productmap.NewFile(
-				newFilePath,
+				path.Join(newDir, newFile),
 				string(content),
 			).WithData(feature).
 				WithFuncMap(plugin.parsingFunctions)

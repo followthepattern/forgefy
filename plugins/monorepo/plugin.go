@@ -3,8 +3,8 @@ package monorepo
 import (
 	"io/fs"
 	"path"
-	"strings"
 
+	"github.com/followthepattern/forgefy/forgeio"
 	"github.com/followthepattern/forgefy/plugins"
 	"github.com/followthepattern/forgefy/plugins/monorepo/templates"
 	"github.com/followthepattern/forgefy/productmap"
@@ -21,7 +21,7 @@ func (MonoRepo) Apps() []plugins.App {
 	return nil
 }
 
-func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specification.Product) error {
+func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specification.Product) (err error) {
 	dir := templates.Files
 
 	return fs.WalkDir(dir, ".", func(filepath string, d fs.DirEntry, err error) error {
@@ -29,7 +29,11 @@ func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specificatio
 			return err
 		}
 
-		if !strings.HasSuffix(filepath, ".tmpl") {
+		if forgeio.ExcludeTemplate(filepath, productSpec.ExcludeDagger) {
+			return nil
+		}
+
+		if !forgeio.IsForgeTemplate(filepath) {
 			return nil
 		}
 
@@ -38,12 +42,12 @@ func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specificatio
 			return err
 		}
 
-		filepath = strings.TrimSuffix(filepath, ".tmpl")
-
-		filepath = path.Join(templates.RootDirectory(), filepath)
+		newFilepath := forgeio.CleanFilepath(filepath, forgeio.DAGGER_FILE_TOKEN)
+		newFilepath = forgeio.RemoveTemplateExtension(newFilepath)
+		newFilepath = path.Join(productmap.ROOT_DIRECTORY, newFilepath)
 
 		file := productmap.NewFile(
-			filepath,
+			newFilepath,
 			string(content),
 		).WithData(productSpec)
 

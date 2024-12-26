@@ -1,0 +1,21 @@
+---
+server:
+  httpListenAddr: ":{{ .CerbosPort }}"
+  # httpListenAddr: "unix:/sock/cerbos.sock"
+  grpcListenAddr: ":{{ .CerbosPort }}"
+  apiExplorerEnabled: false
+  adminAPI:
+    enabled: false
+
+engine:
+  defaultPolicyVersion: "default"
+
+auxData:
+  jwt:
+    disableVerification: true
+
+storage:
+  driver: "disk"
+  disk:
+    directory: "/policies"
+    watchForChanges: true

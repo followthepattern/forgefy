@@ -1,0 +1,70 @@
+{{ $product := . }}
+{{ $app := .App -}}
+
+package main
+
+import (
+	"context"
+	"dagger/{{ $product.Name | LowerSnakeCase }}/internal/dagger"
+)
+
+const (
+	GoImage       = "golang:1.22"
+	PostgresImage = "postgres:12.21"
+	CerbosImage   = "ghcr.io/cerbos/cerbos:0.39.0"
+)
+
+type {{ $app.AppName | UpperCamelCase }} struct{}
+
+func (m *{{ $app.AppName | UpperCamelCase }}) DB({{ $app.AppName | LowerCamelCase }} *dagger.Directory) *dagger.Service {
+	initSql := {{ $app.AppName | LowerCamelCase }}.File("tests/integration/testdata/database.sql")
+
+	return dag.Container().
+		From(PostgresImage).
+		WithFile("/docker-entrypoint-initdb.d/database.sql", initSql).
+		WithEnvVariable("POSTGRES_DB", "{{ $app.AppName | LowerCamelCase }}").
+		WithEnvVariable("POSTGRES_USER", "{{ $app.AppName | LowerCamelCase }}user").
+		WithEnvVariable("POSTGRES_PASSWORD", "dbpass").
+		WithExposedPort(5432).
+		AsService()
+}
+
+func (m *{{ $app.AppName | UpperCamelCase }}) Cerbos({{ $app.AppName | LowerCamelCase }} *dagger.Directory) *dagger.Service {
+	policiesDir := {{ $app.AppName | LowerCamelCase }}.Directory("policies")
+
+	return dag.Container().
+		From(CerbosImage).
+		WithMountedDirectory("/policies", policiesDir).
+		WithWorkdir("/").
+		WithExec([]string{"/cerbos", "server", "--config=/policies/.cerbos.yaml"}).
+		WithExposedPort(3592).
+		AsService()
+}
+
+func (m *{{ $app.AppName | UpperCamelCase }}) Service({{ $app.AppName | LowerCamelCase }} *dagger.Directory) *dagger.Service {
+	dbService := m.DB({{ $app.AppName | LowerCamelCase }})
+	cerbosService := m.Cerbos({{ $app.AppName | LowerCamelCase }})
+
+	return dag.Container().
+		From(GoImage).
+		WithServiceBinding("{{ $app.AppName | LowerCamelCase }}_db", dbService).
+		WithServiceBinding("{{ $app.AppName | LowerCamelCase }}_cerbos", cerbosService).
+		WithMountedDirectory("/src", {{ $app.AppName | LowerCamelCase }}).
+		WithWorkdir("/src").
+		WithExec([]string{
+			"go", "mod", "tidy",
+		}).
+		WithExec([]string{
+			"go", "run", "./cmd/{{ $app.AppName | LowerCamelCase }}",
+		}).
+		WithExposedPort(8080).
+		AsService()
+}
+
+func (m *{{ $app.AppName | UpperCamelCase }}) HealthTest(ctx context.Context, {{ $app.AppName | LowerCamelCase }} *dagger.Directory) (string, error) {
+	return dag.Container().
+		From(AlpineImage).
+		WithServiceBinding("{{ $app.AppName | LowerCamelCase }}", m.Service({{ $app.AppName | LowerCamelCase }})).
+		WithExec([]string{"wget", "-O-", "http://{{ $app.AppName | LowerCamelCase }}:8080/healthcheck"}).
+		Stdout(ctx)
+}
