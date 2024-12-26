@@ -5,6 +5,6 @@ import (
 )
 
 var (
-	//go:embed * apps/\[(application)\]/policies/.cerbos.yaml.tmpl
+	//go:embed * apps/\[(application)\]/policies/.cerbos.yaml.tmpl apps/\[(application)\]/.gitignore.tmpl
 	EntireDir embed.FS
 )
