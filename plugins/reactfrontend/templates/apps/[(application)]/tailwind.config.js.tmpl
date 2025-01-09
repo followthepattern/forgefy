@@ -27,9 +27,9 @@ module.exports = {
       warning: colors.amber["500"],
       success: colors.green["500"],
       brand: {
-        DEFAULT: "#3b82f6",
-        hover: "color-mix(in srgb, white 5%, #3b82f6)",
-        active: "color-mix(in srgb, black 10%, #3b82f6)"
+        DEFAULT: "rgb(var(--color-brand))",
+        hover: "color-mix(in srgb, white 5%, rgb(var(--color-brand)))",
+        active: "color-mix(in srgb, black 10%, rgb(var(--color-brand)))"
       },
       gray: {
         "primary": colors.slate["950"],
