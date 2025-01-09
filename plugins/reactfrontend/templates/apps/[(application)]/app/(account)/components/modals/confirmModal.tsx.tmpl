@@ -1,9 +1,9 @@
 import classNames from 'classnames';
 import React, { MouseEventHandler } from 'react';
-import { Button, Dialog, DialogTrigger, Modal, ModalOverlay } from 'react-aria-components';
-import TertiaryButton from '../buttons/tertiaryButton';
-import SecondaryButton from '../buttons/secondaryButton';
-import PrimaryButton from '../buttons/primaryButton';
+import { Dialog, DialogTrigger, Modal, ModalOverlay } from 'react-aria-components';
+import TertiaryButton from '../../../components/buttons/tertiaryButton';
+import SecondaryButton from '../../../components/buttons/secondaryButton';
+import PrimaryButton from '../../../components/buttons/primaryButton';
 
 interface ConfirmModalProperties {
   className?: string
@@ -14,11 +14,16 @@ interface ConfirmModalProperties {
 }
 
 export default function ConfirmModal(props: ConfirmModalProperties) {
+  let [isOpen, setOpen] = React.useState(false);
+
   return (
-    <DialogTrigger>
-      <Button className={classNames(props.className, TertiaryButton.ClassName)}>
+    <DialogTrigger
+      isOpen={isOpen}
+      onOpenChange={setOpen}
+    >
+      <TertiaryButton onClick={() => setOpen(true)}>
         {props.children}
-      </Button>
+      </TertiaryButton>
 
       <ModalOverlay
         className={({ isEntering, isExiting }) =>
@@ -29,6 +34,7 @@ export default function ConfirmModal(props: ConfirmModalProperties) {
             })}
       >
         <Modal
+          isDismissable={true}
           className={({ isEntering, isExiting }) =>
             classNames("w-full max-w-md overflow-hidden rounded-2xl bg-white p-6 text-left shadow-xl",
               {

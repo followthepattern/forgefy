@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { useTokenStore } from "@/lib/store";
 import { ErrorParser } from "@/lib/errorParser";
+import PrimaryButton from "@/app/components/buttons/primaryButton";
 
 type FormValues = {
     email: string;
@@ -74,13 +75,13 @@ export default function LoginForm() {
                 </div>
 
                 <div>
-                    <button
+                    <PrimaryButton
                         type="submit"
-                        className="w-full px-3 py-3 text-sm font-semibold text-white bg-blue-500 rounded-md shadow-sm mx:auto hover:bg-blue-700 focus:bg-blue-900"
+                        className="w-full"
                     >
-                        Sign in
-                    </button>
-                    {error && <p className="mt-2 text-sm font-bold text-red-600">
+                        Sign In
+                    </PrimaryButton>
+                    {error && <p className="mt-2 text-sm font-bold text-error">
                         {ErrorParser(error.message)}
                     </p>}
                 </div>
