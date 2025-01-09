@@ -1,0 +1,23 @@
+import classNames from "classnames";
+import Button, { ButtonProperties } from "./button";
+
+
+export default function SecondaryButton(props: ButtonProperties) {
+    const state = props.state ?? 'active';
+
+    return (
+        <Button
+            {...props}
+            className={classNames(props.className, 
+                "text-brand border",
+                {
+                    "border-brand hover:bg-gray-fill active:bg-gray-stroke-weak": state === 'active',
+                    "border-brand hover:bg-gray-fill cursor-not-allowed": state === 'loading',
+                    "bg-gray-stroke-weak cursor-not-allowed": state === 'disabled',
+                }
+            )}
+        >
+            {props.children}
+        </Button>
+    )
+}

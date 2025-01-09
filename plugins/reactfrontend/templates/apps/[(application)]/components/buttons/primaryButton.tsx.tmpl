@@ -1,0 +1,22 @@
+import classNames from "classnames";
+import Button, { ButtonProperties } from "./button";
+
+export default function PrimaryButton(props: ButtonProperties) {
+    const state = props.state ?? 'active';
+
+    return (
+        <Button
+            {...props}
+            className={classNames(props.className, 
+                "text-white border",
+                {
+                    "bg-brand hover:bg-brand-hover active:bg-brand-active": state === 'active',
+                    "bg-brand hover:bg-brand-hover cursor-not-allowed": state === 'loading',
+                    "bg-gray-stroke-weak cursor-not-allowed": state === 'disabled',
+                }
+            )}
+        >
+            {props.children}
+        </Button>
+    )
+}
