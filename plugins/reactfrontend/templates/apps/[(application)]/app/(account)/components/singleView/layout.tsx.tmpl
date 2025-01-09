@@ -10,7 +10,7 @@ function Title(props: SingleLayoutTitleProperties) {
 }
 
 function Subtitle(props: SingleLayoutTitleProperties) {
-    return <p className={classNames("text-sm text-gray-500", props.className)}>{props.children}</p>
+    return <p className={classNames("text-sm text-gray-stroke-strong", props.className)}>{props.children}</p>
 }
 
 interface SingleLayoutFooterProperties {
@@ -33,7 +33,7 @@ export default function SingleLayout(props: SingleLayoutProperties) {
     return (
         <div className="overflow-hidden">
             <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                <div className="p-4 border border-gray-300 rounded-lg">
+                <div className="p-4 border border-gray-stroke-weak rounded-lg">
                     {props.children}
                 </div>
             </div>

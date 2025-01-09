@@ -22,7 +22,7 @@ export default function Navbar(props: NavbarProperties) {
 
     return (
         <nav className="flex flex-col flex-1">
-            <div className="pb-4 text-sm font-semibold text-blue-200 uppercase">Resources</div>
+            <div className="pb-4 text-sm font-semibold text-white uppercase">Resources</div>
             <ul role="list" className="flex flex-col flex-1">
                 <li>
                     <ul role="list" className="-mx-2 space-y-2">
@@ -34,14 +34,14 @@ export default function Navbar(props: NavbarProperties) {
                                         to={item.href}
                                         className={classNames(
                                             current
-                                                ? 'bg-blue-700 text-white'
-                                                : 'text-blue-200 hover:text-white hover:bg-blue-700',
+                                                ? 'bg-brand-hover text-white'
+                                                : 'text-white hover:text-white hover:bg-brand-hover',
                                             'group flex items-center gap-x-3 rounded-lg p-3 text-sm font-semibold'
                                         )}
                                     >
                                         <item.icon
                                             className={classNames(
-                                                current ? 'text-white' : 'text-blue-200 group-hover:text-white',
+                                                current ? 'text-white' : 'text-white group-hover:text-white',
                                                 'h-5 w-5 shrink-0'
                                             )}
                                             aria-hidden="true"

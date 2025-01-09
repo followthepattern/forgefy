@@ -16,7 +16,7 @@ function Label(props: React.HTMLAttributes<HTMLDivElement>) {
 
 function Field(props: React.HTMLAttributes<HTMLDivElement>) {
     return (
-        <div className={classNames(props.className, "overflow-hidden mt-1 text-sm text-gray-700 sm:col-span-2 sm:mt-0")}>{props.children}</div>
+        <div className={classNames(props.className, "overflow-hidden mt-1 text-sm text-gray-supporting sm:col-span-2 sm:mt-0")}>{props.children}</div>
     )
 }
 
@@ -27,7 +27,7 @@ interface DataListViewProperties {
 
 export default function DataListView(props: DataListViewProperties) {
     return (
-        <div className={classNames(props.className, "border-gray-100 border-y")}>
+        <div className={classNames(props.className, "border-gray-fill border-y")}>
             <div className="divide-y divide-gray-100">
                 {props.children}
             </div>
