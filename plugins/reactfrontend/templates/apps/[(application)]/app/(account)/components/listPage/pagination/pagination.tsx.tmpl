@@ -38,7 +38,7 @@ function PageNumberSymbol({ onClick, page, currentPage, isFirst, isLast }: PageN
             onClick={() => onClick(page)}
             className={classNames("py-2 px-4 border-y",
                 {
-                    "border-gray-fill focus:bg-gray-200 hover:bg-gray-100 hover:text-gray-supporting": !isCurrent,
+                    "border-gray-fill focus:bg-gray-200 hover:bg-gray-fill hover:text-gray-supporting": !isCurrent,
                     "border-brand text-white bg-brand-hover": isCurrent,
                     "rounded-l-lg border-l": isFirst,
                     "rounded-r-lg border-r": isLast,
@@ -78,7 +78,7 @@ function PageSymbols({ paginationSymbols, onClick, currentPage }: PageSymbolProp
 export default function Pagination(props: PaginationProperties) {
     const paginationSymbols = calculatePaginationSymbol2(props.maxPage, props.currentPage)
 
-    const arrowButton = "py-2 px-4 border border-gray-fill rounded-lg hover:bg-gray-100 hover:text-gray-supporting focus:bg-gray-200"
+    const arrowButton = "py-2 px-4 border border-gray-fill rounded-lg hover:bg-gray-fill hover:text-gray-supporting focus:bg-gray-200"
     const arrowIcon = "w-5 h-5 text-gray-supporting"
 
     return (

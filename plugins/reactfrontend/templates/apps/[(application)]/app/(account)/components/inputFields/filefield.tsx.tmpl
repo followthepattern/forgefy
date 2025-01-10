@@ -110,7 +110,7 @@ const Attachment = (props: AttachmentProperties) => {
     const fileName = props.filePath.split(/(\\|\/)/).pop() ?? props.filePath;
 
     return (
-        <div className={classNames(props.className, "flex justify-between w-full px-3 py-2 mt-2 border border-gray-stroke-weak rounded-lg ring-1 ring-inset ring-gray-100 placeholder:text-gray-stroke-strong focus:ring-0 focus:ring-inset")}>
+        <div className={classNames(props.className, "flex justify-between w-full px-3 py-2 mt-2 border border-gray-stroke-weak rounded-lg ring-1 ring-inset ring-gray-fill placeholder:text-gray-stroke-strong focus:ring-0 focus:ring-inset")}>
             <span className="text-ellipsis">{fileName}</span>
             <div className="space-x-2">
                 <DownloadButton onClick={props.onDownloadClick} />
