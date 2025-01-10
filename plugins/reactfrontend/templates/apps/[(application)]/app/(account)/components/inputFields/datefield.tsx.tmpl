@@ -60,7 +60,7 @@ const DatePicker = React.forwardRef((props: DatePickerProps<CustomDate> & React.
                         />
                     )}
                 </DateInput>
-                <Button className="flex items-center px-3 text-gray-primary transition bg-transparent border-0 border-l border-solid rounded-r-lg outline-none border-l-gray-200 pressed:bg-brand-hover focus-visible:ring-1 ring-black">
+                <Button className="flex items-center px-3 text-gray-primary transition bg-transparent border-0 border-l border-solid rounded-r-lg outline-none border-l-gray-fill pressed:bg-brand-hover focus-visible:ring-1 ring-black">
                     <ChevronUpIcon className="w-4 h-4 text-gray-primary" />
                 </Button>
             </Group>
@@ -88,7 +88,7 @@ const DatePicker = React.forwardRef((props: DatePickerProps<CustomDate> & React.
                                 {(date) => (
                                     <CalendarCell
                                         date={date}
-                                        className="flex items-center justify-center rounded-full outline-none cursor-default w-9 h-9 data-[outside-month]:text-gray-stroke-weak hover:bg-gray-fill data-[pressed]:bg-gray-200 data-[selected]:bg-brand-hover data-[selected]:text-white focus-visible:ring ring-brand/70 ring-offset-2"
+                                        className="flex items-center justify-center rounded-full outline-none cursor-default w-9 h-9 data-[outside-month]:text-gray-stroke-weak hover:bg-gray-fill data-[pressed]:bg-gray-fill data-[selected]:bg-brand-hover data-[selected]:text-white focus-visible:ring ring-brand/70 ring-offset-2"
                                     />
                                 )}
                             </CalendarGridBody>
@@ -104,7 +104,7 @@ function RoundButton(props: ButtonProps) {
     return (
         <Button
             {...props}
-            className="flex items-center justify-center text-gray-primary bg-transparent border-0 rounded-full outline-none cursor-default w-9 h-9 hover:bg-gray-fill blue-violet-600/70 ring-offset-2"
+            className="flex items-center justify-center text-gray-primary bg-transparent border-0 rounded-full outline-none cursor-default w-9 h-9 hover:bg-gray-fill ring-offset-2"
         />
     );
 }

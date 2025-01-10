@@ -12,7 +12,7 @@ export default function ProfileMenu(props: ProfileMenuProperties) {
     const userProfile = useContext(UserContext);
     const { removeToken } = useTokenStore();
 
-    const menuItemClassName = "block px-3 py-1 text-sm hover:bg-gray-50";
+    const menuItemClassName = "block w-full text-left px-3 py-1 text-sm hover:bg-gray-fill";
 
     return (
         <Menu as="div" className="relative">

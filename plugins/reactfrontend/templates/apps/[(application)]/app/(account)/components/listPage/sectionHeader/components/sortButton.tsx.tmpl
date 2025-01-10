@@ -23,7 +23,7 @@ export default function SortButton(props: SortButtonProperties) {
     return (
         <div className={classNames(props.className, "relative")}>
             <Listbox value={initValue} onChange={OnChange}>
-                <Listbox.Button className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-semibold rounded-lg gap-x-2 ring-1 ring-inset ring-gray-stroke-weak hover:bg-gray-50">
+                <Listbox.Button className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-semibold rounded-lg gap-x-2 ring-1 ring-inset ring-gray-stroke-weak hover:gray-fill">
                     {initValue ? initValue.name : "Sort"}
                     <ChevronDownIcon className="w-4 h-4 text-gray-stroke-strong" aria-hidden="true" />
                 </Listbox.Button>

@@ -174,10 +174,10 @@ export default function Register() {
                         >
                             Sign Up
                         </button>
-                        {error && <p className="mt-2 text-sm font-bold text-red-600">
+                        {error && <p className="mt-2 text-sm font-bold text-error">
                             {ErrorParser(error.message)}
                         </p>}
-                        {errors && <p className="mt-2 text-sm font-bold text-red-600">
+                        {errors && <p className="mt-2 text-sm font-bold text-error">
                             {errors.password ? "Passwords do not match" : ""}
                         </p>}
                     </div>
