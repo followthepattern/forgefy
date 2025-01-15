@@ -1,4 +1,5 @@
 const defaultTheme = require('tailwindcss/defaultTheme');
+const colors = require('tailwindcss/colors');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -16,6 +17,28 @@ module.exports = {
     screens: {
       'xs': '320px',
       ...defaultTheme.screens,
+    },
+    colors: {
+      transparent: 'transparent',
+      current: 'currentColor',
+      black: colors.black,
+      white: colors.white,
+      error: colors.red["500"],
+      warning: colors.amber["500"],
+      success: colors.green["500"],
+      brand: {
+        DEFAULT: "rgb(var(--color-brand))",
+        hover: "color-mix(in srgb, white 15%, rgb(var(--color-brand)))",
+        active: "color-mix(in srgb, black 10%, rgb(var(--color-brand)))"
+      },
+      gray: {
+        "primary": colors.slate["950"],
+        "supporting": colors.slate["800"],
+        "stroke-strong": colors.slate["600"],
+        "stroke-weak": colors.slate["200"],
+        "fill": colors.slate["100"],
+      },
+      background: colors.white,
     },
     extend: {
       backgroundImage: {

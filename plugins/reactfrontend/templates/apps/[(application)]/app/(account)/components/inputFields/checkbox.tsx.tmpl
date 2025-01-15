@@ -12,7 +12,7 @@ const Checkbox = React.forwardRef((props: React.DetailedHTMLProps<React.InputHTM
             checked={isChecked}
             onChange={e => setIsChecked(e.target.checked)}
             className={
-                classNames(props.className, "mt-2 w-6 h-6 rounded-lg ring-1 ring-inset ring-gray-100 border border-gray-300 focus:ring-0 focus:ring-inset data-[checked]:bg-blue-500")}
+                classNames(props.className, "mt-2 w-6 h-6 rounded-lg ring-1 ring-inset ring-gray-fill border border-gray-stroke-weak focus:ring-0 focus:ring-inset data-[checked]:bg-brand")}
         />
     )
 })

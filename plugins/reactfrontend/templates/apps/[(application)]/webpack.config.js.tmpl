@@ -1,6 +1,5 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { TailwindCSSWebpackPlugin } = require('tailwindcss-webpack-plugin')
 const Dotenv = require('dotenv-webpack');
 
 module.exports = (env, argv) => {
@@ -23,7 +22,7 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.css$/i,
-          use: ["style-loader", "css-loader"],
+          use: ['style-loader', 'css-loader', 'postcss-loader'],
         },
       ],
     },
@@ -39,11 +38,6 @@ module.exports = (env, argv) => {
     plugins: [
       new HtmlWebpackPlugin({
         template: './public/index.html',
-      }),
-      new TailwindCSSWebpackPlugin({
-        devtools: {
-          host: '0.0.0.0'
-        }
       }),
       new Dotenv({
         path: `.env.${argv.mode}`

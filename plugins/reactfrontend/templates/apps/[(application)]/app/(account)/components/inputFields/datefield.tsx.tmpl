@@ -51,35 +51,35 @@ const DatePicker = React.forwardRef((props: DatePickerProps<CustomDate> & React.
                 setValue(date);
             }}
         >
-            <Group className="flex pl-2 mt-2 text-gray-900 transition border rounded-lg bg-white/90 focus-within:bg-white group-open:bg-white ring-1 ring-inset ring-gray-100 focus:ring-0 focus:ring-inset">
+            <Group className="flex pl-2 mt-2 text-gray-primary transition border rounded-lg bg-white/90 focus-within:bg-white group-open:bg-white ring-1 ring-inset ring-gray-fill focus:ring-0 focus:ring-inset">
                 <DateInput className="flex flex-1 py-2">
                     {(segment) => (
                         <DateSegment
                             segment={segment}
-                            className="px-0.5 tabular-nums outline-none rounded-sm focus:bg-blue-700 focus:text-white caret-transparent placeholder-shown:italic"
+                            className="px-0.5 tabular-nums outline-none rounded-sm focus:bg-brand-hover focus:text-white caret-transparent placeholder-shown:italic"
                         />
                     )}
                 </DateInput>
-                <Button className="flex items-center px-3 text-gray-900 transition bg-transparent border-0 border-l border-solid rounded-r-lg outline-none border-l-gray-200 pressed:bg-blue-100 focus-visible:ring-1 ring-black">
-                    <ChevronUpIcon className="w-4 h-4 text-gray-900" />
+                <Button className="flex items-center px-3 text-gray-primary transition bg-transparent border-0 border-l border-solid rounded-r-lg outline-none border-l-gray-fill pressed:bg-brand-hover focus-visible:ring-1 ring-black">
+                    <ChevronUpIcon className="w-4 h-4 text-gray-primary" />
                 </Button>
             </Group>
             <CalendarPopover>
-                <Dialog className="p-6 text-gray-900">
+                <Dialog className="p-6 text-gray-primary">
                     <Calendar>
                         <header className="flex items-center w-full gap-1 px-1 pb-4">
                             <Heading className="flex-1 ml-2 text-2xl font-semibold" />
                             <RoundButton slot="previous">
-                                <ChevronLeftIcon className="w-4 h-4 text-gray-900" />
+                                <ChevronLeftIcon className="w-4 h-4 text-gray-primary" />
                             </RoundButton>
                             <RoundButton slot="next">
-                                <ChevronRightIcon className="w-4 h-4 text-gray-900" />
+                                <ChevronRightIcon className="w-4 h-4 text-gray-primary" />
                             </RoundButton>
                         </header>
                         <CalendarGrid className="border-separate border-spacing-1">
                             <CalendarGridHeader>
                                 {(day) => (
-                                    <CalendarHeaderCell className="text-xs font-semibold text-gray-500">
+                                    <CalendarHeaderCell className="text-xs font-semibold text-gray-stroke-strong">
                                         {day}
                                     </CalendarHeaderCell>
                                 )}
@@ -88,7 +88,7 @@ const DatePicker = React.forwardRef((props: DatePickerProps<CustomDate> & React.
                                 {(date) => (
                                     <CalendarCell
                                         date={date}
-                                        className="flex items-center justify-center rounded-full outline-none cursor-default w-9 h-9 data-[outside-month]:text-gray-300 hover:bg-gray-100 data-[pressed]:bg-gray-200 data-[selected]:bg-blue-700 data-[selected]:text-white focus-visible:ring ring-blue-600/70 ring-offset-2"
+                                        className="flex items-center justify-center rounded-full outline-none cursor-default w-9 h-9 data-[outside-month]:text-gray-stroke-weak hover:bg-gray-fill data-[pressed]:bg-gray-fill data-[selected]:bg-brand-hover data-[selected]:text-white focus-visible:ring ring-brand/70 ring-offset-2"
                                     />
                                 )}
                             </CalendarGridBody>
@@ -104,7 +104,7 @@ function RoundButton(props: ButtonProps) {
     return (
         <Button
             {...props}
-            className="flex items-center justify-center text-gray-900 bg-transparent border-0 rounded-full outline-none cursor-default w-9 h-9 hover:bg-gray-100 blue-violet-600/70 ring-offset-2"
+            className="flex items-center justify-center text-gray-primary bg-transparent border-0 rounded-full outline-none cursor-default w-9 h-9 hover:bg-gray-fill ring-offset-2"
         />
     );
 }

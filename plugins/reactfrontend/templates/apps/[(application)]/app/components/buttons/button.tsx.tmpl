@@ -1,0 +1,35 @@
+import SpinnerIcon from "@/app/icons/spinner";
+import classNames from "classnames"
+import { MouseEventHandler } from "react";
+
+export type ButtonStates = 'active' | 'loading' | 'disabled';
+const minButtonWidth = "min-w-20";
+
+export interface ButtonProperties {
+    children?: any
+    className?: string
+    onClick?: MouseEventHandler<HTMLButtonElement>;
+    type?: 'reset' | 'button' | 'submit';
+    state?: ButtonStates,
+}
+
+export default function Button(props: ButtonProperties) {
+    const state = props.state ?? 'active';
+
+    const content = state === 'loading' ? <SpinnerIcon className="w-6 h-6 animate-spin" /> : props.children;
+
+    return (
+        <button
+            type={props.type ?? 'button'}
+            onClick={props.onClick}
+            className={classNames(
+                props.className,
+                minButtonWidth,
+                "flex justify-center px-4 py-2 rounded-lg font-semibold",
+            )}
+            disabled={state === 'disabled'}
+        >
+            {content}
+        </button>
+    )
+}

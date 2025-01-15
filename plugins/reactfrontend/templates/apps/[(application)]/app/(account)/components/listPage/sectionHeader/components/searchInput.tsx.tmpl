@@ -24,7 +24,7 @@ export default function SearchInput(props: SearchInputProperties) {
     return (
         <div className={classNames(props.className, "relative flex-grow focus-within:z-10")}>
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <SearchIcon className="w-4 h-4 text-gray-400" aria-hidden="true" />
+                <SearchIcon className="w-4 h-4 text-gray-stroke-strong" aria-hidden="true" />
             </div>
             <Controller
                 control={control}
@@ -33,7 +33,7 @@ export default function SearchInput(props: SearchInputProperties) {
                 render={({ field: { onChange } }) => (
                     <input
                         type="text"
-                        className="w-full h-full py-2 pl-10 text-gray-900 border border-gray-300 rounded-lg placeholder:text-gray-400 focus:ring-0 focus:ring-inset"
+                        className="w-full h-full py-2 pl-10 text-gray-primary border border-gray-stroke-weak rounded-lg placeholder:text-gray-stroke-strong focus:ring-0 focus:ring-inset"
                         placeholder="Search"
                         onChange={(e) => {
                             onChange(e);
