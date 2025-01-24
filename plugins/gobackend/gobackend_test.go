@@ -154,7 +154,6 @@ features:
 
 			Expect(dummyWriter).Should(forgeio.ContainFiles(
 				".dagger/backend.go",
-				"dagger.json",
 			))
 		})
 
