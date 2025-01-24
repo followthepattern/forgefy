@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/followthepattern/forgefy"
@@ -47,8 +50,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	excludedFiles := createExcludeMap(exclude)
+
 	if cleanUp {
-		if err := os.RemoveAll(outputDir); err != nil {
+		err := remove(outputDir, excludedFiles)
+		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
 		}
@@ -71,7 +77,7 @@ func main() {
 	productName, err := f.Forge(
 		string(forgeFile),
 		fw,
-		forgefy.WithExclude(exclude))
+		forgefy.WithExcludedFiles(excludedFiles))
 
 	if err != nil {
 		fmt.Printf("during forging %s following error occured: %s", productName, err.Error())
@@ -80,4 +86,47 @@ func main() {
 
 	fmt.Printf("%s is successfully forged to %s\n", productName, outputDir)
 	fmt.Println("forged time", time.Since(now))
+}
+
+func createExcludeMap(exclude string) map[string]struct{} {
+	exceptions := strings.Split(exclude, ",")
+
+	excludedFiles := make(map[string]struct{})
+	for _, exception := range exceptions {
+		excludedFiles[exception] = struct{}{}
+	}
+
+	return excludedFiles
+}
+
+func remove(projectPath string, excludedFiles map[string]struct{}) error {
+	err := filepath.Walk(projectPath, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if projectPath == path {
+			return nil
+		}
+
+		relPath, _ := filepath.Rel(projectPath, path)
+		if _, exists := excludedFiles[relPath]; exists {
+			if info.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		if info.IsDir() {
+			err = os.RemoveAll(path)
+			if err != nil {
+				return err
+			}
+			return filepath.SkipDir
+		}
+
+		return os.Remove(path)
+	})
+
+	return err
 }

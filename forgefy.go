@@ -19,7 +19,7 @@ func New() Forgefy {
 }
 
 type ForgeConfging struct {
-	exclude string
+	excludeFiles map[string]struct{}
 }
 
 type ForgeConfigOption interface {
@@ -32,9 +32,9 @@ func (fn ForgeConfigOptionFn) apply(f *ForgeConfging) {
 	fn(f)
 }
 
-func WithExclude(exclude string) ForgeConfigOption {
+func WithExcludedFiles(excludedFiles map[string]struct{}) ForgeConfigOption {
 	return ForgeConfigOptionFn(func(f *ForgeConfging) {
-		f.exclude = exclude
+		f.excludeFiles = excludedFiles
 	})
 }
 
@@ -57,8 +57,8 @@ func (f Forgefy) Forge(yaml string, fw forgeio.Writer, opts ...ForgeConfigOption
 		return productSpecification.Name, err
 	}
 
-	if len(forgeConfig.exclude) != 0 {
-		product.Exclude(forgeConfig.exclude)
+	if len(forgeConfig.excludeFiles) != 0 {
+		product.Exclude(forgeConfig.excludeFiles)
 	}
 
 	err = product.Walk(func(filePath string, file productmap.File) error {

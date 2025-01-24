@@ -64,7 +64,11 @@ var _ = Describe("Product Map", func() {
 			err = pm.Insert(rootCompose)
 			Expect(err).Should(Succeed())
 
-			pm.Exclude("^docker-compose\\.yaml")
+			excludedFiles := map[string]struct{}{
+				"docker-compose.yaml": {},
+			}
+
+			pm.Exclude(excludedFiles)
 
 			exists := pm.Exists("apps/backend1/docker-compose.yaml")
 			Expect(exists).Should(BeTrue())
