@@ -1,20 +1,38 @@
-import React from "react";
 import classNames from "classnames";
+import { Control, Controller } from "react-hook-form";
 
-const Input = React.forwardRef((props: React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, ref:React.ForwardedRef<HTMLInputElement>) => {
+interface InputFieldProperties {
+    control: Control;
+    name: string;
+    id?: string;
+    className?: string;
+    defaultValue?: any;
+    disabled?: boolean;
+}
+
+const Input = (props: InputFieldProperties) => {
     return (
-        <input
-            ref={ref}
-            {...props}
-            className={classNames(
-                props.className,
-                "block w-full mt-2 border border-gray-stroke-strong rounded-lg ring-1 ring-inset ring-gray-fill placeholder:text-gray-stroke-strong focus:ring-0 focus:ring-inset",
-                {
-                    "cursor-not-allowed bg-gray-fill text-gray-supporting": props.disabled
-                }
-            )}
+        <Controller
+            name={props.name}
+            control={props.control}
+            render={({ field }) => {
+                return (
+                    <input
+                        {...props}
+                        {...field}
+                        className={classNames(
+                            props.className,
+                            "block w-full mt-2 border border-gray-stroke-strong rounded-lg focus:ring-0",
+                            {
+                                "cursor-not-allowed bg-gray-fill text-gray-supporting": props.disabled
+                            }
+                        )}
+                    />
+                )
+            }}
+
         />
     )
-})
+}
 
 export default Input;
