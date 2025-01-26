@@ -111,33 +111,42 @@ func remove(projectPath string, excludedFiles map[string]struct{}) error {
 
 		relPath, _ := filepath.Rel(projectPath, path)
 
-		if hasPrefix(excludedFiles, relPath) {
+		if info.IsDir() {
+			if !pathToExclude(excludedFiles, relPath) {
+				err := os.RemoveAll(path)
+				if err != nil {
+					return err
+				}
+				return filepath.SkipDir
+			}
 			return nil
 		}
 
-		if !info.IsDir() {
-			return os.Remove(path)
+		if pathToExclude(excludedFiles, relPath) {
+			return nil
 		}
 
-		err = os.RemoveAll(path)
-		if err != nil {
-			return err
-		}
-		return filepath.SkipDir
+		return os.Remove(path)
 	})
 
 	return err
 }
 
-func hasPrefix(m map[string]struct{}, relPath string) bool {
-	for key := range m {
-		if strings.HasPrefix(key, relPath) {
-			return true
-		}
+func pathToExclude(m map[string]struct{}, relPath string) (exclude bool) {
+	if relPath == "." {
+		return true
+	}
 
-		if strings.HasPrefix(relPath, key) {
-			return true
+	for key := range m {
+		if len(key) > len(relPath) {
+			exclude = strings.HasPrefix(key, relPath)
+		} else {
+			exclude = strings.HasPrefix(relPath, key)
+		}
+		if exclude {
+			return
 		}
 	}
+
 	return false
 }
