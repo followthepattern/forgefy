@@ -12,26 +12,26 @@ import SecondaryButton from "@/app/components/buttons/secondaryButton";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
 import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
 import Label from "@/app/(account)/components/labels/label";
-import Input from "@/app/(account)/components/inputFields/input";
+import Input from "@/app/components/inputFields/input";
 
 {{- if $feature | HasBoolean -}}
-import Checkbox from "@/app/(account)/components/inputFields/checkbox";
+import Checkbox from "@/app/components/inputFields/checkbox";
 {{ end -}}
 {{if $feature | HasNumber -}}
-import NumberField from "@/app/(account)/components/inputFields/numberfield";
+import NumberField from "@/app/components/inputFields/numberfield";
 {{ end -}}
 {{if $feature | HasText -}}
-import Textarea from "@/app/(account)/components/inputFields/textarea";
+import Textarea from "@/app/components/inputFields/textarea";
 {{ end -}}
 {{if $feature | HasTime -}}
-import TimeField from "@/app/(account)/components/inputFields/timefield";
+import TimeField from "@/app/components/inputFields/timefield";
 {{ end -}}
 {{if $feature | HasDate -}}
-import DateField from "@/app/(account)/components/inputFields/datefield";
+import DateField from "@/app/components/inputFields/datefield";
 {{ end -}}
 {{if $feature | HasFile -}}
-import FileField from "@/app/(account)/components/inputFields/filefield";
-{{ end -}}
+import FileField from "@/app/components/inputFields/filefield";
+{{ end }}
 import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 
