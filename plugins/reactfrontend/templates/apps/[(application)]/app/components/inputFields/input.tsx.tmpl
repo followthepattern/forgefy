@@ -1,9 +1,10 @@
 import classNames from "classnames";
-import { Control, Controller } from "react-hook-form";
+import { Control, Controller, FieldValues, RegisterOptions } from "react-hook-form";
 
 interface InputFieldProperties {
     control: Control;
     name: string;
+    rules?: Omit<RegisterOptions<FieldValues, string>,"valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled">;
     id?: string;
     className?: string;
     defaultValue?: any;
@@ -15,10 +16,10 @@ const Input = (props: InputFieldProperties) => {
         <Controller
             name={props.name}
             control={props.control}
+            rules={props.rules}
             render={({ field }) => {
                 return (
                     <input
-                        {...props}
                         {...field}
                         className={classNames(
                             props.className,

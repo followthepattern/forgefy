@@ -47,7 +47,7 @@ export default function UserEdit() {
         }
     }, [deleteResult])
 
-    const { register, getValues } = useForm<User>();
+    const { register, getValues, control } = useForm<User>();
 
     if (loading) {
         return (<div>Loading...</div>)
@@ -89,8 +89,8 @@ export default function UserEdit() {
                             Email
                         </Label>
                         <Input
-                            {...register("email")}
-                            type="text"
+                            control={control}
+                            name="email"
                             id="email"
                             defaultValue={data?.email}
                         />
@@ -100,9 +100,9 @@ export default function UserEdit() {
                             First Name
                         </Label>
                         <Input
-                            {...register("firstName")}
-                            type="text"
+                            control={control}
                             id="firstName"
+                            name="firstName"
                             defaultValue={data?.firstName}
                         />
                     </div>
@@ -111,9 +111,9 @@ export default function UserEdit() {
                             Last Name
                         </Label>
                         <Input
-                            {...register("lastName")}
-                            type="text"
+                            control={control}
                             id="lastName"
+                            name="lastName"
                             defaultValue={data?.lastName}
                         />
                     </div>

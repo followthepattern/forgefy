@@ -23,7 +23,7 @@ export default function UserNew() {
 
     }, [createResult])
 
-    const { register, getValues } = useForm<User>();
+    const { register, getValues, control } = useForm<User>();
 
     const onCreate = () => {
         const values = getValues();
@@ -50,9 +50,9 @@ export default function UserNew() {
                             Email
                         </Label>
                         <Input
-                            {...register("email")}
-                            type="text"
+                            control={control}
                             id="email"
+                            name="email"
                         />
                     </div>
                     <div className="sm:col-span-2">
@@ -60,9 +60,9 @@ export default function UserNew() {
                             First Name
                         </Label>
                         <Input
-                            {...register("firstName")}
-                            type="text"
+                            control={control}
                             id="firstName"
+                            name="firstName"
                         />
                     </div>
                     <div className="sm:col-span-2">
@@ -70,8 +70,8 @@ export default function UserNew() {
                             Last Name
                         </Label>
                         <Input
-                            {...register("lastName")}
-                            type="text"
+                            control={control}
+                            name="lastName"
                             id="lastName"
                         />
                     </div>
