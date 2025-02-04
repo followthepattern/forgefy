@@ -1,38 +1,46 @@
+import CircleXMarkIcon from "@/app/icons/circleXMark";
 import classNames from "classnames";
-import { Control, Controller, FieldValues, RegisterOptions } from "react-hook-form";
+import { useState } from "react";
+import { useController, UseControllerProps } from "react-hook-form";
 
-interface InputFieldProperties {
-    control: Control;
-    name: string;
-    rules?: Omit<RegisterOptions<FieldValues, string>,"valueAsNumber" | "valueAsDate" | "setValueAs" | "disabled">;
+interface InputProperties extends UseControllerProps {
     id?: string;
     className?: string;
-    defaultValue?: any;
+    defaultValue?: string;
     disabled?: boolean;
 }
 
-const Input = (props: InputFieldProperties) => {
-    return (
-        <Controller
-            name={props.name}
-            control={props.control}
-            rules={props.rules}
-            render={({ field }) => {
-                return (
-                    <input
-                        {...field}
-                        className={classNames(
-                            props.className,
-                            "block w-full mt-2 border border-gray-stroke-strong rounded-lg focus:ring-0",
-                            {
-                                "cursor-not-allowed bg-gray-fill text-gray-supporting": props.disabled
-                            }
-                        )}
-                    />
-                )
-            }}
+const Input = (props: InputProperties) => {
+    const [value, setValue] = useState<string>(props.defaultValue ?? "");
+    const { field, fieldState } = useController(props)
 
-        />
+    return (
+        <div className={classNames(
+            props.className,
+            "mt-2"
+        )}>
+            {fieldState.invalid && <div className="flex items-center space-x-1 text-error mb-0.5">
+                <CircleXMarkIcon className="w-4 h-4" />
+                <p className="text-sm">{fieldState.error?.message}</p>
+            </div>
+            }
+            <input
+                {...field}
+                value={value}
+                onChange={e => {
+                    setValue(e.target.value);
+                    field.onChange(e.target.value);
+                }}
+                className={classNames(
+                    "block w-full border rounded-lg focus:ring-0",
+                    {
+                        "cursor-not-allowed bg-gray-fill text-gray-supporting": props.disabled,
+                        "border-gray-stroke-strong": !fieldState.invalid,
+                        "border-error bg-error-fill": fieldState.invalid,
+                    }
+                )}
+            />
+        </div>
     )
 }
 

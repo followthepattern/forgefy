@@ -1,12 +1,12 @@
 {{ $feature := . -}}
-import useSingle{{ .FeatureNameCamelCaseUpper }} from "../../hooks/single{{ .FeatureNameCamelCaseUpper }}";
-import useUpdate{{ .FeatureNameCamelCaseUpper }} from "../../hooks/update{{ .FeatureNameCamelCaseUpper }}";
+import useSingle{{ $feature.FeatureName | UpperCamelCase }} from "../../hooks/single{{ $feature.FeatureName | UpperCamelCase }}";
+import useUpdate{{ $feature.FeatureName | UpperCamelCase }} from "../../hooks/update{{ $feature.FeatureName | UpperCamelCase }}";
 import { useForm } from "react-hook-form";
-import useDelete{{ .FeatureNameCamelCaseUpper }} from "../../hooks/delete{{ .FeatureNameCamelCaseUpper }}";
+import useDelete{{ $feature.FeatureName | UpperCamelCase }} from "../../hooks/delete{{ $feature.FeatureName | UpperCamelCase }}";
 import { useNavigate, useParams } from "react-router-dom";
 import { RESOURCE_NAME, RESOURCE_URL } from "../../const";
 import React, { useEffect } from "react";
-import { {{ .FeatureNameCamelCaseUpper }} } from "../../model";
+import { {{ $feature.FeatureName | UpperCamelCase }} } from "../../model";
 import SingleLayout from "@/app/(account)/components/singleView/layout";
 import SecondaryButton from "@/app/components/buttons/secondaryButton";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
@@ -35,14 +35,14 @@ import FileField from "@/app/components/inputFields/filefield";
 import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 
-export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
+export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
     const { id } = useParams();
 
-    const { loading, data, error, itemNotFound } = useSingle{{ .FeatureNameCamelCaseUpper }}(id ?? "");
+    const { loading, data, error, itemNotFound } = useSingle{{ $feature.FeatureName | UpperCamelCase }}(id ?? "");
 
-    const [executeUpdateMutation, { updateError, updateResult }] = useUpdate{{ .FeatureNameCamelCaseUpper }}();
+    const [executeUpdateMutation, { updateError, updateResult }] = useUpdate{{ $feature.FeatureName | UpperCamelCase }}();
 
-    const [executeDeleteMutation, { deleteError, deleteResult }] = useDelete{{ .FeatureNameCamelCaseUpper }}();
+    const [executeDeleteMutation, { deleteError, deleteResult }] = useDelete{{ $feature.FeatureName | UpperCamelCase }}();
 
     const navigate = useNavigate();
 
@@ -67,7 +67,9 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
         }
     }, [deleteResult])
 
-    const form = useForm<{{ .FeatureNameCamelCaseUpper }}>();
+    const form = useForm<{{ $feature.FeatureName | UpperCamelCase }}>({
+        mode: "onBlur",
+    });
 
     if (loading) {
         return (<div>Loading...</div>)
@@ -99,7 +101,7 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
 
     return (
         <SingleLayout>
-            <SingleLayout.Title>{{ .FeatureNameCamelCaseUpper }}: {data?.id}</SingleLayout.Title>
+            <SingleLayout.Title>{{ $feature.FeatureName | UpperCamelCase }}: {data?.id}</SingleLayout.Title>
             <form action="">
                 <GridFields className="py-6">
                 {{- range $field := $feature.Fields | NoneID }}
@@ -121,9 +123,17 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                         />{{- end }}
                         {{- if $field | IsString }}
                         <Input
-                            {...form.register("{{ .FieldNameCamelCase }}")}
+                            control={form.control}
+                            name="{{ .FieldNameCamelCase }}"
                             id="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
+                            rules={
+                                {
+                                {{- if $field.Nullable | not }}
+                                    required: "This field is required"
+                                {{- end }}
+                                }
+                            }
                         />{{- end }}
                         {{- if $field | IsText }}
                         <Textarea
@@ -163,6 +173,13 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                             type="{{ $field | HTMLType }}"
                             id="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
+                            rules={
+                                {
+                                {{- if $field.Nullable | not }}
+                                    required: "This field is required"
+                                {{- end }}
+                                }
+                            }
                         />{{- end}}
                     </div>
                 {{- end }}

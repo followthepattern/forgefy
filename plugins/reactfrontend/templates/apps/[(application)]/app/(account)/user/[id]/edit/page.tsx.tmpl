@@ -47,7 +47,9 @@ export default function UserEdit() {
         }
     }, [deleteResult])
 
-    const { register, getValues, control } = useForm<User>();
+    const { getValues, control } = useForm<User>({
+        mode: "onBlur",
+    });
 
     if (loading) {
         return (<div>Loading...</div>)
@@ -93,6 +95,9 @@ export default function UserEdit() {
                             name="email"
                             id="email"
                             defaultValue={data?.email}
+                            rules={
+                                { required: "This field is requiered" }
+                            }
                         />
                     </div>
                     <div className="sm:col-span-2">
@@ -104,6 +109,9 @@ export default function UserEdit() {
                             id="firstName"
                             name="firstName"
                             defaultValue={data?.firstName}
+                            rules={
+                                { required: "This field is requiered" }
+                            }
                         />
                     </div>
                     <div className="sm:col-span-2">
@@ -115,6 +123,9 @@ export default function UserEdit() {
                             id="lastName"
                             name="lastName"
                             defaultValue={data?.lastName}
+                            rules={
+                                { required: "This field is requiered" }
+                            }
                         />
                     </div>
                 </GridFields>

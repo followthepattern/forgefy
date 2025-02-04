@@ -23,7 +23,9 @@ export default function UserNew() {
 
     }, [createResult])
 
-    const { register, getValues, control } = useForm<User>();
+    const { getValues, control } = useForm<User>({
+        mode: "onBlur",
+    });
 
     const onCreate = () => {
         const values = getValues();
@@ -53,6 +55,9 @@ export default function UserNew() {
                             control={control}
                             id="email"
                             name="email"
+                            rules={
+                                { required: "This field is requiered" }
+                            }
                         />
                     </div>
                     <div className="sm:col-span-2">
@@ -63,6 +68,9 @@ export default function UserNew() {
                             control={control}
                             id="firstName"
                             name="firstName"
+                            rules={
+                                { required: "This field is requiered" }
+                            }
                         />
                     </div>
                     <div className="sm:col-span-2">
@@ -73,6 +81,9 @@ export default function UserNew() {
                             control={control}
                             name="lastName"
                             id="lastName"
+                            rules={
+                                { required: "This field is requiered" }
+                            }
                         />
                     </div>
                 </GridFields>
