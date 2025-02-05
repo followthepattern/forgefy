@@ -7,7 +7,7 @@ import { User } from "../model";
 import SingleLayout from "../../components/singleView/layout";
 import GridFields from "../../components/singleView/gridFields/gridFields";
 import Label from "../../components/labels/label";
-import Input from "@/app/components/inputFields/input";
+import InputField from "@/app/components/inputFields/inputField";
 import SecondaryButton from "../../../components/buttons/secondaryButton";
 import PrimaryButton from "../../../components/buttons/primaryButton";
 
@@ -51,7 +51,7 @@ export default function UserNew() {
                         <Label htmlFor="title">
                             Email
                         </Label>
-                        <Input
+                        <InputField
                             control={control}
                             id="email"
                             name="email"
@@ -64,7 +64,7 @@ export default function UserNew() {
                         <Label htmlFor="title">
                             First Name
                         </Label>
-                        <Input
+                        <InputField
                             control={control}
                             id="firstName"
                             name="firstName"
@@ -77,7 +77,7 @@ export default function UserNew() {
                         <Label htmlFor="title">
                             Last Name
                         </Label>
-                        <Input
+                        <InputField
                             control={control}
                             name="lastName"
                             id="lastName"

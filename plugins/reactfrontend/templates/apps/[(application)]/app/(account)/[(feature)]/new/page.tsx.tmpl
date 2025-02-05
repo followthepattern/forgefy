@@ -8,7 +8,7 @@ import { {{ .FeatureNameCamelCaseUpper }} } from "../model";
 import SingleLayout from "../../components/singleView/layout";
 import GridFields from "../../components/singleView/gridFields/gridFields";
 import Label from "../../components/labels/label";
-import Input from "@/app/components/inputFields/input";
+import InputField from "@/app/components/inputFields/inputField";
 import SecondaryButton from "../../../components/buttons/secondaryButton";
 import PrimaryButton from "../../../components/buttons/primaryButton";
 
@@ -79,7 +79,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                             id="{{ $field.FieldNameCamelCase }}"
                         />{{- end }}
                         {{- if $field | IsString }}
-                        <Input
+                        <InputField
                             control={form.control}
                             name="{{ $field.FieldNameCamelCase }}"
                             id="{{ $field.FieldNameCamelCase }}"
@@ -121,7 +121,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                             }}
                         />{{- end }}
                         {{- if $field | IsUndefined -}}
-                        <Input
+                        <InputField
                             {...form.register("{{ $field.FieldNameCamelCase }}")}
                             type="{{ $field | HTMLType }}"
                             id="{{ $field.FieldNameCamelCase }}"

@@ -12,7 +12,7 @@ import SecondaryButton from "@/app/components/buttons/secondaryButton";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
 import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
 import Label from "@/app/(account)/components/labels/label";
-import Input from "@/app/components/inputFields/input";
+import InputField from "@/app/components/inputFields/inputField";
 
 {{- if $feature | HasBoolean -}}
 import Checkbox from "@/app/components/inputFields/checkbox";
@@ -122,7 +122,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                             id="{{ .FieldNameCamelCase }}"
                         />{{- end }}
                         {{- if $field | IsString }}
-                        <Input
+                        <InputField
                             control={form.control}
                             name="{{ .FieldNameCamelCase }}"
                             id="{{ .FieldNameCamelCase }}"
@@ -168,7 +168,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                             }}
                         />{{- end }}
                         {{- if $field | IsUndefined -}}
-                        <Input
+                        <InputField
                             {...form.register("{{ .FieldNameCamelCase }}")}
                             type="{{ $field | HTMLType }}"
                             id="{{ .FieldNameCamelCase }}"

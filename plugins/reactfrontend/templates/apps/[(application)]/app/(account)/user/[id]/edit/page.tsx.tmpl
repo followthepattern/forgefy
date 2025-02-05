@@ -11,7 +11,7 @@ import SecondaryButton from "@/app/components/buttons/secondaryButton";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
 import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
 import Label from "@/app/(account)/components/labels/label";
-import Input from "@/app/components/inputFields/input";
+import InputField from "@/app/components/inputFields/inputField";
 import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 
@@ -90,7 +90,7 @@ export default function UserEdit() {
                         <Label htmlFor="email">
                             Email
                         </Label>
-                        <Input
+                        <InputField
                             control={control}
                             name="email"
                             id="email"
@@ -104,7 +104,7 @@ export default function UserEdit() {
                         <Label htmlFor="firstName">
                             First Name
                         </Label>
-                        <Input
+                        <InputField
                             control={control}
                             id="firstName"
                             name="firstName"
@@ -118,7 +118,7 @@ export default function UserEdit() {
                         <Label htmlFor="lastName">
                             Last Name
                         </Label>
-                        <Input
+                        <InputField
                             control={control}
                             id="lastName"
                             name="lastName"
