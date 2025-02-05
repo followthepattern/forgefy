@@ -13,7 +13,7 @@ type Field struct {
 	Name     string `yaml:"name"`
 	Type     string `yaml:"type"`
 	Value    string `yaml:"-"`
-	Nullable bool   `yaml:"nullable" default:"true"`
+	Nullable bool   `yaml:"nullable"`
 }
 
 func (f Field) FieldName() string {
