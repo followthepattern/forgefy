@@ -8,27 +8,27 @@ import { {{ .FeatureNameCamelCaseUpper }} } from "../model";
 import SingleLayout from "../../components/singleView/layout";
 import GridFields from "../../components/singleView/gridFields/gridFields";
 import Label from "../../components/labels/label";
-import Input from "../../components/inputFields/input";
+import InputField from "@/app/components/inputFields/inputField";
 import SecondaryButton from "../../../components/buttons/secondaryButton";
 import PrimaryButton from "../../../components/buttons/primaryButton";
 
 {{- if $feature | HasBoolean -}}
-import Checkbox from "@/app/(account)/components/inputFields/checkbox";
+import Checkbox from "@/app/components/inputFields/checkbox";
 {{ end -}}
 {{if $feature | HasNumber -}}
-import NumberField from "@/app/(account)/components/inputFields/numberfield";
+import NumberField from "@/app/components/inputFields/numberfield";
 {{ end -}}
 {{if $feature | HasText -}}
-import Textarea from "@/app/(account)/components/inputFields/textarea";
+import Textarea from "@/app/components/inputFields/textarea";
 {{ end -}}
 {{if $feature | HasTime -}}
-import TimeField from "@/app/(account)/components/inputFields/timefield";
+import TimeField from "@/app/components/inputFields/timefield";
 {{ end -}}
 {{if $feature | HasDate -}}
-import DateField from "@/app/(account)/components/inputFields/datefield";
+import DateField from "@/app/components/inputFields/datefield";
 {{ end -}}
 {{if $feature | HasFile -}}
-import FileField from "@/app/(account)/components/inputFields/filefield";
+import FileField from "@/app/components/inputFields/filefield";
 {{ end }}
 
 export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
@@ -43,7 +43,9 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
 
     }, [createResult])
 
-    const form = useForm<{{ .FeatureNameCamelCaseUpper }}>();
+    const form = useForm<{{ .FeatureNameCamelCaseUpper }}>({
+        mode: "onBlur",
+    });
 
     const onCreate = () => {
         const values = form.getValues();
@@ -63,58 +65,73 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                 <GridFields className="py-6">
                 {{- range $field := $feature.Fields | NoneID }}
                     <div className="sm:col-span-2">
-                        <Label htmlFor="{{ .FieldNameCamelCase }}">
+                        <Label htmlFor="{{ $field.FieldNameCamelCase }}">
                             {{ .FieldNameHumanReadable }}
                         </Label>
                         {{- if $field | IsNumber }}
                         <NumberField
                             control={form.control}
-                            name="{{ .FieldNameCamelCase }}"
+                            name="{{ $field.FieldNameCamelCase }}"
                         />{{- end }}
                         {{- if $field | IsBoolean }}
                         <Checkbox
-                            {...form.register("{{ .FieldNameCamelCase }}")}
-                            id="{{ .FieldNameCamelCase }}"
+                            {...form.register("{{ $field.FieldNameCamelCase }}")}
+                            id="{{ $field.FieldNameCamelCase }}"
                         />{{- end }}
                         {{- if $field | IsString }}
-                        <Input
-                            {...form.register("{{ .FieldNameCamelCase }}")}
-                            id="{{ .FieldNameCamelCase }}"
+                        <InputField
+                            control={form.control}
+                            name="{{ $field.FieldNameCamelCase }}"
+                            id="{{ $field.FieldNameCamelCase }}"
+                            rules={
+                                {
+                                {{- if $field.Nullable | not }}
+                                    required: "This field is required"
+                                {{- end }}
+                                }
+                            }
                         />{{- end }}
                         {{- if $field | IsText }}
                         <Textarea
-                            name="{{ .FieldNameCamelCase }}"
+                            name="{{ $field.FieldNameCamelCase }}"
                             control={form.control}
                         />{{- end }}
                         {{- if $field | IsTime }}
                         <TimeField
-                            name="{{ .FieldNameCamelCase }}"
+                            name="{{ $field.FieldNameCamelCase }}"
                             control={form.control}
                         />{{- end }}
                         {{- if $field | IsDate }}
                         <DateField
-                            name="{{ .FieldNameCamelCase }}"
+                            name="{{ $field.FieldNameCamelCase }}"
                             control={form.control}
                         />{{- end }}
                         {{- if $field | IsFile }}
                         <FileField
                             control={form.control}
-                            name="{{ .FieldNameCamelCase }}"
+                            name="{{ $field.FieldNameCamelCase }}"
                             resource={RESOURCE_URL.toLowerCase()}
                             defaultValue=""
                             onChange={e => {
                                 if (!e) {
-                                    form.setValue("{{ .FieldNameCamelCase }}", "");
+                                    form.setValue("{{ $field.FieldNameCamelCase }}", "");
                                     return
                                 }
-                                form.setValue("{{ .FieldNameCamelCase }}", e)
+                                form.setValue("{{ $field.FieldNameCamelCase }}", e)
                             }}
                         />{{- end }}
                         {{- if $field | IsUndefined -}}
-                        <Input
-                            {...form.register("{{ .FieldNameCamelCase }}")}
+                        <InputField
+                            {...form.register("{{ $field.FieldNameCamelCase }}")}
                             type="{{ $field | HTMLType }}"
-                            id="{{ .FieldNameCamelCase }}"
+                            id="{{ $field.FieldNameCamelCase }}"
+                            rules={
+                                {
+                                {{- if $field.Nullable | not }}
+                                    required: "This field is required"
+                                {{- end }}
+                                }
+                            }
                         />{{- end}}
                     </div>
                 {{- end }}

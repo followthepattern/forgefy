@@ -34,8 +34,10 @@ features:
         type: id
       - name: Name
         type: string
+        nullable: false
       - name: Description
         type: string
+        nullable: false
   - name: image
     fields:
       - name: Id

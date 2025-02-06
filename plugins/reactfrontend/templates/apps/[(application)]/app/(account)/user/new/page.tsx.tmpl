@@ -7,7 +7,7 @@ import { User } from "../model";
 import SingleLayout from "../../components/singleView/layout";
 import GridFields from "../../components/singleView/gridFields/gridFields";
 import Label from "../../components/labels/label";
-import Input from "../../components/inputFields/input";
+import InputField from "@/app/components/inputFields/inputField";
 import SecondaryButton from "../../../components/buttons/secondaryButton";
 import PrimaryButton from "../../../components/buttons/primaryButton";
 
@@ -23,7 +23,9 @@ export default function UserNew() {
 
     }, [createResult])
 
-    const { register, getValues } = useForm<User>();
+    const { getValues, control } = useForm<User>({
+        mode: "onBlur",
+    });
 
     const onCreate = () => {
         const values = getValues();
@@ -49,30 +51,39 @@ export default function UserNew() {
                         <Label htmlFor="title">
                             Email
                         </Label>
-                        <Input
-                            {...register("email")}
-                            type="text"
+                        <InputField
+                            control={control}
                             id="email"
+                            name="email"
+                            rules={
+                                { required: "This field is requiered" }
+                            }
                         />
                     </div>
                     <div className="sm:col-span-2">
                         <Label htmlFor="title">
                             First Name
                         </Label>
-                        <Input
-                            {...register("firstName")}
-                            type="text"
+                        <InputField
+                            control={control}
                             id="firstName"
+                            name="firstName"
+                            rules={
+                                { required: "This field is requiered" }
+                            }
                         />
                     </div>
                     <div className="sm:col-span-2">
                         <Label htmlFor="title">
                             Last Name
                         </Label>
-                        <Input
-                            {...register("lastName")}
-                            type="text"
+                        <InputField
+                            control={control}
+                            name="lastName"
                             id="lastName"
+                            rules={
+                                { required: "This field is requiered" }
+                            }
                         />
                     </div>
                 </GridFields>

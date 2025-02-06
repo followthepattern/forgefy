@@ -23,7 +23,10 @@ module.exports = {
       current: 'currentColor',
       black: colors.black,
       white: colors.white,
-      error: colors.red["500"],
+      error: {
+        DEFAULT: colors.red["500"],
+        fill: colors.red["50"],
+      },
       warning: colors.amber["500"],
       success: colors.green["500"],
       brand: {
@@ -34,7 +37,7 @@ module.exports = {
       gray: {
         "primary": colors.slate["950"],
         "supporting": colors.slate["800"],
-        "stroke-strong": colors.slate["600"],
+        "stroke-strong": colors.slate["400"],
         "stroke-weak": colors.slate["200"],
         "fill": colors.slate["100"],
       },

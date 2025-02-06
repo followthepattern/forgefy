@@ -1,0 +1,43 @@
+import classNames from "classnames";
+import { useState } from "react";
+import { useController, UseControllerProps } from "react-hook-form";
+import ErrorLabel from "./inputErrorLabel";
+
+interface InputFieldProperties extends UseControllerProps {
+    id?: string;
+    className?: string;
+    defaultValue?: string;
+    disabled?: boolean;
+}
+
+const InputField = (props: InputFieldProperties) => {
+    const [value, setValue] = useState<string>(props.defaultValue ?? "");
+    const { field, fieldState } = useController(props)
+
+    return (
+        <div className={classNames(
+            props.className,
+            "mt-2"
+        )}>
+            {fieldState.invalid && <ErrorLabel errorMessage={fieldState.error?.message} />}
+            <input
+                {...field}
+                value={value}
+                onChange={e => {
+                    setValue(e.target.value);
+                    field.onChange(e.target.value);
+                }}
+                className={classNames(
+                    "block w-full border rounded-lg focus:ring-0",
+                    {
+                        "cursor-not-allowed bg-gray-fill text-gray-supporting": props.disabled,
+                        "border-gray-stroke-strong": !fieldState.invalid,
+                        "border-error bg-error-fill": fieldState.invalid,
+                    }
+                )}
+            />
+        </div>
+    )
+}
+
+export default InputField;

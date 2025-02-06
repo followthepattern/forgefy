@@ -11,7 +11,7 @@ import SecondaryButton from "@/app/components/buttons/secondaryButton";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
 import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
 import Label from "@/app/(account)/components/labels/label";
-import Input from "@/app/(account)/components/inputFields/input";
+import InputField from "@/app/components/inputFields/inputField";
 import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 
@@ -47,7 +47,9 @@ export default function UserEdit() {
         }
     }, [deleteResult])
 
-    const { register, getValues } = useForm<User>();
+    const { getValues, control } = useForm<User>({
+        mode: "onBlur",
+    });
 
     if (loading) {
         return (<div>Loading...</div>)
@@ -88,33 +90,42 @@ export default function UserEdit() {
                         <Label htmlFor="email">
                             Email
                         </Label>
-                        <Input
-                            {...register("email")}
-                            type="text"
+                        <InputField
+                            control={control}
+                            name="email"
                             id="email"
                             defaultValue={data?.email}
+                            rules={
+                                { required: "This field is requiered" }
+                            }
                         />
                     </div>
                     <div className="sm:col-span-2">
                         <Label htmlFor="firstName">
                             First Name
                         </Label>
-                        <Input
-                            {...register("firstName")}
-                            type="text"
+                        <InputField
+                            control={control}
                             id="firstName"
+                            name="firstName"
                             defaultValue={data?.firstName}
+                            rules={
+                                { required: "This field is requiered" }
+                            }
                         />
                     </div>
                     <div className="sm:col-span-2">
                         <Label htmlFor="lastName">
                             Last Name
                         </Label>
-                        <Input
-                            {...register("lastName")}
-                            type="text"
+                        <InputField
+                            control={control}
                             id="lastName"
+                            name="lastName"
                             defaultValue={data?.lastName}
+                            rules={
+                                { required: "This field is requiered" }
+                            }
                         />
                     </div>
                 </GridFields>

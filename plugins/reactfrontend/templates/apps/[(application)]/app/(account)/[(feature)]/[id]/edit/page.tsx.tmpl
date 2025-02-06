@@ -1,48 +1,48 @@
 {{ $feature := . -}}
-import useSingle{{ .FeatureNameCamelCaseUpper }} from "../../hooks/single{{ .FeatureNameCamelCaseUpper }}";
-import useUpdate{{ .FeatureNameCamelCaseUpper }} from "../../hooks/update{{ .FeatureNameCamelCaseUpper }}";
+import useSingle{{ $feature.FeatureName | UpperCamelCase }} from "../../hooks/single{{ $feature.FeatureName | UpperCamelCase }}";
+import useUpdate{{ $feature.FeatureName | UpperCamelCase }} from "../../hooks/update{{ $feature.FeatureName | UpperCamelCase }}";
 import { useForm } from "react-hook-form";
-import useDelete{{ .FeatureNameCamelCaseUpper }} from "../../hooks/delete{{ .FeatureNameCamelCaseUpper }}";
+import useDelete{{ $feature.FeatureName | UpperCamelCase }} from "../../hooks/delete{{ $feature.FeatureName | UpperCamelCase }}";
 import { useNavigate, useParams } from "react-router-dom";
 import { RESOURCE_NAME, RESOURCE_URL } from "../../const";
 import React, { useEffect } from "react";
-import { {{ .FeatureNameCamelCaseUpper }} } from "../../model";
+import { {{ $feature.FeatureName | UpperCamelCase }} } from "../../model";
 import SingleLayout from "@/app/(account)/components/singleView/layout";
 import SecondaryButton from "@/app/components/buttons/secondaryButton";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
 import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
 import Label from "@/app/(account)/components/labels/label";
-import Input from "@/app/(account)/components/inputFields/input";
+import InputField from "@/app/components/inputFields/inputField";
 
 {{- if $feature | HasBoolean -}}
-import Checkbox from "@/app/(account)/components/inputFields/checkbox";
+import Checkbox from "@/app/components/inputFields/checkbox";
 {{ end -}}
 {{if $feature | HasNumber -}}
-import NumberField from "@/app/(account)/components/inputFields/numberfield";
+import NumberField from "@/app/components/inputFields/numberfield";
 {{ end -}}
 {{if $feature | HasText -}}
-import Textarea from "@/app/(account)/components/inputFields/textarea";
+import Textarea from "@/app/components/inputFields/textarea";
 {{ end -}}
 {{if $feature | HasTime -}}
-import TimeField from "@/app/(account)/components/inputFields/timefield";
+import TimeField from "@/app/components/inputFields/timefield";
 {{ end -}}
 {{if $feature | HasDate -}}
-import DateField from "@/app/(account)/components/inputFields/datefield";
+import DateField from "@/app/components/inputFields/datefield";
 {{ end -}}
 {{if $feature | HasFile -}}
-import FileField from "@/app/(account)/components/inputFields/filefield";
-{{ end -}}
+import FileField from "@/app/components/inputFields/filefield";
+{{ end }}
 import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 
-export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
+export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
     const { id } = useParams();
 
-    const { loading, data, error, itemNotFound } = useSingle{{ .FeatureNameCamelCaseUpper }}(id ?? "");
+    const { loading, data, error, itemNotFound } = useSingle{{ $feature.FeatureName | UpperCamelCase }}(id ?? "");
 
-    const [executeUpdateMutation, { updateError, updateResult }] = useUpdate{{ .FeatureNameCamelCaseUpper }}();
+    const [executeUpdateMutation, { updateError, updateResult }] = useUpdate{{ $feature.FeatureName | UpperCamelCase }}();
 
-    const [executeDeleteMutation, { deleteError, deleteResult }] = useDelete{{ .FeatureNameCamelCaseUpper }}();
+    const [executeDeleteMutation, { deleteError, deleteResult }] = useDelete{{ $feature.FeatureName | UpperCamelCase }}();
 
     const navigate = useNavigate();
 
@@ -67,7 +67,9 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
         }
     }, [deleteResult])
 
-    const form = useForm<{{ .FeatureNameCamelCaseUpper }}>();
+    const form = useForm<{{ $feature.FeatureName | UpperCamelCase }}>({
+        mode: "onBlur",
+    });
 
     if (loading) {
         return (<div>Loading...</div>)
@@ -99,7 +101,7 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
 
     return (
         <SingleLayout>
-            <SingleLayout.Title>{{ .FeatureNameCamelCaseUpper }}: {data?.id}</SingleLayout.Title>
+            <SingleLayout.Title>{{ $feature.FeatureName | UpperCamelCase }}: {data?.id}</SingleLayout.Title>
             <form action="">
                 <GridFields className="py-6">
                 {{- range $field := $feature.Fields | NoneID }}
@@ -120,10 +122,18 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                             id="{{ .FieldNameCamelCase }}"
                         />{{- end }}
                         {{- if $field | IsString }}
-                        <Input
-                            {...form.register("{{ .FieldNameCamelCase }}")}
+                        <InputField
+                            control={form.control}
+                            name="{{ .FieldNameCamelCase }}"
                             id="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
+                            rules={
+                                {
+                                {{- if $field.Nullable | not }}
+                                    required: "This field is required"
+                                {{- end }}
+                                }
+                            }
                         />{{- end }}
                         {{- if $field | IsText }}
                         <Textarea
@@ -158,11 +168,18 @@ export default function {{ .FeatureNameCamelCaseUpper }}Edit() {
                             }}
                         />{{- end }}
                         {{- if $field | IsUndefined -}}
-                        <Input
+                        <InputField
                             {...form.register("{{ .FieldNameCamelCase }}")}
                             type="{{ $field | HTMLType }}"
                             id="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
+                            rules={
+                                {
+                                {{- if $field.Nullable | not }}
+                                    required: "This field is required"
+                                {{- end }}
+                                }
+                            }
                         />{{- end}}
                     </div>
                 {{- end }}
