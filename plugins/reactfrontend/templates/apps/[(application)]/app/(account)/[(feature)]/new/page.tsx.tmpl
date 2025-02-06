@@ -8,27 +8,27 @@ import { {{ .FeatureNameCamelCaseUpper }} } from "../model";
 import SingleLayout from "../../components/singleView/layout";
 import GridFields from "../../components/singleView/gridFields/gridFields";
 import Label from "../../components/labels/label";
-import InputField from "@/app/components/inputFields/inputField";
+import InputField from "@/app/components/inputs/inputField";
 import SecondaryButton from "../../../components/buttons/secondaryButton";
 import PrimaryButton from "../../../components/buttons/primaryButton";
 
 {{- if $feature | HasBoolean -}}
-import Checkbox from "@/app/components/inputFields/checkbox";
+import Checkbox from "@/app/components/inputs/checkbox";
 {{ end -}}
 {{if $feature | HasNumber -}}
-import NumberField from "@/app/components/inputFields/numberfield";
+import NumberField from "@/app/components/inputs/numberfield";
 {{ end -}}
 {{if $feature | HasText -}}
-import Textarea from "@/app/components/inputFields/textarea";
+import Textarea from "@/app/components/inputs/textarea";
 {{ end -}}
 {{if $feature | HasTime -}}
-import TimeField from "@/app/components/inputFields/timefield";
+import TimeField from "@/app/components/inputs/timefield";
 {{ end -}}
 {{if $feature | HasDate -}}
-import DateField from "@/app/components/inputFields/datefield";
+import DateField from "@/app/components/inputs/datefield";
 {{ end -}}
 {{if $feature | HasFile -}}
-import FileField from "@/app/components/inputFields/filefield";
+import FileField from "@/app/components/inputs/filefield";
 {{ end }}
 
 export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
