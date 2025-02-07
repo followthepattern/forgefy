@@ -72,6 +72,13 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                         <NumberField
                             control={form.control}
                             name="{{ $field.FieldNameCamelCase }}"
+                            rules={
+                                {
+                                {{- if $field.Nullable | not }}
+                                    required: "This field is required"
+                                {{- end }}
+                                }
+                            }
                         />{{- end }}
                         {{- if $field | IsBoolean }}
                         <Checkbox
