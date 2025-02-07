@@ -1,38 +1,52 @@
-import React from "react";
+import { useState } from "react";
 import classNames from "classnames";
-import { Control, Controller, FieldValues } from "react-hook-form";
-import { NumberField as AriaNumberField, Input, NumberFieldProps } from 'react-aria-components';
+import { useController, UseControllerProps } from "react-hook-form";
+import { NumberField as AriaNumberField, Input } from 'react-aria-components';
+import ErrorLabel from "./inputErrorLabel";
 
-interface NumberProperties extends NumberFieldProps, React.RefAttributes<HTMLDivElement> {
-    control: Control<FieldValues>
+interface NumberFieldProperties extends UseControllerProps {
+    id?: string
+    className?: string;
+    defaultValue?: number;
+    disabled?: boolean;
 }
 
-const NumberField = React.forwardRef((props: NumberProperties, ref:React.ForwardedRef<HTMLDivElement>) => {
-    return (
-        <Controller
-            control={props.control}
-            name={props.name ?? ""}
-            defaultValue={props.defaultValue}
-            render={({ field }) => {
-                return <InputField
-                    {...field}
-                />
-            }}
-        />
-    )
-})
+const NumberField = (props: NumberFieldProperties) => {
+    const [value, setValue] = useState<string | number | undefined>(props.defaultValue)
+    const { field, fieldState } = useController(props);
 
-const InputField = React.forwardRef((props: NumberFieldProps & React.RefAttributes<HTMLDivElement>, ref:React.ForwardedRef<HTMLDivElement>) => {
     return (
-        <AriaNumberField maxValue={Number.MAX_VALUE}
-            ref={ref}
-            {...props}
-        >
-            <Input 
-                className={classNames(props.className, "block w-full p-2 mt-2 border border-gray-stroke-weak rounded-lg ring-1 ring-inset ring-gray-fill placeholder:text-gray-stroke-strong focus:ring-0 focus:ring-inset")}
-            />
-        </AriaNumberField>
+        <div className={classNames(
+            props.className,
+            "mt-2"
+        )}>
+            {fieldState.invalid && <ErrorLabel errorMessage={fieldState.error?.message} />}
+            <AriaNumberField
+                formatOptions={
+                    { maximumFractionDigits: 0, }
+                }
+            >
+                <Input
+                    {...field}
+                    id={props.id}
+                    value={value}
+                    onChange={e => {
+                        setValue(e.target.value);
+                        field.onChange(e.target.value);
+                    }}
+                    className={classNames(
+                        "block w-full border rounded-lg focus:ring-0",
+                        {
+                            "cursor-not-allowed bg-gray-fill text-gray-supporting": props.disabled,
+                            "border-gray-stroke-strong": !fieldState.invalid,
+                            "border-error bg-error-fill": fieldState.invalid,
+                        }
+                    )}
+                />
+            </AriaNumberField>
+        </div>
+
     )
-})
+}
 
 export default NumberField;
