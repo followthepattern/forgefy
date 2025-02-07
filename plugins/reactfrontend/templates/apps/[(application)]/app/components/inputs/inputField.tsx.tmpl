@@ -11,7 +11,7 @@ interface InputFieldProperties extends UseControllerProps {
 }
 
 const InputField = (props: InputFieldProperties) => {
-    const [value, setValue] = useState<string>(props.defaultValue ?? "");
+    const [value, setValue] = useState(props.defaultValue);
     const { field, fieldState } = useController(props)
 
     return (
@@ -22,7 +22,7 @@ const InputField = (props: InputFieldProperties) => {
             {fieldState.invalid && <ErrorLabel errorMessage={fieldState.error?.message} />}
             <input
                 {...field}
-                value={value}
+                value={value ?? ""}
                 onChange={e => {
                     setValue(e.target.value);
                     field.onChange(e.target.value);
