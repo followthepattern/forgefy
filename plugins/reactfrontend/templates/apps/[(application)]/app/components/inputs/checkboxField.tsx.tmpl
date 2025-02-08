@@ -1,0 +1,42 @@
+import { useState } from "react";
+import classNames from "classnames";
+import { useController, UseControllerProps } from "react-hook-form";
+
+interface CheckboxFieldProperties extends UseControllerProps {
+    id?: string
+    className?: string;
+    disabled?: boolean;
+}
+
+const CheckboxField = (props: CheckboxFieldProperties) => {
+    const defaultValue = props.defaultValue ?? false;
+    const [value, setValue] = useState(defaultValue);
+    const { field, fieldState } = useController({
+        ...props,
+        defaultValue: defaultValue,
+    });
+
+    return (
+        <input
+            id={props.id}
+            name={props.name}
+            type="checkbox"
+            disabled={props.disabled}
+            checked={value}
+            onChange={e => {
+                setValue(e.target.checked);
+                field.onChange(e.target.checked);
+            }}
+            className={classNames(
+                "block w-6 h-6 border rounded-lg focus:ring-1",
+                {
+                    "cursor-not-allowed bg-gray-fill text-gray-supporting": props.disabled,
+                    "border-gray-stroke-strong": !fieldState.invalid,
+                    "border-error bg-error-fill": fieldState.invalid,
+                }
+            )}
+        />
+    )
+}
+
+export default CheckboxField;

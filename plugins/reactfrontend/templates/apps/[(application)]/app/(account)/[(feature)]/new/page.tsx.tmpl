@@ -13,7 +13,7 @@ import SecondaryButton from "../../../components/buttons/secondaryButton";
 import PrimaryButton from "../../../components/buttons/primaryButton";
 
 {{- if $feature | HasBoolean -}}
-import Checkbox from "@/app/components/inputs/checkbox";
+import Checkbox from "@/app/components/inputs/checkboxField";
 {{ end -}}
 {{if $feature | HasNumber -}}
 import NumberField from "@/app/components/inputs/numberField";
@@ -82,7 +82,8 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                         />{{- end }}
                         {{- if $field | IsBoolean }}
                         <Checkbox
-                            {...form.register("{{ $field.FieldNameCamelCase }}")}
+                            control={form.control}
+                            name="{{ $field.FieldNameCamelCase }}"
                             id="{{ $field.FieldNameCamelCase }}"
                         />{{- end }}
                         {{- if $field | IsString }}
