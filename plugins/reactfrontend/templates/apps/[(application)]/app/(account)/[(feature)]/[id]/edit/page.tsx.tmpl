@@ -15,7 +15,7 @@ import Label from "@/app/(account)/components/labels/label";
 import InputField from "@/app/components/inputs/inputField";
 
 {{- if $feature | HasBoolean -}}
-import Checkbox from "@/app/components/inputs/checkbox";
+import Checkbox from "@/app/components/inputs/checkboxField";
 {{ end -}}
 {{if $feature | HasNumber -}}
 import NumberField from "@/app/components/inputs/numberField";
@@ -124,9 +124,10 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                         />{{- end }}
                         {{- if $field | IsBoolean }}
                         <Checkbox
-                            {...form.register("{{ .FieldNameCamelCase }}")}
-                            checked={data?.{{ .FieldNameCamelCase }}}
-                            id="{{ .FieldNameCamelCase }}"
+                            control={form.control}
+                            name="{{ $field.FieldNameCamelCase }}"
+                            id="{{ $field.FieldNameCamelCase }}"
+                            defaultValue={data?.{{ .FieldNameCamelCase }}}
                         />{{- end }}
                         {{- if $field | IsString }}
                         <InputField
