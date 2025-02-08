@@ -9,7 +9,7 @@ interface TextareaFieldProperties extends UseControllerProps {
     disabled?: boolean;
 }
 
-const Textarea = (props: TextareaFieldProperties) => {
+const TextareaField = (props: TextareaFieldProperties) => {
     const [value, setValue] = useState(props.defaultValue ?? "");
     const { field, fieldState } = useController(props);
 
@@ -40,4 +40,4 @@ const Textarea = (props: TextareaFieldProperties) => {
     )
 }
 
-export default Textarea;
+export default TextareaField;
