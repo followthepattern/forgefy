@@ -1,28 +1,42 @@
-import React from "react";
+import { useState } from "react";
 import classNames from "classnames";
-import { Control, Controller } from "react-hook-form";
+import { useController, UseControllerProps } from "react-hook-form";
+import ErrorLabel from "./inputErrorLabel";
 
-interface TextareaProps extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
-    control: Control
+interface TextareaFieldProperties extends UseControllerProps {
+    id?: string;
+    className?: string;
+    disabled?: boolean;
 }
 
-const Textarea = (props: TextareaProps) => {
-    return (
-        <Controller
-            name={props.name ?? ""}
-            control={props.control}
-            defaultValue={props.defaultValue}
+const Textarea = (props: TextareaFieldProperties) => {
+    const [value, setValue] = useState(props.defaultValue ?? "");
+    const { field, fieldState } = useController(props);
 
-            render={({ field }) => {
-                return (
-                    <textarea
-                        {...field}
-                        rows={4}
-                        className={classNames(props.className, "block w-full mt-2 border border-gray-stroke-weak rounded-lg ring-1 ring-inset ring-gray-fill placeholder:text-gray-stroke-strong focus:ring-0 focus:ring-inset")}
-                    />
-                )
-            }}
-        />
+    return (
+        <div className={classNames(
+            props.className,
+            "mt-2"
+        )}>
+            {fieldState.invalid && <ErrorLabel errorMessage={fieldState.error?.message} />}
+            <textarea
+                {...field}
+                value={value}
+                onChange={e => {
+                    setValue(e.target.value);
+                    field.onChange(e.target.value);
+                }}
+                rows={4}
+                className={classNames(
+                    "block w-full border rounded-lg focus:ring-0",
+                    {
+                        "cursor-not-allowed bg-gray-fill text-gray-supporting": props.disabled,
+                        "border-gray-stroke-strong": !fieldState.invalid,
+                        "border-error bg-error-fill": fieldState.invalid,
+                    }
+                )}
+            />
+        </div>
     )
 }
 
