@@ -1,0 +1,43 @@
+import { useState } from "react";
+import classNames from "classnames";
+import { useController, UseControllerProps } from "react-hook-form";
+import ErrorLabel from "./inputErrorLabel";
+
+interface TextareaFieldProperties extends UseControllerProps {
+    id?: string;
+    className?: string;
+    disabled?: boolean;
+}
+
+const TextareaField = (props: TextareaFieldProperties) => {
+    const [value, setValue] = useState(props.defaultValue ?? "");
+    const { field, fieldState } = useController(props);
+
+    return (
+        <div className={classNames(
+            props.className,
+            "mt-2"
+        )}>
+            {fieldState.invalid && <ErrorLabel errorMessage={fieldState.error?.message} />}
+            <textarea
+                {...field}
+                value={value}
+                onChange={e => {
+                    setValue(e.target.value);
+                    field.onChange(e.target.value);
+                }}
+                rows={4}
+                className={classNames(
+                    "block w-full border rounded-lg focus:ring-0",
+                    {
+                        "cursor-not-allowed bg-gray-fill text-gray-supporting": props.disabled,
+                        "border-gray-stroke-strong": !fieldState.invalid,
+                        "border-error bg-error-fill": fieldState.invalid,
+                    }
+                )}
+            />
+        </div>
+    )
+}
+
+export default TextareaField;

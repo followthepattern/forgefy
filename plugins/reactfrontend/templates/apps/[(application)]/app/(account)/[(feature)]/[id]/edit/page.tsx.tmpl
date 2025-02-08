@@ -21,7 +21,7 @@ import Checkbox from "@/app/components/inputs/checkboxField";
 import NumberField from "@/app/components/inputs/numberField";
 {{ end -}}
 {{if $feature | HasText -}}
-import Textarea from "@/app/components/inputs/textarea";
+import TextareaField from "@/app/components/inputs/textareaField";
 {{ end -}}
 {{if $feature | HasTime -}}
 import TimeField from "@/app/components/inputs/timefield";
@@ -144,10 +144,18 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                             }
                         />{{- end }}
                         {{- if $field | IsText }}
-                        <Textarea
+                        <TextareaField
+                            id="{{ .FieldNameCamelCase }}"
                             name="{{ .FieldNameCamelCase }}"
                             control={form.control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
+                            rules={
+                                {
+                                {{- if $field.Nullable | not }}
+                                    required: "This field is required"
+                                {{- end }}
+                                }
+                            }
                         />{{- end }}
                         {{- if $field | IsTime }}
                         <TimeField
