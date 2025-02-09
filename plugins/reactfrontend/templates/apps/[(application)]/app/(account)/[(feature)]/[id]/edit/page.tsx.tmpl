@@ -24,7 +24,7 @@ import NumberField from "@/app/components/inputs/numberField";
 import TextareaField from "@/app/components/inputs/textareaField";
 {{ end -}}
 {{if $feature | HasTime -}}
-import TimeField from "@/app/components/inputs/timefield";
+import TimeField from "@/app/components/inputs/timeField";
 {{ end -}}
 {{if $feature | HasDate -}}
 import DateField from "@/app/components/inputs/datefield";
@@ -159,9 +159,17 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                         />{{- end }}
                         {{- if $field | IsTime }}
                         <TimeField
+                            id="{{ .FieldNameCamelCase }}"
                             name="{{ .FieldNameCamelCase }}"
                             control={form.control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
+                            rules={
+                                {
+                                {{- if $field.Nullable | not }}
+                                    required: "This field is required"
+                                {{- end }}
+                                }
+                            }
                         />{{- end }}
                         {{- if $field | IsDate }}
                         <DateField

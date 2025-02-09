@@ -1,0 +1,66 @@
+import React from "react";
+import classNames from "classnames";
+import { useController, UseControllerProps } from "react-hook-form";
+import { TimeField as AriaTimeField, DateInput, DateSegment } from 'react-aria-components';
+import { Time as CustomTime, parseTime } from "@/lib/time";
+import ErrorLabel from "./inputErrorLabel";
+
+interface TimeFieldProperties extends UseControllerProps {
+    id?: string
+    className?: string;
+    disabled?: boolean;
+}
+
+const TimeField = (props: TimeFieldProperties) => {
+    let defaultTime: CustomTime | undefined;
+
+    if (typeof (props.defaultValue) === "string") {
+        defaultTime = parseTime(props.defaultValue)
+    }
+    const [value, setValue] = React.useState(defaultTime);
+
+    const { field, fieldState } = useController(props);
+
+    return (
+        <div className={classNames(
+            props.className,
+            "mt-2"
+        )}>
+            {fieldState.invalid && <ErrorLabel errorMessage={fieldState.error?.message} />}
+            <AriaTimeField
+                {...field}
+                className={classNames(
+                    "block w-20 border rounded-lg focus:ring-0",
+                    {
+                        "cursor-not-allowed bg-gray-fill text-gray-supporting": props.disabled,
+                        "border-gray-stroke-strong": !fieldState.invalid,
+                        "border-error bg-error-fill": fieldState.invalid,
+                    })
+                }
+                value={value}
+                onChange={v => {
+                    if (!v) {
+                        return
+                    }
+                    const time = new CustomTime(v.hour, v.minute, v.second);
+                    setValue(time);
+                    field.onChange(time);
+                }}
+            >
+                <DateInput className="flex flex-1 py-2 pl-2">
+                    {segment => <DateSegment
+                        segment={segment}
+                        className={classNames(
+                            "px-0.5 tabular-nums outline-none rounded-sm focus:bg-brand focus:text-white caret-transparent",
+                            {
+                                "text-error": fieldState.invalid,
+                            }
+                        )}
+                    />}
+                </DateInput>
+            </AriaTimeField>
+        </div>
+    )
+}
+
+export default TimeField;
