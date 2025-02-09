@@ -1,52 +1,65 @@
 import React from "react";
 import classNames from "classnames";
-import { Control, Controller } from "react-hook-form";
+import { useController, UseControllerProps } from "react-hook-form";
 import { TimeField as AriaTimeField, DateInput, DateSegment } from 'react-aria-components';
 import { Time as CustomTime, parseTime } from "@/lib/time";
+import ErrorLabel from "./inputErrorLabel";
 
-interface TimeFieldProps extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
-    control: Control
+interface TimeFieldProperties extends UseControllerProps {
+    id?: string
+    className?: string;
+    disabled?: boolean;
 }
 
-const TimeField = (props: TimeFieldProps) => {
+const TimeField = (props: TimeFieldProperties) => {
     let defaultTime: CustomTime | undefined;
 
     if (typeof (props.defaultValue) === "string") {
         defaultTime = parseTime(props.defaultValue)
     }
+    const [value, setValue] = React.useState(defaultTime);
 
-    const [value, setValue] = React.useState(defaultTime)
+    const { field, fieldState } = useController(props);
 
     return (
-        <Controller
-            name={props.name ?? ""}
-            control={props.control}
-            defaultValue={defaultTime}
-            render={({ field }) => {
-                return (
-                    <AriaTimeField
-                        className={classNames(props.className, "flex flex-col w-20 mt-2 border border-gray-stroke-weak rounded-lg ring-1 ring-inset ring-gray-fill placeholder:text-gray-stroke-strong focus:ring-0 focus:ring-inset")}
-                        {...field}
-                        value={value}
-                        onChange={v => {
-                            if (!v) {
-                                return
+        <div className={classNames(
+            props.className,
+            "mt-2"
+        )}>
+            {fieldState.invalid && <ErrorLabel errorMessage={fieldState.error?.message} />}
+            <AriaTimeField
+                {...field}
+                className={classNames(
+                    "block w-20 border rounded-lg focus:ring-0",
+                    {
+                        "cursor-not-allowed bg-gray-fill text-gray-supporting": props.disabled,
+                        "border-gray-stroke-strong": !fieldState.invalid,
+                        "border-error bg-error-fill": fieldState.invalid,
+                    })
+                }
+                value={value}
+                onChange={v => {
+                    if (!v) {
+                        return
+                    }
+                    const time = new CustomTime(v.hour, v.minute, v.second);
+                    setValue(time);
+                    field.onChange(time);
+                }}
+            >
+                <DateInput className="flex flex-1 py-2 pl-2">
+                    {segment => <DateSegment
+                        segment={segment}
+                        className={classNames(
+                            "px-0.5 tabular-nums outline-none rounded-sm focus:bg-brand focus:text-white caret-transparent",
+                            {
+                                "text-error": fieldState.invalid,
                             }
-                            const time = new CustomTime(v.hour, v.minute, v.second);
-                            field.onChange(time);
-                            setValue(time)
-                        }}
-                    >
-                        <DateInput className="flex flex-1 py-2 pl-2">
-                            {segment => <DateSegment
-                                segment={segment}
-                                className="px-0.5 tabular-nums outline-none rounded-sm focus:bg-brand-hover focus:text-white caret-transparent placeholder-shown:italic"
-                            />}
-                        </DateInput>
-                    </AriaTimeField>
-                )
-            }}
-        />
+                        )}
+                    />}
+                </DateInput>
+            </AriaTimeField>
+        </div>
     )
 }
 

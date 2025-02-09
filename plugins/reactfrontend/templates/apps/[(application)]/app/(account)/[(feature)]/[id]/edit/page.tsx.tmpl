@@ -159,9 +159,17 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                         />{{- end }}
                         {{- if $field | IsTime }}
                         <TimeField
+                            id="{{ .FieldNameCamelCase }}"
                             name="{{ .FieldNameCamelCase }}"
                             control={form.control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
+                            rules={
+                                {
+                                {{- if $field.Nullable | not }}
+                                    required: "This field is required"
+                                {{- end }}
+                                }
+                            }
                         />{{- end }}
                         {{- if $field | IsDate }}
                         <DateField
