@@ -10,7 +10,7 @@ export function parseDate(value?: string): Date | undefined {
     }
 
     const date = parseIntDateTime(value);
-    return new Date(date.year, date.month, date.second)
+    return new Date(date.year, date.month, date.day)
 }
 
 export function parseTime(value?: string): Time | undefined {
