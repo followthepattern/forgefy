@@ -92,7 +92,7 @@ const FileComponent = React.forwardRef((props: FileComponentProperties, ref: Rea
                     execute(files[0], props.resource)
                 }}>
                 <Button
-                    className={classNames(props.className, "mt-2 px-1 py-1 font-semibold text-brand border border-brand rounded-lg hover:bg-brand-hover focus:bg-brand-hover")}
+                    className={classNames(props.className, "mt-2 px-1 py-1 font-semibold text-brand border border-brand rounded-lg hover:bg-gray-fill active:bg-gray-stroke-weak")}
                 >{file ? "Change" : "Select"}</Button>
             </FileTrigger>
         </>
