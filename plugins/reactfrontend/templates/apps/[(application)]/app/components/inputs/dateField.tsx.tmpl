@@ -24,13 +24,13 @@ import type { ButtonProps, DatePickerProps, PopoverProps } from 'react-aria-comp
 import { useController, UseControllerProps } from "react-hook-form";
 import ErrorLabel from "./inputErrorLabel";
 
-interface DateFieldProperties2 extends UseControllerProps {
+interface DateFieldProperties extends UseControllerProps {
     id?: string;
     className?: string;
     disabled?: boolean;
 }
 
-const DateField = (props: DateFieldProperties2) => {
+const DateField = (props: DateFieldProperties) => {
     let defaultCalendarDate: CustomDate | null | undefined;
 
     if (typeof (props.defaultValue) === "string") {
