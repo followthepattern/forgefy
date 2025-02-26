@@ -1,28 +1,44 @@
-import { useStorage, useUploadFile } from '@/lib/storage';
-import classNames from 'classnames';
 import React, { useEffect, useState } from 'react';
+import classNames from 'classnames';
 import { FileTrigger, Button } from 'react-aria-components';
-import { Control, Controller, FieldValues } from 'react-hook-form';
+import { useController, UseControllerProps } from 'react-hook-form';
 
-interface FileFieldProperties extends FileComponentProperties {
-    control: Control<FieldValues>
+import { useStorage, useUploadFile } from '@/lib/storage';
+import TrashIcon from '@/app/icons/trash';
+import ErrorLabel from './inputErrorLabel';
+
+interface FileFieldProperties extends UseControllerProps {
+    id?: string;
+    className?: string;
+    resource: string;
+    onChange?: (filePath: string | null) => void;
 }
 
 function FileField(props: FileFieldProperties) {
+    const { field, fieldState: { invalid, error } } = useController(props);
+
     return (
-        <Controller
-            name={props.name}
-            control={props.control}
-            defaultValue={props.defaultValue}
-            render={({ field }) => {
-                return <FileComponent
-                    {...props}
-                    {...field}
-                    onChange={props.onChange}
-                    defaultValue={field.value}
-                />
-            }}
-        />
+        <div
+            id={props.id}
+            className={classNames(
+            props.className,
+            "mt-2",
+        )} onBlur={field.onBlur}>
+            {invalid && <ErrorLabel errorMessage={error?.message} />}
+            <FileComponent
+                {...props}
+                onChange={(e) => {
+                    if (props.onChange) {
+                        props.onChange(e);
+                    }
+                    field.onChange(e);
+                }}
+                invalid={invalid}
+                disabled={props.disabled}
+                onBlur={field.onBlur}
+                defaultValue={field.value}
+            />
+        </div>
     )
 }
 
@@ -31,7 +47,10 @@ interface FileComponentProperties {
     resource: string
     className?: string
     defaultValue?: string
+    invalid?: boolean
+    disabled?: boolean
     onChange?: (filePath: string | null) => void
+    onBlur?: (e: React.FocusEvent<Element, Element>) => void
 }
 
 const FileComponent = React.forwardRef((props: FileComponentProperties, ref: React.ForwardedRef<HTMLInputElement>) => {
@@ -65,7 +84,7 @@ const FileComponent = React.forwardRef((props: FileComponentProperties, ref: Rea
     return (
         <>
             {file &&
-                <div className="mt-2 space-y-2">
+                <div className="mb-1 space-y-2">
                     {file.map(file =>
                         <Attachment
                             key={file}
@@ -77,6 +96,7 @@ const FileComponent = React.forwardRef((props: FileComponentProperties, ref: Rea
                                 }
                                 setFile(undefined);
                             }}
+                            disabled={props.disabled}
                         />
                     )}
                 </div>}
@@ -90,9 +110,19 @@ const FileComponent = React.forwardRef((props: FileComponentProperties, ref: Rea
                     }
                     let files = Array.from(e);
                     execute(files[0], props.resource)
-                }}>
+                }}
+            >
                 <Button
-                    className={classNames(props.className, "mt-2 px-1 py-1 font-semibold text-brand border border-brand rounded-lg hover:bg-gray-fill active:bg-gray-stroke-weak")}
+                    className={classNames(props.className,
+                        "px-1 py-1 font-semibold border rounded-lg hover:bg-gray-fill focus:bg-gray-stroke-weak",
+                        {
+                            "text-brand border-brand": !props.invalid,
+                            "text-error border-error bg-error-fill": props.invalid,
+                            "cursor-not-allowed border-gray-supporting bg-gray-fill text-gray-supporting": props.disabled
+                        }
+                    )}
+                    onBlur={props.onBlur}
+                    isDisabled={props.disabled}
                 >{file ? "Change" : "Select"}</Button>
             </FileTrigger>
         </>
@@ -104,47 +134,70 @@ interface AttachmentProperties {
     filePath: string;
     onDownloadClick: () => void
     onRemoveClick: () => void
+    onBlur?: (e: React.FocusEvent<Element, Element>) => void
+    disabled?: boolean
+}
+
+interface AttachmentProperties {
+    className?: string;
+    filePath: string;
+    onDownloadClick: () => void
+    onRemoveClick: () => void
+    onBlur?: (e: React.FocusEvent<Element, Element>) => void
+    disabled?: boolean
 }
 
 const Attachment = (props: AttachmentProperties) => {
     const fileName = props.filePath.split(/(\\|\/)/).pop() ?? props.filePath;
 
     return (
-        <div className={classNames(props.className, "flex justify-between w-full px-3 py-2 mt-2 border border-gray-stroke-weak rounded-lg ring-1 ring-inset ring-gray-fill placeholder:text-gray-stroke-strong focus:ring-0 focus:ring-inset")}>
-            <span className="text-ellipsis">{fileName}</span>
-            <div className="space-x-2">
-                <DownloadButton onClick={props.onDownloadClick} />
-                <span>|</span>
-                <RemoveButton onClick={props.onRemoveClick} />
-            </div>
+        <div className={classNames(props.className, "flex justify-between w-full pl-3 pr-2 py-2 space-x-2 border border-gray-stroke-strong rounded-lg")}>
+            <DownloadButton
+                onClick={props.onDownloadClick}
+            >
+                {fileName}
+            </DownloadButton>
+            {!props.disabled &&
+                <div className="content-center">
+                    <RemoveButton onClick={props.onRemoveClick} />
+                </div>}
         </div>
     )
 }
 
-interface DownloadButtonProperties extends React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> { }
+interface DownloadButtonProperties {
+    className?: string;
+    onClick?: () => void;
+    children?: any;
+}
 
 const DownloadButton = (props: DownloadButtonProperties) => {
     return (
         <button
-            {...props}
             type="button"
-            className={classNames(props.className, "text-brand hover:brand-hover focus:brand-active font-medium")}
+            className={classNames(props.className, "text-brand text-left hover:text-brand-hover active:text-brand-active font-medium")}
+            onClick={props.onClick}
         >
-            Download
+            {props.children}
         </button>
     )
 }
 
-interface RemoveButtonProperties extends React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> { }
+interface RemoveButtonProperties {
+    className?: string;
+    onClick?: () => void;
+}
 
 const RemoveButton = (props: RemoveButtonProperties) => {
     return (
         <button
-            {...props}
             type="button"
-            className={classNames(props.className, "text-gray-supporting hover:gray-stoke-strong focus:gray-stoke-strong font-medium")}
+            className={classNames(props.className, "text-gray-supporting p-1 rounded-lg hover:bg-gray-fill active:bg-gray-stroke-weak")}
+            onClick={props.onClick}
         >
-            Remove
+            <TrashIcon
+                className="w-5 h-5 text-gray-stroke-strong"
+            />
         </button>
     )
 }

@@ -69,6 +69,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
 
     const form = useForm<{{ $feature.FeatureName | UpperCamelCase }}>({
         mode: "onBlur",
+        criteriaMode: "all",
     });
 
     if (loading) {
@@ -187,9 +188,17 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                         />{{- end }}
                         {{- if $field | IsFile }}
                         <FileField
-                            control={form.control}
-                            name="{{ .FieldNameCamelCase }}"
+                            id="{{ $field.FieldNameCamelCase }}"
+                            name="{{ $field.FieldNameCamelCase }}"
                             resource={RESOURCE_NAME.toLowerCase()}
+                            control={form.control}
+                            rules={
+                                {
+                                {{- if $field.Nullable | not }}
+                                    required: "This field is required"
+                                {{- end }}
+                                }
+                            }
                             defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
                             onChange={e => {
                                 if (!e) {
@@ -218,7 +227,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                 </GridFields>
                 <SingleLayout.Footer className="justify-between">
                     <div className="flex space-x-2">
-                        <PrimaryButton onClick={onSave}>Save</PrimaryButton>
+                        <PrimaryButton onClick={form.handleSubmit(onSave)}>Save</PrimaryButton>
                         <SecondaryButton onClick={onCancel}>Cancel</SecondaryButton>
                     </div>
                     <ConfirmModal onConfirm={onDelete} title="Delete {{ .FeatureHumanReadableName }}" body={`Are you sure you want to delete ${data?.id}?`}>
