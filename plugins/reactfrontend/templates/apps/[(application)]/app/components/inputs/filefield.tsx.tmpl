@@ -6,6 +6,7 @@ import { useController, UseControllerProps } from 'react-hook-form';
 import { useStorage, useUploadFile } from '@/lib/storage';
 import TrashIcon from '@/app/icons/trash';
 import ErrorLabel from './inputErrorLabel';
+import PaperclipIcon from '@/app/icons/paperclip';
 
 interface FileFieldProperties extends UseControllerProps {
     id?: string;
@@ -21,9 +22,9 @@ function FileField(props: FileFieldProperties) {
         <div
             id={props.id}
             className={classNames(
-            props.className,
-            "mt-2",
-        )} onBlur={field.onBlur}>
+                props.className,
+                "mt-2",
+            )} onBlur={field.onBlur}>
             {invalid && <ErrorLabel errorMessage={error?.message} />}
             <FileComponent
                 {...props}
@@ -114,7 +115,7 @@ const FileComponent = React.forwardRef((props: FileComponentProperties, ref: Rea
             >
                 <Button
                     className={classNames(props.className,
-                        "px-1 py-1 font-semibold border rounded-lg hover:bg-gray-fill focus:bg-gray-stroke-weak",
+                        "flex space-x-1 px-3 py-2 border rounded-lg hover:bg-gray-fill focus:bg-gray-stroke-weak",
                         {
                             "text-brand border-brand": !props.invalid,
                             "text-error border-error bg-error-fill": props.invalid,
@@ -123,7 +124,14 @@ const FileComponent = React.forwardRef((props: FileComponentProperties, ref: Rea
                     )}
                     onBlur={props.onBlur}
                     isDisabled={props.disabled}
-                >{file ? "Change" : "Select"}</Button>
+                >
+                    <div className="content-center">
+                        <span className="inline-block">
+                            <PaperclipIcon className="w-4 h-4 " />
+                        </span>
+                    </div>
+                    <span>{file ? "Change" : "Attach"}</span>
+                </Button>
             </FileTrigger>
         </>
     )
