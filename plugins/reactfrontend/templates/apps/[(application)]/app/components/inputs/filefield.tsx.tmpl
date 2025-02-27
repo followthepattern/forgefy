@@ -175,7 +175,7 @@ const DownloadButton = (props: DownloadButtonProperties) => {
     return (
         <button
             type="button"
-            className={classNames(props.className, "text-brand text-left hover:text-brand-hover active:text-brand-active font-medium")}
+            className={classNames(props.className, "text-brand text-left truncate hover:text-brand-hover active:text-brand-active font-medium")}
             onClick={props.onClick}
         >
             {props.children}
