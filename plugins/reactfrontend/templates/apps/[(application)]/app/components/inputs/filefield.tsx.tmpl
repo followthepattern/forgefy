@@ -146,15 +146,6 @@ interface AttachmentProperties {
     disabled?: boolean
 }
 
-interface AttachmentProperties {
-    className?: string;
-    filePath: string;
-    onDownloadClick: () => void
-    onRemoveClick: () => void
-    onBlur?: (e: React.FocusEvent<Element, Element>) => void
-    disabled?: boolean
-}
-
 const Attachment = (props: AttachmentProperties) => {
     const fileName = props.filePath.split(/(\\|\/)/).pop() ?? props.filePath;
 
