@@ -1,0 +1,204 @@
+import React, { useEffect, useState } from 'react';
+import classNames from 'classnames';
+import { FileTrigger, Button } from 'react-aria-components';
+import { useController, UseControllerProps } from 'react-hook-form';
+
+import { useStorage, useUploadFile } from '@/lib/storage';
+import TrashIcon from '@/app/icons/trash';
+import ErrorLabel from './inputErrorLabel';
+import PaperclipIcon from '@/app/icons/paperclip';
+
+interface FileFieldProperties extends UseControllerProps {
+    id?: string;
+    className?: string;
+    resource: string;
+    onChange?: (filePath: string | null) => void;
+}
+
+function FileField(props: FileFieldProperties) {
+    const { field, fieldState: { invalid, error } } = useController(props);
+
+    return (
+        <div
+            id={props.id}
+            className={classNames(
+                props.className,
+                "mt-2",
+            )} onBlur={field.onBlur}>
+            {invalid && <ErrorLabel errorMessage={error?.message} />}
+            <FileComponent
+                {...props}
+                onChange={(e) => {
+                    if (props.onChange) {
+                        props.onChange(e);
+                    }
+                    field.onChange(e);
+                }}
+                invalid={invalid}
+                disabled={props.disabled}
+                onBlur={field.onBlur}
+                defaultValue={field.value}
+            />
+        </div>
+    )
+}
+
+interface FileComponentProperties {
+    name: string
+    resource: string
+    className?: string
+    defaultValue?: string
+    invalid?: boolean
+    disabled?: boolean
+    onChange?: (filePath: string | null) => void
+    onBlur?: (e: React.FocusEvent<Element, Element>) => void
+}
+
+const FileComponent = React.forwardRef((props: FileComponentProperties, ref: React.ForwardedRef<HTMLInputElement>) => {
+    let value: string[] | undefined;
+
+    if (typeof props.defaultValue === "string" && props.defaultValue.length != 0) {
+        value = props.defaultValue.split(",")
+    }
+    const [file, setFile] = useState<string[] | undefined>(value);
+
+    const { download } = useStorage();
+
+    const { data, called, execute } = useUploadFile();
+
+    useEffect(() => {
+        if (!called) {
+            return
+        }
+
+        if (props.onChange) {
+            props.onChange(data)
+        }
+        if (data) {
+            setFile([data]);
+        } else {
+            setFile(undefined);
+        }
+
+    }, [called, data])
+
+    return (
+        <>
+            {file &&
+                <div className="mb-1 space-y-2">
+                    {file.map(file =>
+                        <Attachment
+                            key={file}
+                            filePath={file}
+                            onDownloadClick={() => { download(file) }}
+                            onRemoveClick={() => {
+                                if (props.onChange) {
+                                    props.onChange(null)
+                                }
+                                setFile(undefined);
+                            }}
+                            disabled={props.disabled}
+                        />
+                    )}
+                </div>}
+            <FileTrigger
+                {...props}
+                allowsMultiple={false}
+                ref={ref}
+                onSelect={e => {
+                    if (!e) {
+                        return
+                    }
+                    let files = Array.from(e);
+                    execute(files[0], props.resource)
+                }}
+            >
+                <Button
+                    className={classNames(props.className,
+                        "flex space-x-1 px-3 py-2 border rounded-lg hover:bg-gray-fill focus:bg-gray-stroke-weak",
+                        {
+                            "text-brand border-brand": !props.invalid,
+                            "text-error border-error bg-error-fill": props.invalid,
+                            "cursor-not-allowed border-gray-supporting bg-gray-fill text-gray-supporting": props.disabled
+                        }
+                    )}
+                    onBlur={props.onBlur}
+                    isDisabled={props.disabled}
+                >
+                    <div className="content-center">
+                        <span className="inline-block">
+                            <PaperclipIcon className="w-4 h-4 " />
+                        </span>
+                    </div>
+                    <span>{file ? "Change" : "Attach"}</span>
+                </Button>
+            </FileTrigger>
+        </>
+    )
+})
+
+interface AttachmentProperties {
+    className?: string;
+    filePath: string;
+    onDownloadClick: () => void
+    onRemoveClick: () => void
+    onBlur?: (e: React.FocusEvent<Element, Element>) => void
+    disabled?: boolean
+}
+
+const Attachment = (props: AttachmentProperties) => {
+    const fileName = props.filePath.split(/(\\|\/)/).pop() ?? props.filePath;
+
+    return (
+        <div className={classNames(props.className, "flex justify-between w-full pl-3 pr-2 py-2 space-x-2 border border-gray-stroke-strong rounded-lg")}>
+            <DownloadButton
+                onClick={props.onDownloadClick}
+            >
+                {fileName}
+            </DownloadButton>
+            {!props.disabled &&
+                <div className="content-center">
+                    <RemoveButton onClick={props.onRemoveClick} />
+                </div>}
+        </div>
+    )
+}
+
+interface DownloadButtonProperties {
+    className?: string;
+    onClick?: () => void;
+    children?: any;
+}
+
+const DownloadButton = (props: DownloadButtonProperties) => {
+    return (
+        <button
+            type="button"
+            className={classNames(props.className, "text-brand text-left truncate hover:text-brand-hover active:text-brand-active font-medium")}
+            onClick={props.onClick}
+        >
+            {props.children}
+        </button>
+    )
+}
+
+interface RemoveButtonProperties {
+    className?: string;
+    onClick?: () => void;
+}
+
+const RemoveButton = (props: RemoveButtonProperties) => {
+    return (
+        <button
+            type="button"
+            className={classNames(props.className, "text-gray-supporting p-1 rounded-lg hover:bg-gray-fill active:bg-gray-stroke-weak")}
+            onClick={props.onClick}
+        >
+            <TrashIcon
+                className="w-5 h-5 text-gray-stroke-strong"
+            />
+        </button>
+    )
+}
+
+export default FileField;
