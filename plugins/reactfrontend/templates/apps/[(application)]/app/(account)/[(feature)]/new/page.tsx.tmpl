@@ -14,6 +14,9 @@ import { RESOURCE_URL } from "../const";
 
 import PrimaryButton from "@/app/components/buttons/primaryButton";
 import CancelModal from "@/app/components/modals/cancelModal";
+{{- if $feature | HasString -}}
+import InputField from "@/app/components/inputs/inputField";
+{{ end -}}
 {{- if $feature | HasBoolean -}}
 import Checkbox from "@/app/components/inputs/checkboxField";
 {{ end -}}
@@ -77,14 +80,13 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
             isDirty,
         },
         getValues,
+        {{if $feature | HasFile -}} setValue, {{- end }}
         handleSubmit,
     } = useForm<{{ .FeatureNameCamelCaseUpper }}>({
         mode: "onBlur",
         criteriaMode: "all",
         defaultValues: {
-        {{- range $field := $feature.Fields | NoneID }}
-            {{ $field.FieldNameCamelCase }}: null,
-        {{ end -}}
+            {{ range $field := $feature.Fields | NoneID }} {{ $field.FieldNameCamelCase }}: null, {{ end -}}
         }
     });
 
@@ -112,7 +114,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                         </Label>
                         {{- if $field | IsNumber }}
                         <NumberField
-                            control={form.control}
+                            control={control}
                             name="{{ $field.FieldNameCamelCase }}"
                             rules={
                                 {
@@ -124,13 +126,13 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                         />{{- end }}
                         {{- if $field | IsBoolean }}
                         <Checkbox
-                            control={form.control}
+                            control={control}
                             name="{{ $field.FieldNameCamelCase }}"
                             id="{{ $field.FieldNameCamelCase }}"
                         />{{- end }}
                         {{- if $field | IsString }}
                         <InputField
-                            control={form.control}
+                            control={control}
                             name="{{ $field.FieldNameCamelCase }}"
                             id="{{ $field.FieldNameCamelCase }}"
                             rules={
@@ -145,7 +147,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                         <TextareaField
                             id="{{ .FieldNameCamelCase }}"
                             name="{{ $field.FieldNameCamelCase }}"
-                            control={form.control}
+                            control={control}
                             rules={
                                 {
                                 {{- if $field.Nullable | not }}
@@ -158,7 +160,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                         <TimeField
                             id="{{ $field.FieldNameCamelCase }}"
                             name="{{ $field.FieldNameCamelCase }}"
-                            control={form.control}
+                            control={control}
                             rules={
                                 {
                                 {{- if $field.Nullable | not }}
@@ -171,7 +173,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                         <DateField
                             id="{{ $field.FieldNameCamelCase }}"
                             name="{{ $field.FieldNameCamelCase }}"
-                            control={form.control}
+                            control={control}
                             rules={
                                 {
                                 {{- if $field.Nullable | not }}
@@ -185,7 +187,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                             id="{{ $field.FieldNameCamelCase }}"
                             name="{{ $field.FieldNameCamelCase }}"
                             resource={RESOURCE_URL.toLowerCase()}
-                            control={form.control}
+                            control={control}
                             rules={
                                 {
                                 {{- if $field.Nullable | not }}
@@ -196,16 +198,16 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                             defaultValue=""
                             onChange={e => {
                                 if (!e) {
-                                    form.setValue("{{ $field.FieldNameCamelCase }}", "");
+                                    setValue("{{ $field.FieldNameCamelCase }}", "");
                                     return
                                 }
-                                form.setValue("{{ $field.FieldNameCamelCase }}", e)
+                                setValue("{{ $field.FieldNameCamelCase }}", e)
                             }}
                         />{{- end }}
                         {{- if $field | IsUndefined -}}
                         <InputField
-                            {...form.register("{{ $field.FieldNameCamelCase }}")}
-                            type="{{ $field | HTMLType }}"
+                            control={control}
+                            name="{{ $field.FieldNameCamelCase }}"
                             id="{{ $field.FieldNameCamelCase }}"
                             rules={
                                 {
@@ -218,7 +220,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                     </div>
                 {{- end }}
                 </GridFields>
-                <SingleLayout.Footer className="justify-end">
+                <SingleLayout.Footer>
                     <PrimaryButton
                         onClick={handleSubmit(onCreate)}
                         state={createLoading ? 'loading' : 'active'}
