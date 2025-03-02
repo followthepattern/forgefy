@@ -32,7 +32,7 @@ export class {{ $typeName }} {
 		{{- end -}}
 	}
 {{- range $field := .Fields }}
-	{{ .FieldNameCamelCase }}?: {{ $field | JSType }}
+	{{ .FieldNameCamelCase }}?: {{ $field | JSType }} | null
 {{- end }}
 }
 
