@@ -1,4 +1,4 @@
-import React, { Component, ComponentType, MouseEventHandler, ReactElement, ReactNode } from 'react';
+import React, { MouseEventHandler } from 'react';
 import classNames from 'classnames';
 import {
   Dialog,
@@ -67,11 +67,11 @@ export default function CancelModal(props: CancelModalProperties) {
               <>
                 <div
                   slot="title"
-                  className="my-0 text-xl font-semibold"
+                  className="my-0 text-xl font-semibold text-gray-supporting"
                 >
                   {props.title ?? "Discard Your Work?"}
                 </div>
-                <p className="mt-3 text-gray-supporting">
+                <p className="mt-3 text-gray-stroke-strong">
                   {props.body ?? "You have unsaved changes. Are you sure you want to cancel creating this item? Any entered data will be lost."}
                 </p>
                 <div className="flex flex-col-reverse gap-2 mt-6 sm:flex-row sm:flex sm:justify-start">
