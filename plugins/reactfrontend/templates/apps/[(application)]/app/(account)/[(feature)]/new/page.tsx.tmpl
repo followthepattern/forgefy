@@ -1,17 +1,19 @@
 {{ $feature := . -}}
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import useCreate{{ .FeatureNameCamelCaseUpper }} from "../hooks/create{{ .FeatureNameCamelCaseUpper }}";
+import { Id, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { RESOURCE_URL } from "../const";
-import { useEffect } from "react";
-import { {{ .FeatureNameCamelCaseUpper }} } from "../model";
+
 import SingleLayout from "../../components/singleView/layout";
 import GridFields from "../../components/singleView/gridFields/gridFields";
 import Label from "../../components/labels/label";
-import InputField from "@/app/components/inputs/inputField";
-import SecondaryButton from "../../../components/buttons/secondaryButton";
-import PrimaryButton from "../../../components/buttons/primaryButton";
 
+import { {{ .FeatureNameCamelCaseUpper }}  } from "../model";
+import useCreate{{ .FeatureNameCamelCaseUpper }} from "../hooks/create{{ .FeatureNameCamelCaseUpper }}";
+import { RESOURCE_URL } from "../const";
+
+import PrimaryButton from "@/app/components/buttons/primaryButton";
+import CancelModal from "@/app/components/modals/cancelModal";
 {{- if $feature | HasBoolean -}}
 import Checkbox from "@/app/components/inputs/checkboxField";
 {{ end -}}
@@ -36,6 +38,8 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
 
     const navigate = useNavigate();
 
+    const toastId = React.useRef<Id | null>(null);
+
     useEffect(() => {
         if (createResult && createResult > 0) {
             navigate(`/${RESOURCE_URL}`)
@@ -43,17 +47,54 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
 
     }, [createResult])
 
-    const form = useForm<{{ .FeatureNameCamelCaseUpper }}>({
+    useEffect(() => {
+        if (createResult && createResult > 0) {
+            navigate(`/${RESOURCE_URL}`)
+
+            if (!toastId.current) return;
+
+            toast.update(toastId.current, {
+                render: "Success!",
+                type: toast.TYPE.SUCCESS,
+                autoClose: 3000,
+            })
+        }
+
+        if (createError) {
+            if (!toastId.current) return;
+            toast.update(toastId.current, {
+                render: "Error happened!",
+                type: toast.TYPE.ERROR,
+                autoClose: 3000,
+            })
+        }
+
+    }, [createResult, createError])
+
+    const {
+        control,
+        formState: {
+            isDirty,
+        },
+        getValues,
+        handleSubmit,
+    } = useForm<{{ .FeatureNameCamelCaseUpper }}>({
         mode: "onBlur",
         criteriaMode: "all",
+        defaultValues: {
+        {{- range $field := $feature.Fields | NoneID }}
+            {{ $field.FieldNameCamelCase }}: null,
+        {{ end -}}
+        }
     });
 
     const onCreate = () => {
-        const values = form.getValues();
+        const values = getValues();
+
+        toastId.current = toast("Creating...", { autoClose: false });
 
         executeMutation(values);
     }
-    
 
     const onCancel = () => {
         navigate(`/${RESOURCE_URL}`)
@@ -178,8 +219,19 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                 {{- end }}
                 </GridFields>
                 <SingleLayout.Footer className="justify-end">
-                    <SecondaryButton onClick={onCancel}>Cancel</SecondaryButton>
-                    <PrimaryButton onClick={form.handleSubmit(onCreate)}>Create</PrimaryButton>
+                    <PrimaryButton
+                        onClick={handleSubmit(onCreate)}
+                        state={createLoading ? 'loading' : 'active'}
+                    >
+                        Create
+                    </PrimaryButton>
+                    <CancelModal
+                        onConfirm={onCancel}
+                        dontAsk={!isDirty}
+                        className="border text-brand border-brand hover:bg-gray-fill active:bg-gray-stroke-weak"
+                    >
+                        Cancel
+                    </CancelModal>
                 </SingleLayout.Footer>
             </form>
         </SingleLayout>
