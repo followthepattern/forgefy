@@ -7,12 +7,13 @@ import ErrorLabel from "./inputErrorLabel";
 interface NumberFieldProperties extends UseControllerProps {
     id?: string
     className?: string;
-    defaultValue?: number;
+    defaultValue?: number | null;
     disabled?: boolean;
 }
 
 const NumberField = (props: NumberFieldProperties) => {
-    const [value, setValue] = useState<string | number | undefined>(props.defaultValue)
+    const defaultValue = props.defaultValue? props.defaultValue : undefined;
+    const [value, setValue] = useState<string | number | undefined>(defaultValue)
     const { field, fieldState } = useController(props);
 
     return (

@@ -12,7 +12,7 @@ interface TimeFieldProperties extends UseControllerProps {
 }
 
 const TimeField = (props: TimeFieldProperties) => {
-    let defaultTime: CustomTime | undefined;
+    let defaultTime: CustomTime | null | undefined;
 
     if (typeof (props.defaultValue) === "string") {
         defaultTime = parseTime(props.defaultValue)
