@@ -1,41 +1,66 @@
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import useCreateUser from "../hooks/createUser";
+import { Id } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { RESOURCE_URL } from "../const";
-import { useEffect } from "react";
-import { User } from "../model";
+
 import SingleLayout from "../../components/singleView/layout";
 import GridFields from "../../components/singleView/gridFields/gridFields";
 import Label from "../../components/labels/label";
+import { createToast, upsertToastError, upsertToastSuccess } from "../../components/toastContainer/toasts";
+
+import { User } from "../model";
+import useCreateUser from "../hooks/createUser";
+import { RESOURCE_URL } from "../const";
+
+import PrimaryButton from "@/app/components/buttons/primaryButton";
+import CancelModal from "@/app/components/modals/cancelModal";
 import InputField from "@/app/components/inputs/inputField";
-import SecondaryButton from "../../../components/buttons/secondaryButton";
-import PrimaryButton from "../../../components/buttons/primaryButton";
 
 export default function UserNew() {
     const [executeMutation, { createLoading, createError, createResult }] = useCreateUser();
 
     const navigate = useNavigate();
 
+    const toastId = React.useRef<Id | null>(null);
+
     useEffect(() => {
         if (createResult && createResult > 0) {
-            navigate(`/${RESOURCE_URL}`)
+            upsertToastSuccess(toastId);
+
+            navigate(`/${RESOURCE_URL}`);
         }
 
-    }, [createResult])
+        if (createError) {
+            upsertToastError(toastId);
 
-    const { getValues, control } = useForm<User>({
+            console.error(createError);
+        }
+
+    }, [createResult, createError]);
+
+    const {
+        control,
+        formState: {
+            isDirty,
+        },
+        getValues,
+        handleSubmit,
+    } = useForm<User>({
         mode: "onBlur",
+        criteriaMode: "all",
+        defaultValues: {
+            email: null,
+            firstName: null,
+            lastName: null,
+        }
     });
 
     const onCreate = () => {
         const values = getValues();
 
-        executeMutation({
-            id: values.id,
-            email: values.email,
-            firstName: values.firstName,
-            lastName: values.lastName,
-        })
+        toastId.current = createToast();
+
+        executeMutation(values);
     }
 
     const onCancel = () => {
@@ -87,9 +112,20 @@ export default function UserNew() {
                         />
                     </div>
                 </GridFields>
-                <SingleLayout.Footer className="justify-end">
-                    <SecondaryButton onClick={onCancel}>Cancel</SecondaryButton>
-                    <PrimaryButton onClick={onCreate}>Create</PrimaryButton>
+                <SingleLayout.Footer>
+                    <PrimaryButton
+                        onClick={handleSubmit(onCreate)}
+                        state={createLoading ? 'loading' : 'active'}
+                    >
+                        Create
+                    </PrimaryButton>
+                    <CancelModal
+                        onConfirm={onCancel}
+                        dontAsk={!isDirty}
+                        className="border text-brand border-brand hover:bg-gray-fill active:bg-gray-stroke-weak"
+                    >
+                        Cancel
+                    </CancelModal>
                 </SingleLayout.Footer>
             </form>
         </SingleLayout>

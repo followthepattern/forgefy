@@ -1,12 +1,13 @@
 {{ $feature := . -}}
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Id, toast } from "react-toastify";
+import { Id } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 import SingleLayout from "../../components/singleView/layout";
 import GridFields from "../../components/singleView/gridFields/gridFields";
 import Label from "../../components/labels/label";
+import { createToast, upsertToastError, upsertToastSuccess } from "../../components/toastContainer/toasts";
 
 import { {{ .FeatureNameCamelCaseUpper }}  } from "../model";
 import useCreate{{ .FeatureNameCamelCaseUpper }} from "../hooks/create{{ .FeatureNameCamelCaseUpper }}";
@@ -45,34 +46,18 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
 
     useEffect(() => {
         if (createResult && createResult > 0) {
-            navigate(`/${RESOURCE_URL}`)
-        }
+            upsertToastSuccess(toastId);
 
-    }, [createResult])
-
-    useEffect(() => {
-        if (createResult && createResult > 0) {
-            navigate(`/${RESOURCE_URL}`)
-
-            if (!toastId.current) return;
-
-            toast.update(toastId.current, {
-                render: "Success!",
-                type: toast.TYPE.SUCCESS,
-                autoClose: 3000,
-            })
+            navigate(`/${RESOURCE_URL}`);
         }
 
         if (createError) {
-            if (!toastId.current) return;
-            toast.update(toastId.current, {
-                render: "Error happened!",
-                type: toast.TYPE.ERROR,
-                autoClose: 3000,
-            })
+            upsertToastError(toastId);
+
+            console.error(createError);
         }
 
-    }, [createResult, createError])
+    }, [createResult, createError]);
 
     const {
         control,
@@ -93,7 +78,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
     const onCreate = () => {
         const values = getValues();
 
-        toastId.current = toast("Creating...", { autoClose: false });
+        toastId.current = createToast();
 
         executeMutation(values);
     }
