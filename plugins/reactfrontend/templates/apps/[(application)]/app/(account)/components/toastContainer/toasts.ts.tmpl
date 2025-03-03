@@ -1,0 +1,33 @@
+import { Id, toast } from "react-toastify";
+
+const autoClose = 3000
+
+export function createToast(message?: string): Id {
+    return toast(message ?? "Creating...", { autoClose: autoClose });
+}
+
+export function upsertToastError(toastId: React.MutableRefObject<Id | null>, errorMsg?: string) {
+    if (toastId.current) {
+        toast.update(toastId.current, {
+            render: errorMsg ?? "Error happened!",
+            type: toast.TYPE.ERROR,
+            autoClose: 3000,
+        })
+        return
+    }
+
+    toast.error(errorMsg ?? "Error happened", { autoClose: autoClose })
+}
+
+export function upsertToastSuccess(toastId: React.MutableRefObject<Id | null>, errorMsg?: string) {
+    if (toastId.current) {
+        toast.update(toastId.current, {
+            render: "Success!",
+            type: toast.TYPE.SUCCESS,
+            autoClose: autoClose,
+        })
+        return
+    }
+
+    toast.success(errorMsg ?? "Success!", { autoClose: autoClose })
+}
