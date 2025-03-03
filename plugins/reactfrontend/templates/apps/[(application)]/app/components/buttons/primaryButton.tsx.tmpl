@@ -10,9 +10,9 @@ export default function PrimaryButton(props: ButtonProperties) {
             className={classNames(props.className, 
                 "text-white border",
                 {
-                    "bg-brand hover:bg-brand-hover active:bg-brand-active": state === 'active',
+                    "bg-brand border border-brand hover:bg-brand-hover hover:border-brand-hover active:bg-brand-active active:border-brand-active": state === 'active',
                     "bg-brand hover:bg-brand-hover cursor-not-allowed": state === 'loading',
-                    "bg-gray-stroke-weak cursor-not-allowed": state === 'disabled',
+                    "bg-gray-stroke-weak cursor-not-allowed": state == 'disabled',
                 }
             )}
         >

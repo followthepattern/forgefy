@@ -1,17 +1,23 @@
 {{ $feature := . -}}
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import useCreate{{ .FeatureNameCamelCaseUpper }} from "../hooks/create{{ .FeatureNameCamelCaseUpper }}";
+import { Id } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { RESOURCE_URL } from "../const";
-import { useEffect } from "react";
-import { {{ .FeatureNameCamelCaseUpper }} } from "../model";
+
 import SingleLayout from "../../components/singleView/layout";
 import GridFields from "../../components/singleView/gridFields/gridFields";
 import Label from "../../components/labels/label";
-import InputField from "@/app/components/inputs/inputField";
-import SecondaryButton from "../../../components/buttons/secondaryButton";
-import PrimaryButton from "../../../components/buttons/primaryButton";
+import { createToast, upsertToastError, upsertToastSuccess } from "../../components/toastContainer/toasts";
 
+import { {{ .FeatureNameCamelCaseUpper }}  } from "../model";
+import useCreate{{ .FeatureNameCamelCaseUpper }} from "../hooks/create{{ .FeatureNameCamelCaseUpper }}";
+import { RESOURCE_URL } from "../const";
+
+import PrimaryButton from "@/app/components/buttons/primaryButton";
+import CancelModal from "@/app/components/modals/cancelModal";
+{{- if $feature | HasString -}}
+import InputField from "@/app/components/inputs/inputField";
+{{ end -}}
 {{- if $feature | HasBoolean -}}
 import Checkbox from "@/app/components/inputs/checkboxField";
 {{ end -}}
@@ -36,24 +42,46 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
 
     const navigate = useNavigate();
 
+    const toastId = React.useRef<Id | null>(null);
+
     useEffect(() => {
         if (createResult && createResult > 0) {
-            navigate(`/${RESOURCE_URL}`)
+            upsertToastSuccess(toastId);
+
+            navigate(`/${RESOURCE_URL}`);
         }
 
-    }, [createResult])
+        if (createError) {
+            upsertToastError(toastId);
 
-    const form = useForm<{{ .FeatureNameCamelCaseUpper }}>({
+            console.error(createError);
+        }
+
+    }, [createResult, createError]);
+
+    const {
+        control,
+        formState: {
+            isDirty,
+        },
+        getValues,
+        {{if $feature | HasFile -}} setValue, {{- end }}
+        handleSubmit,
+    } = useForm<{{ .FeatureNameCamelCaseUpper }}>({
         mode: "onBlur",
         criteriaMode: "all",
+        defaultValues: {
+            {{ range $field := $feature.Fields | NoneID }} {{ $field.FieldNameCamelCase }}: null, {{ end -}}
+        }
     });
 
     const onCreate = () => {
-        const values = form.getValues();
+        const values = getValues();
+
+        toastId.current = createToast();
 
         executeMutation(values);
     }
-    
 
     const onCancel = () => {
         navigate(`/${RESOURCE_URL}`)
@@ -71,7 +99,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                         </Label>
                         {{- if $field | IsNumber }}
                         <NumberField
-                            control={form.control}
+                            control={control}
                             name="{{ $field.FieldNameCamelCase }}"
                             rules={
                                 {
@@ -83,13 +111,13 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                         />{{- end }}
                         {{- if $field | IsBoolean }}
                         <Checkbox
-                            control={form.control}
+                            control={control}
                             name="{{ $field.FieldNameCamelCase }}"
                             id="{{ $field.FieldNameCamelCase }}"
                         />{{- end }}
                         {{- if $field | IsString }}
                         <InputField
-                            control={form.control}
+                            control={control}
                             name="{{ $field.FieldNameCamelCase }}"
                             id="{{ $field.FieldNameCamelCase }}"
                             rules={
@@ -104,7 +132,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                         <TextareaField
                             id="{{ .FieldNameCamelCase }}"
                             name="{{ $field.FieldNameCamelCase }}"
-                            control={form.control}
+                            control={control}
                             rules={
                                 {
                                 {{- if $field.Nullable | not }}
@@ -117,7 +145,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                         <TimeField
                             id="{{ $field.FieldNameCamelCase }}"
                             name="{{ $field.FieldNameCamelCase }}"
-                            control={form.control}
+                            control={control}
                             rules={
                                 {
                                 {{- if $field.Nullable | not }}
@@ -130,7 +158,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                         <DateField
                             id="{{ $field.FieldNameCamelCase }}"
                             name="{{ $field.FieldNameCamelCase }}"
-                            control={form.control}
+                            control={control}
                             rules={
                                 {
                                 {{- if $field.Nullable | not }}
@@ -144,7 +172,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                             id="{{ $field.FieldNameCamelCase }}"
                             name="{{ $field.FieldNameCamelCase }}"
                             resource={RESOURCE_URL.toLowerCase()}
-                            control={form.control}
+                            control={control}
                             rules={
                                 {
                                 {{- if $field.Nullable | not }}
@@ -155,16 +183,16 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                             defaultValue=""
                             onChange={e => {
                                 if (!e) {
-                                    form.setValue("{{ $field.FieldNameCamelCase }}", "");
+                                    setValue("{{ $field.FieldNameCamelCase }}", "");
                                     return
                                 }
-                                form.setValue("{{ $field.FieldNameCamelCase }}", e)
+                                setValue("{{ $field.FieldNameCamelCase }}", e)
                             }}
                         />{{- end }}
                         {{- if $field | IsUndefined -}}
                         <InputField
-                            {...form.register("{{ $field.FieldNameCamelCase }}")}
-                            type="{{ $field | HTMLType }}"
+                            control={control}
+                            name="{{ $field.FieldNameCamelCase }}"
                             id="{{ $field.FieldNameCamelCase }}"
                             rules={
                                 {
@@ -177,9 +205,20 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                     </div>
                 {{- end }}
                 </GridFields>
-                <SingleLayout.Footer className="justify-end">
-                    <SecondaryButton onClick={onCancel}>Cancel</SecondaryButton>
-                    <PrimaryButton onClick={form.handleSubmit(onCreate)}>Create</PrimaryButton>
+                <SingleLayout.Footer>
+                    <PrimaryButton
+                        onClick={handleSubmit(onCreate)}
+                        state={createLoading ? 'loading' : 'active'}
+                    >
+                        Create
+                    </PrimaryButton>
+                    <CancelModal
+                        onConfirm={onCancel}
+                        dontAsk={!isDirty}
+                        className="border text-brand border-brand hover:bg-gray-fill active:bg-gray-stroke-weak"
+                    >
+                        Cancel
+                    </CancelModal>
                 </SingleLayout.Footer>
             </form>
         </SingleLayout>

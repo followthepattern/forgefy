@@ -2,10 +2,10 @@ import { MutationResourceResponse } from "@/graphql/mutation";
 import { QueryResourceResponse } from "@/graphql/query";
 
 export interface User {
-	id?: string
-	email?: string
-	firstName?: string
-	lastName?: string
+	id?: string | null
+	email?: string | null
+	firstName?: string | null
+	lastName?: string | null
 }
 
 export interface MutationResponse {
