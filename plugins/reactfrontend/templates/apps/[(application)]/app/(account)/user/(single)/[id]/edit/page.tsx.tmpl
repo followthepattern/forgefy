@@ -18,7 +18,11 @@ import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 export default function UserEdit() {
     const { id } = useParams();
 
-    const { loading, data, error, itemNotFound } = useSingleUser(id ?? "");
+    if (!id) {
+        return (<div>not found</div>)
+    }
+
+    const { loading, data, error, itemNotFound } = useSingleUser(id);
 
     const [executeUpdateMutation, { updateError, updateResult }] = useUpdateUser();
 
@@ -56,7 +60,7 @@ export default function UserEdit() {
     }
 
     if (itemNotFound) {
-        // notFound();
+        return (<div>Item not found!</div>)
     }
 
     if (error) {
@@ -70,11 +74,11 @@ export default function UserEdit() {
 
         values.id = id;
 
-        executeUpdateMutation(id ?? "", values)
+        executeUpdateMutation(id, values)
     }
 
     const onDelete = () => {
-        executeDeleteMutation(id ?? "")
+        executeDeleteMutation(id)
     }
 
     const onCancel = () => {
