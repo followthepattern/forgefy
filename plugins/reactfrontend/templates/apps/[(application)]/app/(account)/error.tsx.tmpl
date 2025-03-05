@@ -1,28 +1,40 @@
 import { useEffect } from 'react'
- 
+import classNames from 'classnames'
+import SecondaryButton from '../components/buttons/secondaryButton'
+
 export default function Error({
   error,
-  reset,
+  retry,
+  className,
 }: {
   error: Error
-  reset: () => void
+  retry?: () => void
+  className?: string
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
     console.error(error)
   }, [error])
- 
+
   return (
-    <div>
-      <h2>Something went wrong!</h2>
-      <button
-        onClick={
-          // Attempt to recover by trying to re-render the segment
-          () => reset()
-        }
-      >
-        Try again
-      </button>
+    <div className={classNames(
+      className,
+    )}>
+      <h2 className="text-2xl text-center text-error">
+        Something went wrong!
+      </h2>
+      {retry && <div className="flex justify-center">
+        <SecondaryButton
+          className='mt-6'
+          onClick={
+            // Attempt to recover by trying to re-render the segment
+            () => retry()
+          }
+        >
+          Try again
+        </SecondaryButton>
+      </div>
+      }
     </div>
   )
 }

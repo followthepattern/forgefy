@@ -1,0 +1,19 @@
+import SpinnerIcon from "@/app/icons/spinner"
+import classNames from "classnames"
+
+interface LoadingSingleItemProperties {
+    className?: string
+}
+
+export default function LoadingSingleItem(props: LoadingSingleItemProperties) {
+    return (
+        <div className={
+            classNames(
+                props.className,
+            "flex justify-center text-gray-stroke-strong",
+            )
+        }
+            >
+            <SpinnerIcon className="w-20 h-20 animate-spin" /> 
+        </div>)
+}
