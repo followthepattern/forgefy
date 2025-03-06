@@ -1,12 +1,9 @@
 {{ $feature := . -}}
-import useSingle{{ $feature.FeatureName | UpperCamelCase }} from "../../hooks/single{{ $feature.FeatureName | UpperCamelCase }}";
-import useUpdate{{ $feature.FeatureName | UpperCamelCase }} from "../../hooks/update{{ $feature.FeatureName | UpperCamelCase }}";
-import { useForm } from "react-hook-form";
-import useDelete{{ $feature.FeatureName | UpperCamelCase }} from "../../hooks/delete{{ $feature.FeatureName | UpperCamelCase }}";
-import { useNavigate, useParams } from "react-router-dom";
-import { RESOURCE_NAME, RESOURCE_URL } from "../../const";
 import React, { useEffect } from "react";
-import { {{ $feature.FeatureName | UpperCamelCase }} } from "../../model";
+import { useNavigate, useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { Id, toast } from "react-toastify";
+
 import SingleLayout from "@/app/(account)/components/singleView/layout";
 import SecondaryButton from "@/app/components/buttons/secondaryButton";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
@@ -32,8 +29,13 @@ import DateField from "@/app/components/inputs/dateField";
 {{if $feature | HasFile -}}
 import FileField from "@/app/components/inputs/fileField";
 {{ end }}
-import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
+
+import useSingle{{ $feature.FeatureName | UpperCamelCase }} from "../../../hooks/single{{ $feature.FeatureName | UpperCamelCase }}";
+import useUpdate{{ $feature.FeatureName | UpperCamelCase }} from "../../../hooks/update{{ $feature.FeatureName | UpperCamelCase }}";
+import useDelete{{ $feature.FeatureName | UpperCamelCase }} from "../../../hooks/delete{{ $feature.FeatureName | UpperCamelCase }}";
+import { RESOURCE_NAME, RESOURCE_URL } from "../../../const";
+import { {{ $feature.FeatureName | UpperCamelCase }} } from "../../../model";
 
 export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
     const { id } = useParams();
@@ -101,7 +103,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
     }
 
     return (
-        <SingleLayout>
+        <>
             <SingleLayout.Title>{{ $feature.FeatureName | UpperCamelCase }}: {data?.id}</SingleLayout.Title>
             <form action="">
                 <GridFields className="py-6">
@@ -235,6 +237,6 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                     </ConfirmModal>
                 </SingleLayout.Footer>
             </form>
-        </SingleLayout>
+        </>
     )
 }
