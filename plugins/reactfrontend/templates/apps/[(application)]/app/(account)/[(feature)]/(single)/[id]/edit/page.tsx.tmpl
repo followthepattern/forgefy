@@ -91,6 +91,10 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
     } = useForm<{{ $feature.FeatureName | UpperCamelCase }}>({
         mode: "onBlur",
         criteriaMode: "all",
+        defaultValues: {
+            {{- range $field := $feature.Fields | NoneID }}
+            {{ $field.Name | LowerCamelCase }}: data?.{{ $field.Name | LowerCamelCase }}, {{- end }}
+        }
     });
 
     if (loading) {

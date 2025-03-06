@@ -71,7 +71,8 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
         mode: "onBlur",
         criteriaMode: "all",
         defaultValues: {
-            {{ range $field := $feature.Fields | NoneID }} {{ $field.FieldNameCamelCase }}: null, {{ end -}}
+            {{- range $field := $feature.Fields | NoneID }}
+            {{ $field.Name | LowerCamelCase }}: null, {{- end }}
         }
     });
 
