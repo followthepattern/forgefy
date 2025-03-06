@@ -3,6 +3,10 @@ import { useForm } from "react-hook-form";
 import { Id } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
+import PrimaryButton from "@/app/components/buttons/primaryButton";
+import CancelModal from "@/app/components/modals/cancelModal";
+import InputField from "@/app/components/inputs/inputField";
+
 import SingleLayout from "../../../components/singleView/layout";
 import GridFields from "../../../components/singleView/gridFields/gridFields";
 import Label from "../../../components/labels/label";
@@ -11,10 +15,6 @@ import { createToast, upsertToastError, upsertToastSuccess } from "../../../comp
 import { User } from "../../model";
 import useCreateUser from "../../hooks/createUser";
 import { RESOURCE_URL } from "../../const";
-
-import PrimaryButton from "@/app/components/buttons/primaryButton";
-import CancelModal from "@/app/components/modals/cancelModal";
-import InputField from "@/app/components/inputs/inputField";
 
 export default function UserNew() {
     const [executeMutation, { createLoading, createError, createResult }] = useCreateUser();
