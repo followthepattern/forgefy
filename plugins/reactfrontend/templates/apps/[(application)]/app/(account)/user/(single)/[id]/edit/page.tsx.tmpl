@@ -4,8 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Id } from "react-toastify";
 
 import SingleLayout from "@/app/(account)/components/singleView/layout";
-import SecondaryButton from "@/app/components/buttons/secondaryButton";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
+import CancelModal from "@/app/components/modals/cancelModal";
 import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
 import Label from "@/app/(account)/components/labels/label";
 import InputField from "@/app/components/inputs/inputField";
@@ -62,7 +62,13 @@ export default function UserEdit() {
 
     }, [deleteResult])
 
-    const { getValues, control } = useForm<User>({
+    const {
+        getValues,
+        control,
+        formState: {
+            isDirty,
+        },
+    } = useForm<User>({
         mode: "onBlur",
         criteriaMode: "all",
     });
@@ -149,7 +155,13 @@ export default function UserEdit() {
                 <SingleLayout.Footer className="justify-between">
                     <div className="flex gap-x-2">
                         <PrimaryButton onClick={onSave}>Save</PrimaryButton>
-                        <SecondaryButton onClick={onCancel}>Cancel</SecondaryButton>
+                        <CancelModal
+                            onConfirm={onCancel}
+                            dontAsk={!isDirty}
+                            className="border text-brand border-brand hover:bg-gray-fill active:bg-gray-stroke-weak"
+                        >
+                            Cancel
+                        </CancelModal>
                     </div>
                     <ConfirmModal onConfirm={onDelete} title="Delete User" body={`Are you sure you want to delete ${data?.id}?`}>
                         Delete
