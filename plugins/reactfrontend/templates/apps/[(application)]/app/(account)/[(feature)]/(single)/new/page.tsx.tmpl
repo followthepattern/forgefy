@@ -29,13 +29,13 @@ import FileField from "@/app/components/inputs/fileField";
 {{ end }}
 
 import SingleLayout from "../../../components/singleView/layout";
-import GridFields from "../../components/singleView/gridFields/gridFields";
-import Label from "../../components/labels/label";
-import { createToast, upsertToastError, upsertToastSuccess } from "../../components/toastContainer/toasts";
+import GridFields from "../../../components/singleView/gridFields/gridFields";
+import Label from "../../../components/labels/label";
+import { createToast, upsertToastError, upsertToastSuccess } from "../../../components/toastContainer/toasts";
 
-import { {{ .FeatureNameCamelCaseUpper }}  } from "../model";
-import useCreate{{ .FeatureNameCamelCaseUpper }} from "../hooks/create{{ .FeatureNameCamelCaseUpper }}";
-import { RESOURCE_URL } from "../const";
+import { {{ .FeatureNameCamelCaseUpper }} } from "../../model";
+import useCreate{{ .FeatureNameCamelCaseUpper }} from "../../hooks/create{{ .FeatureNameCamelCaseUpper }}";
+import { RESOURCE_URL } from "../../const";
 
 export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
     const [executeMutation, { createLoading, createError, createResult }] = useCreate{{ .FeatureNameCamelCaseUpper }}();

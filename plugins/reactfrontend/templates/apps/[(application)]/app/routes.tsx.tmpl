@@ -59,11 +59,11 @@ export const Routes: RouteObject[] = [
                 element: <Profile />
             },
             {
-                path: "user/",
+                path: "user",
                 element: <ListPageWrapper Component={UserList} />,
             },
             {
-                path: "user/",
+                path: "user",
                 element: <UserSingleLayout />,
                 children: [
                     {
@@ -86,19 +86,19 @@ export const Routes: RouteObject[] = [
                 element: <ListPageWrapper Component={{ "{" }}{{ .FeatureNameCamelCaseUpper }}List} />,
             },
             {
-                path: "{{ $feature | URL }}/",
+                path: "{{ $feature | URL }}",
                 element: <{{ $feature.FeatureName | UpperCamelCase }}SingleLayout />,
                 children: [
                     {
-                        path: "{{ $feature | URL }}/:id",
+                        path: ":id",
                         element: <{{ .FeatureNameCamelCaseUpper }}Single />
                     },
                     {
-                        path: "{{ $feature | URL }}/new",
+                        path: "new",
                         element: <{{ .FeatureNameCamelCaseUpper }}New />
                     },
                     {
-                        path: "{{ $feature | URL }}/:id/edit",
+                        path: ":id/edit",
                         element: <{{ .FeatureNameCamelCaseUpper }}Edit />
                     },
                 ]
