@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { Id } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-import SingleLayout from "../../components/singleView/layout";
+import SingleLayout from "../../../components/singleView/layout";
 import GridFields from "../../components/singleView/gridFields/gridFields";
 import Label from "../../components/labels/label";
 import { createToast, upsertToastError, upsertToastSuccess } from "../../components/toastContainer/toasts";
@@ -88,7 +88,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
     }
 
     return (
-        <SingleLayout>
+        <>
             <SingleLayout.Title>New {{ .FeatureNameCamelCaseUpper }}</SingleLayout.Title>
             <form>
                 <GridFields className="py-6">
@@ -221,6 +221,6 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
                     </CancelModal>
                 </SingleLayout.Footer>
             </form>
-        </SingleLayout>
+        </>
     )
 }
