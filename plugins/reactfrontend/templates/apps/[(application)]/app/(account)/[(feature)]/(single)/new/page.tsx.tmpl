@@ -4,21 +4,12 @@ import { useForm } from "react-hook-form";
 import { Id } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-import SingleLayout from "../../../components/singleView/layout";
-import GridFields from "../../components/singleView/gridFields/gridFields";
-import Label from "../../components/labels/label";
-import { createToast, upsertToastError, upsertToastSuccess } from "../../components/toastContainer/toasts";
-
-import { {{ .FeatureNameCamelCaseUpper }}  } from "../model";
-import useCreate{{ .FeatureNameCamelCaseUpper }} from "../hooks/create{{ .FeatureNameCamelCaseUpper }}";
-import { RESOURCE_URL } from "../const";
-
 import PrimaryButton from "@/app/components/buttons/primaryButton";
 import CancelModal from "@/app/components/modals/cancelModal";
-{{- if $feature | HasString -}}
+{{ if $feature | HasString -}}
 import InputField from "@/app/components/inputs/inputField";
 {{ end -}}
-{{- if $feature | HasBoolean -}}
+{{ if $feature | HasBoolean -}}
 import Checkbox from "@/app/components/inputs/checkboxField";
 {{ end -}}
 {{if $feature | HasNumber -}}
@@ -36,6 +27,15 @@ import DateField from "@/app/components/inputs/dateField";
 {{if $feature | HasFile -}}
 import FileField from "@/app/components/inputs/fileField";
 {{ end }}
+
+import SingleLayout from "../../../components/singleView/layout";
+import GridFields from "../../components/singleView/gridFields/gridFields";
+import Label from "../../components/labels/label";
+import { createToast, upsertToastError, upsertToastSuccess } from "../../components/toastContainer/toasts";
+
+import { {{ .FeatureNameCamelCaseUpper }}  } from "../model";
+import useCreate{{ .FeatureNameCamelCaseUpper }} from "../hooks/create{{ .FeatureNameCamelCaseUpper }}";
+import { RESOURCE_URL } from "../const";
 
 export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
     const [executeMutation, { createLoading, createError, createResult }] = useCreate{{ .FeatureNameCamelCaseUpper }}();
