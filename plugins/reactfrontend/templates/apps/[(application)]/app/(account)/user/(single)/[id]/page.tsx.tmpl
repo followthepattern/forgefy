@@ -1,31 +1,32 @@
 import { useNavigate, useParams } from "react-router-dom";
-import useSingleUser from "../hooks/singleUser";
-import { RESOURCE_URL } from "../const";
-import SingleLayout from "../../components/singleView/layout";
-import DataListView from "../../components/singleView/dataListView/dataListView";
-import SecondaryButton from "../../../components/buttons/secondaryButton";
-import PrimaryButton from "../../../components/buttons/primaryButton";
+
+import SingleLayout from "@/app/(account)/components/singleView/layout";
+import DataListView from "@/app/(account)/components/singleView/dataListView/dataListView";
+import SecondaryButton from "@/app/(account)/../components/buttons/secondaryButton";
+import PrimaryButton from "@/app/(account)/../components/buttons/primaryButton";
+import LoadingSingleItem from "@/app/(account)/components/singleView/loadingSingleItem";
+import Error from "@/app/(account)/error";
+import ItemNotFound from "@/app/(account)/components/singleView/itemNotFound";
+
+import useSingleUser from "../../hooks/singleUser";
+import { RESOURCE_URL } from "../../const";
 
 export default function UserSingle() {
-    const { id } = useParams()
+    const { id = "" } = useParams()
     const navigate = useNavigate();
 
-    const { loading, data, error, itemNotFound } = useSingleUser(id ?? "");
+    const { loading, data, error, itemNotFound } = useSingleUser(id);
 
     if (loading) {
-        return (
-            <div>Loading...</div>
-        )
+        return <LoadingSingleItem className="py-6" />
     }
 
     if (error) {
-        return (
-            <div>{JSON.stringify(error)}</div>
-        )
+        return <Error error={error} />
     }
 
     if (itemNotFound) {
-        // notFound();
+        return <ItemNotFound className="py-6" />
     }
 
     const onCancel = () => {
@@ -37,7 +38,7 @@ export default function UserSingle() {
     }
 
     return (
-        <SingleLayout>
+        <>
             <SingleLayout.Title>User</SingleLayout.Title>
             <DataListView className="mt-6">
                 <DataListView.Row>
@@ -65,14 +66,14 @@ export default function UserSingle() {
                     </DataListView.Field>
                 </DataListView.Row>
             </DataListView>
-            <SingleLayout.Footer className="justify-end">
-                <SecondaryButton onClick={onCancel}>
-                    Cancel
-                </SecondaryButton>
+            <SingleLayout.Footer>
                 <PrimaryButton onClick={onEdit}>
                     Edit
                 </PrimaryButton>
+                <SecondaryButton onClick={onCancel}>
+                    Cancel
+                </SecondaryButton>
             </SingleLayout.Footer>
-        </SingleLayout>
+        </>
     )
 }

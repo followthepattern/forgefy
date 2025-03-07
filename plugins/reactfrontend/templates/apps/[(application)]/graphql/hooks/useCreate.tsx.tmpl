@@ -7,7 +7,7 @@ interface CreateProperties {
 }
 
 export default function useCreate<T>({ parseResult, graphQL }: CreateProperties): CreateMutationResult<T, number> {
-    const [executeMutation, { data, loading, error }] = useMutation(gql(graphQL));
+    const [executeMutation, { data, loading, error }] = useMutation(gql(graphQL), { errorPolicy: "all" });
 
     const execute = (model: T) => {
         executeMutation({

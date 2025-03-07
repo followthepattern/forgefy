@@ -1,24 +1,31 @@
-import useSingleUser from "../../hooks/singleUser";
-import useUpdateUser from "../../hooks/updateUser";
-import { useForm } from "react-hook-form";
-import useDeleteUser from "../../hooks/deleteUser";
-import { useNavigate, useParams } from "react-router-dom";
-import { RESOURCE_URL } from "../../const";
 import React, { useEffect } from "react";
-import { User } from "../../model";
+import { useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
+import { Id } from "react-toastify";
+
 import SingleLayout from "@/app/(account)/components/singleView/layout";
-import SecondaryButton from "@/app/components/buttons/secondaryButton";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
+import CancelModal from "@/app/components/modals/cancelModal";
 import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
 import Label from "@/app/(account)/components/labels/label";
 import InputField from "@/app/components/inputs/inputField";
-import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
+import ItemNotFound from "@/app/(account)/components/singleView/itemNotFound";
+import LoadingSingleItem from "@/app/(account)/components/singleView/loadingSingleItem";
+import { deleteToast, saveToast, upsertToastError, upsertToastSuccess } from "@/app/(account)/components/toastContainer/toasts";
+import Error from "@/app/(account)/error";
+
+import useSingleUser from "../../../hooks/singleUser";
+import useUpdateUser from "../../../hooks/updateUser";
+import useDeleteUser from "../../../hooks/deleteUser";
+
+import { RESOURCE_URL } from "../../../const";
+import { User } from "../../../model";
 
 export default function UserEdit() {
-    const { id } = useParams();
+    const { id = "" } = useParams();
 
-    const { loading, data, error, itemNotFound } = useSingleUser(id ?? "");
+    const { loading, data, error, itemNotFound } = useSingleUser(id);
 
     const [executeUpdateMutation, { updateError, updateResult }] = useUpdateUser();
 
@@ -30,51 +37,72 @@ export default function UserEdit() {
 
     useEffect(() => {
         if (updateResult && updateResult > 0) {
-            if (toastId.current) {
-                toast.update(toastId.current, {
-                    render: "Success!",
-                    type: toast.TYPE.SUCCESS,
-                    autoClose: 3000,
-                })
-            }
-            navigate(`/${RESOURCE_URL}`)
+            upsertToastSuccess(toastId);
         }
+
+        if (updateError) {
+            upsertToastError(toastId);
+
+            console.error(updateError);
+        }
+
     }, [updateResult])
 
     useEffect(() => {
         if (deleteResult && deleteResult > 0) {
+            upsertToastSuccess(toastId);
             navigate(`/${RESOURCE_URL}`)
         }
+
+        if (deleteError) {
+            upsertToastError(toastId);
+
+            console.error(deleteError);
+        }
+
     }, [deleteResult])
 
-    const { getValues, control } = useForm<User>({
+    const {
+        getValues,
+        control,
+        formState: {
+            isDirty,
+        },
+    } = useForm<User>({
         mode: "onBlur",
+        criteriaMode: "all",
+        defaultValues: {
+            email: data?.email,
+            firstName: data?.firstName,
+            lastName: data?.lastName,
+        }
     });
 
     if (loading) {
-        return (<div>Loading...</div>)
+        return <LoadingSingleItem className="py-6" />
     }
 
     if (itemNotFound) {
-        // notFound();
+        return <ItemNotFound className="py-6" />
     }
 
     if (error) {
-        return <div>{JSON.stringify(error)}</div>
+        return <Error error={error} />
     }
 
     const onSave = () => {
         const values = getValues();
 
-        toastId.current = toast("Saving...", { autoClose: false })
+        toastId.current = saveToast()
 
         values.id = id;
-
-        executeUpdateMutation(id ?? "", values)
+        executeUpdateMutation(id, values)
     }
 
     const onDelete = () => {
-        executeDeleteMutation(id ?? "")
+        toastId.current = deleteToast();
+
+        executeDeleteMutation(id)
     }
 
     const onCancel = () => {
@@ -82,7 +110,7 @@ export default function UserEdit() {
     }
 
     return (
-        <SingleLayout>
+        <>
             <SingleLayout.Title>User: {data?.id}</SingleLayout.Title>
             <form action="">
                 <GridFields className="py-6">
@@ -132,13 +160,19 @@ export default function UserEdit() {
                 <SingleLayout.Footer className="justify-between">
                     <div className="flex gap-x-2">
                         <PrimaryButton onClick={onSave}>Save</PrimaryButton>
-                        <SecondaryButton onClick={onCancel}>Cancel</SecondaryButton>
+                        <CancelModal
+                            onConfirm={onCancel}
+                            dontAsk={!isDirty}
+                            className="border text-brand border-brand hover:bg-gray-fill active:bg-gray-stroke-weak"
+                        >
+                            Cancel
+                        </CancelModal>
                     </div>
                     <ConfirmModal onConfirm={onDelete} title="Delete User" body={`Are you sure you want to delete ${data?.id}?`}>
                         Delete
                     </ConfirmModal>
                 </SingleLayout.Footer>
             </form>
-        </SingleLayout>
+        </>
     )
 }

@@ -36,7 +36,7 @@ function getCreateTableProperties(): CreateTableProperties<{{ .FeatureNameCamelC
   }
 }
 
-export default function {{ .FeatureNameCamelCaseUpper }}s(props: ListPageComponentProperties) {
+export default function {{ $feature.FeatureName | UpperCamelCase }}List(props: ListPageComponentProperties) {
   const sortOnChange = (sortLabel: SortLabel) => {
     SetSortPatternParrams(props.searchParams, props.setSearchParams, sortLabel);
   }

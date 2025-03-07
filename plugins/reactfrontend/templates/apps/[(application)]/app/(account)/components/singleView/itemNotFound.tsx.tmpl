@@ -1,0 +1,18 @@
+import classNames from "classnames"
+
+interface ItemNotFoundProperties {
+    className?: string
+}
+
+export default function ItemNotFound(props: ItemNotFoundProperties) {
+    return (
+        <div className={
+            classNames(
+                props.className,
+            "font-bold text-gray-supporting/80 text-center text-lg",
+            )
+        }
+            >
+            Requested Item Not Found!
+        </div>)
+}

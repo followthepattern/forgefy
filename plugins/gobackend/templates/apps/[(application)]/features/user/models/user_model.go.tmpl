@@ -23,7 +23,6 @@ func (model UserModel) IsDefault() bool {
 
 func (m UserModel) CreateValidate() error {
 	return validation.ValidateStruct(&m,
-		validation.Field(&m.Id, validation.Required),
 		validation.Field(&m.Email, validation.Required),
 		validation.Field(&m.FirstName, validation.Required),
 		validation.Field(&m.LastName, validation.Required),

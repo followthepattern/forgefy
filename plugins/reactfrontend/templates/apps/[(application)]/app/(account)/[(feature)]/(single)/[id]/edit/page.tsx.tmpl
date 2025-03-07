@@ -1,16 +1,17 @@
 {{ $feature := . -}}
-import useSingle{{ $feature.FeatureName | UpperCamelCase }} from "../../hooks/single{{ $feature.FeatureName | UpperCamelCase }}";
-import useUpdate{{ $feature.FeatureName | UpperCamelCase }} from "../../hooks/update{{ $feature.FeatureName | UpperCamelCase }}";
-import { useForm } from "react-hook-form";
-import useDelete{{ $feature.FeatureName | UpperCamelCase }} from "../../hooks/delete{{ $feature.FeatureName | UpperCamelCase }}";
-import { useNavigate, useParams } from "react-router-dom";
-import { RESOURCE_NAME, RESOURCE_URL } from "../../const";
 import React, { useEffect } from "react";
-import { {{ $feature.FeatureName | UpperCamelCase }} } from "../../model";
+import { useNavigate, useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { Id } from "react-toastify";
+
 import SingleLayout from "@/app/(account)/components/singleView/layout";
-import SecondaryButton from "@/app/components/buttons/secondaryButton";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
+import CancelModal from "@/app/components/modals/cancelModal";
 import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
+import { saveToast, deleteToast, upsertToastError, upsertToastSuccess } from "@/app/(account)/components/toastContainer/toasts";
+import LoadingSingleItem from "@/app/(account)/components/singleView/loadingSingleItem";
+import ItemNotFound from "@/app/(account)/components/singleView/itemNotFound";
+import Error from "@/app/(account)/error";
 import Label from "@/app/(account)/components/labels/label";
 import InputField from "@/app/components/inputs/inputField";
 
@@ -32,13 +33,18 @@ import DateField from "@/app/components/inputs/dateField";
 {{if $feature | HasFile -}}
 import FileField from "@/app/components/inputs/fileField";
 {{ end }}
-import { Id, toast } from "react-toastify";
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 
-export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
-    const { id } = useParams();
+import useSingle{{ $feature.FeatureName | UpperCamelCase }} from "../../../hooks/single{{ $feature.FeatureName | UpperCamelCase }}";
+import useUpdate{{ $feature.FeatureName | UpperCamelCase }} from "../../../hooks/update{{ $feature.FeatureName | UpperCamelCase }}";
+import useDelete{{ $feature.FeatureName | UpperCamelCase }} from "../../../hooks/delete{{ $feature.FeatureName | UpperCamelCase }}";
+import { RESOURCE_NAME, RESOURCE_URL } from "../../../const";
+import { {{ $feature.FeatureName | UpperCamelCase }} } from "../../../model";
 
-    const { loading, data, error, itemNotFound } = useSingle{{ $feature.FeatureName | UpperCamelCase }}(id ?? "");
+export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
+    const { id = "" } = useParams();
+
+    const { loading, data, error, itemNotFound } = useSingle{{ $feature.FeatureName | UpperCamelCase }}(id);
 
     const [executeUpdateMutation, { updateError, updateResult }] = useUpdate{{ $feature.FeatureName | UpperCamelCase }}();
 
@@ -50,50 +56,72 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
 
     useEffect(() => {
         if (updateResult && updateResult > 0) {
-            if (toastId.current) {
-                toast.update(toastId.current, {
-                    render: "Success!",
-                    type: toast.TYPE.SUCCESS,
-                    autoClose: 3000,
-                })
-            }
-            navigate(`/${RESOURCE_URL}`)
+            upsertToastSuccess(toastId);
+        }
+
+        if (updateError) {
+            upsertToastError(toastId);
+
+            console.error(updateError);
         }
     }, [updateResult])
 
     useEffect(() => {
         if (deleteResult && deleteResult > 0) {
+            upsertToastSuccess(toastId);
             navigate(`/${RESOURCE_URL}`)
         }
+
+        if (deleteError) {
+            upsertToastError(toastId);
+
+            console.error(deleteError);
+        }
+
     }, [deleteResult])
 
-    const form = useForm<{{ $feature.FeatureName | UpperCamelCase }}>({
+    const {
+        control,
+        formState: {
+            isDirty,
+        },
+        getValues,
+        {{if $feature | HasFile -}} setValue, {{- end }}
+        handleSubmit,
+    } = useForm<{{ $feature.FeatureName | UpperCamelCase }}>({
         mode: "onBlur",
         criteriaMode: "all",
+        defaultValues: {
+            {{- range $field := $feature.Fields | NoneID }}
+            {{ $field.Name | LowerCamelCase }}: data?.{{ $field.Name | LowerCamelCase }}, {{- end }}
+        }
     });
 
     if (loading) {
-        return (<div>Loading...</div>)
+        return <LoadingSingleItem className="py-6" />
     }
 
     if (itemNotFound) {
-        // notFound();
+        return <ItemNotFound className="py-6" />
     }
 
     if (error) {
-        return <div>{JSON.stringify(error)}</div>
+        return <Error error={error} />
     }
 
     const onSave = () => {
-        const values = form.getValues();
+        const values = getValues();
 
-        toastId.current = toast("Saving...", { autoClose: false })
+        toastId.current = saveToast()
 
-        executeUpdateMutation(id ?? "", values)
+        values.id = id;
+        executeUpdateMutation(id, values)
     }
 
     const onDelete = () => {
-        executeDeleteMutation(id ?? "")
+        toastId.current = deleteToast();
+
+        executeDeleteMutation(id)
     }
 
     const onCancel = () => {
@@ -101,7 +129,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
     }
 
     return (
-        <SingleLayout>
+        <>
             <SingleLayout.Title>{{ $feature.FeatureName | UpperCamelCase }}: {data?.id}</SingleLayout.Title>
             <form action="">
                 <GridFields className="py-6">
@@ -112,7 +140,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                         </Label>
                         {{- if $field | IsNumber }}
                         <NumberField
-                            control={form.control}
+                            control={control}
                             name="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
                             rules={
@@ -125,14 +153,14 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                         />{{- end }}
                         {{- if $field | IsBoolean }}
                         <Checkbox
-                            control={form.control}
+                            control={control}
                             name="{{ $field.FieldNameCamelCase }}"
                             id="{{ $field.FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
                         />{{- end }}
                         {{- if $field | IsString }}
                         <InputField
-                            control={form.control}
+                            control={control}
                             name="{{ .FieldNameCamelCase }}"
                             id="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
@@ -148,7 +176,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                         <TextareaField
                             id="{{ .FieldNameCamelCase }}"
                             name="{{ .FieldNameCamelCase }}"
-                            control={form.control}
+                            control={control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
                             rules={
                                 {
@@ -162,7 +190,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                         <TimeField
                             id="{{ .FieldNameCamelCase }}"
                             name="{{ .FieldNameCamelCase }}"
-                            control={form.control}
+                            control={control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
                             rules={
                                 {
@@ -176,7 +204,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                         <DateField
                             id="{{ .FieldNameCamelCase }}"
                             name="{{ .FieldNameCamelCase }}"
-                            control={form.control}
+                            control={control}
                             defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
                             rules={
                                 {
@@ -191,7 +219,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                             id="{{ $field.FieldNameCamelCase }}"
                             name="{{ $field.FieldNameCamelCase }}"
                             resource={RESOURCE_NAME.toLowerCase()}
-                            control={form.control}
+                            control={control}
                             rules={
                                 {
                                 {{- if $field.Nullable | not }}
@@ -202,16 +230,16 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                             defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
                             onChange={e => {
                                 if (!e) {
-                                    form.setValue("{{ .FieldNameCamelCase }}", "");
+                                    setValue("{{ .FieldNameCamelCase }}", "");
                                     return
                                 }
-                                form.setValue("{{ .FieldNameCamelCase }}", e)
+                                setValue("{{ .FieldNameCamelCase }}", e)
                             }}
                         />{{- end }}
                         {{- if $field | IsUndefined -}}
                         <InputField
-                            {...form.register("{{ .FieldNameCamelCase }}")}
-                            type="{{ $field | HTMLType }}"
+                            control={control}
+                            name="{{ .FieldNameCamelCase }}"
                             id="{{ .FieldNameCamelCase }}"
                             defaultValue={data?.{{ .FieldNameCamelCase }}}
                             rules={
@@ -227,14 +255,20 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                 </GridFields>
                 <SingleLayout.Footer className="justify-between">
                     <div className="flex space-x-2">
-                        <PrimaryButton onClick={form.handleSubmit(onSave)}>Save</PrimaryButton>
-                        <SecondaryButton onClick={onCancel}>Cancel</SecondaryButton>
+                        <PrimaryButton onClick={handleSubmit(onSave)}>Save</PrimaryButton>
+                        <CancelModal
+                            onConfirm={onCancel}
+                            dontAsk={!isDirty}
+                            className="border text-brand border-brand hover:bg-gray-fill active:bg-gray-stroke-weak"
+                        >
+                            Cancel
+                        </CancelModal>
                     </div>
                     <ConfirmModal onConfirm={onDelete} title="Delete {{ .FeatureHumanReadableName }}" body={`Are you sure you want to delete ${data?.id}?`}>
                         Delete
                     </ConfirmModal>
                 </SingleLayout.Footer>
             </form>
-        </SingleLayout>
+        </>
     )
 }

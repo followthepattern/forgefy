@@ -3,15 +3,17 @@ import Login from "./(auth)/login/page"
 import Register from "./(auth)/register/page"
 import AuthLayout from "./(auth)/layout"
 import AccountLayout from "./(account)/layout"
+import UserSingleLayout from "./(account)/user/(single)/layout"
 import UserList from "./(account)/user/page"
-import UserSingle from "./(account)/user/[id]/page"
-import UserEdit from "./(account)/user/[id]/edit/page"
-import UserNew from "./(account)/user/new/page"
-{{- range .Features }}
-import {{ .FeatureNameCamelCaseUpper }}List from "./(account)/{{ .FeatureNameDir }}/page"
-import {{ .FeatureNameCamelCaseUpper }}Single from "./(account)/{{ .FeatureNameDir }}/[id]/page"
-import {{ .FeatureNameCamelCaseUpper }}Edit from "./(account)/{{ .FeatureNameDir }}/[id]/edit/page"
-import {{ .FeatureNameCamelCaseUpper }}New from "./(account)/{{ .FeatureNameDir }}/new/page"
+import UserSingle from "./(account)/user/(single)/[id]/page"
+import UserEdit from "./(account)/user/(single)/[id]/edit/page"
+import UserNew from "./(account)/user/(single)/new/page"
+{{- range $feature := .Features }}
+import {{ $feature.FeatureName | UpperCamelCase }}List from "./(account)/{{ .FeatureNameDir }}/page"
+import {{ $feature.FeatureName | UpperCamelCase }}Single from "./(account)/{{ .FeatureNameDir }}/(single)/[id]/page"
+import {{ $feature.FeatureName | UpperCamelCase }}Edit from "./(account)/{{ .FeatureNameDir }}/(single)/[id]/edit/page"
+import {{ $feature.FeatureName | UpperCamelCase }}New from "./(account)/{{ .FeatureNameDir }}/(single)/new/page"
+import {{ $feature.FeatureName | UpperCamelCase }}SingleLayout from "./(account)/{{ .FeatureNameDir }}/(single)/layout"
 {{- end }}
 
 import Profile from "./(account)/profile/page"
@@ -61,16 +63,22 @@ export const Routes: RouteObject[] = [
                 element: <ListPageWrapper Component={UserList} />,
             },
             {
-                path: "user/:id",
-                element: <UserSingle />
-            },
-            {
-                path: "user/new",
-                element: <UserNew />
-            },
-            {
-                path: "user/:id/edit",
-                element: <UserEdit />
+                path: "user",
+                element: <UserSingleLayout />,
+                children: [
+                    {
+                        path: ":id",
+                        element: <UserSingle />
+                    },
+                    {
+                        path: "new",
+                        element: <UserNew />
+                    },
+                    {
+                        path: ":id/edit",
+                        element: <UserEdit />
+                    },
+                ]
             },
 {{- range $feature := .Features }}
             {
@@ -78,16 +86,22 @@ export const Routes: RouteObject[] = [
                 element: <ListPageWrapper Component={{ "{" }}{{ .FeatureNameCamelCaseUpper }}List} />,
             },
             {
-                path: "{{ $feature | URL }}/:id",
-                element: <{{ .FeatureNameCamelCaseUpper }}Single />
-            },
-            {
-                path: "{{ $feature | URL }}/new",
-                element: <{{ .FeatureNameCamelCaseUpper }}New />
-            },
-            {
-                path: "{{ $feature | URL }}/:id/edit",
-                element: <{{ .FeatureNameCamelCaseUpper }}Edit />
+                path: "{{ $feature | URL }}",
+                element: <{{ $feature.FeatureName | UpperCamelCase }}SingleLayout />,
+                children: [
+                    {
+                        path: ":id",
+                        element: <{{ .FeatureNameCamelCaseUpper }}Single />
+                    },
+                    {
+                        path: "new",
+                        element: <{{ .FeatureNameCamelCaseUpper }}New />
+                    },
+                    {
+                        path: ":id/edit",
+                        element: <{{ .FeatureNameCamelCaseUpper }}Edit />
+                    },
+                ]
             },
 {{- end }}
         ]
