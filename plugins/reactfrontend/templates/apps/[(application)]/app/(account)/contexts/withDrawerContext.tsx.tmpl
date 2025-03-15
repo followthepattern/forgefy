@@ -1,0 +1,24 @@
+import { useState } from "react";
+import DrawerContext from "./drawerContext";
+
+
+interface WithDrawerContextProperties {
+    children?: any;
+}
+
+const WithDrawerContext = (props: WithDrawerContextProperties) => {
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+
+    const drawerState = {
+        isOpen: isOpen,
+        Close: () => { setIsOpen(false) },
+        Open: () => { setIsOpen(true) },
+        Toggle: () => { setIsOpen(!isOpen) },
+    }
+
+    return (
+        <DrawerContext.Provider value={drawerState}>{props.children}</DrawerContext.Provider>
+    )
+}
+
+export default WithDrawerContext;
