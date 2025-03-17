@@ -1,9 +1,10 @@
+{{ $app := . }}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --color-brand: 59, 130, 246;
+    --color-brand: {{ .BrandColorRGB }};
   }
 }
