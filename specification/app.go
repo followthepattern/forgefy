@@ -15,6 +15,7 @@ type App struct {
 	AppName             string    `yaml:"name"`
 	AppType             AppType   `yaml:"type"`
 	Backend             string    `yaml:"backend"`
+	BrandColorRGB       string    `yaml:"brand_color_rgb"`
 	Features            []Feature `yaml:"features"`
 	AppPort             int       `yaml:"port"`
 	CountOfRandomValues int       `yaml:""`
@@ -48,4 +49,7 @@ func (a App) Validate() error {
 
 func (a *App) setDefaults() {
 	a.CountOfRandomValues = 30
+	if a.BrandColorRGB == "" {
+		a.BrandColorRGB = defaults.DefultBrandColor
+	}
 }

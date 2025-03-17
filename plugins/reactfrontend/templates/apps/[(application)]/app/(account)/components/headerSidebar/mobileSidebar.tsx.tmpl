@@ -1,28 +1,22 @@
-import { Dispatch, Fragment, SetStateAction } from 'react'
-
+import { Fragment, useContext } from 'react'
 import { Transition, Dialog } from "@headlessui/react"
 import {
-    Cog6ToothIcon,
     XMarkIcon,
 } from '@heroicons/react/24/outline'
-import classNames from 'classnames'
-import { Link, useLocation } from "react-router-dom"
-import { IsSelected, NavigationItem } from './navbar/navigation'
+import { NavigationItem } from './navbar/navigation'
 import Navbar from './navbar/navbar'
+import DrawerContext from '@/app/(account)/contexts/drawerContext'
 
 interface MobileSidebarProperties {
-    sidebarOpen: boolean
-    setSidebarOpen: Dispatch<SetStateAction<boolean>>
     navigationItems: NavigationItem[]
 }
 
 export default function MobileSidebar(props: MobileSidebarProperties) {
-    const pathname = useLocation().pathname;
-
+    const drawerState = useContext(DrawerContext);
 
     return (
-        <Transition.Root show={props.sidebarOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-50 lg:hidden" onClose={props.setSidebarOpen}>
+        <Transition.Root show={drawerState?.isOpen} as={Fragment}>
+            <Dialog as="div" className="relative z-50 lg:hidden" onClose={() => drawerState?.Close()}>
                 <Transition.Child
                     as={Fragment}
                     enter="transition-opacity ease-linear duration-300"
@@ -45,7 +39,7 @@ export default function MobileSidebar(props: MobileSidebarProperties) {
                         leaveFrom="translate-x-0"
                         leaveTo="-translate-x-full"
                     >
-                        <Dialog.Panel className="relative flex flex-1 w-full max-w-xs mr-16">
+                        <Dialog.Panel className="relative flex flex-1 w-full max-w-xs pt-2 pb-2 pl-2 mr-16">
                             <Transition.Child
                                 as={Fragment}
                                 enter="ease-in-out duration-300"
@@ -56,12 +50,12 @@ export default function MobileSidebar(props: MobileSidebarProperties) {
                                 leaveTo="opacity-0"
                             >
                                 <div className="absolute top-0 flex justify-center w-16 pt-5 left-full">
-                                    <button type="button" className="-m-2.5 p-2.5" onClick={() => props.setSidebarOpen(false)}>
+                                    <button type="button" className="-m-2.5 p-2.5" onClick={() => drawerState?.Close()}>
                                         <XMarkIcon className="w-6 h-6 text-white" aria-hidden="true" />
                                     </button>
                                 </div>
                             </Transition.Child>
-                            <div className="flex flex-col px-6 pb-4 overflow-y-auto bg-brand grow gap-y-5">
+                            <div className="flex flex-col px-6 pb-4 overflow-y-auto bg-brand grow gap-y-5 rounded-2xl">
                                 <div className="flex items-center h-16 shrink-0"></div>
                                 <Navbar navigationItems={props.navigationItems} />
                             </div>

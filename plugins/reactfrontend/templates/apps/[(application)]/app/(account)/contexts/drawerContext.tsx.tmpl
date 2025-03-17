@@ -1,0 +1,12 @@
+import { createContext } from "react";
+
+interface Drawer {
+    isOpen: boolean
+    Close: () => void
+    Open: () => void
+    Toggle: () => void
+}
+
+const DrawerContext = createContext<Drawer | null>(null);
+
+export default DrawerContext;
