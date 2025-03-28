@@ -1,0 +1,24 @@
+import { createContext } from "react";
+
+export interface SortLabel {
+    name: string
+    asc: boolean
+    code: string
+}
+
+export interface SortOptions {
+    sortLabel?: SortLabel
+}
+
+export interface FilterOptions {
+    searchString: string
+}
+
+interface QueryOptions {
+    sortOptions: SortOptions
+    filterOptions: FilterOptions
+}
+
+const QueryContext = createContext<QueryOptions | null>(null);
+
+export default QueryContext;
