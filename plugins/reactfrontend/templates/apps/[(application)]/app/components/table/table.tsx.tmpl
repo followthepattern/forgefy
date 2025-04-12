@@ -1,0 +1,93 @@
+import { Link } from "react-router-dom";
+
+import {
+    Cell as AriaCell,
+    Column as AriaColumn,
+    Row as AriaRow,
+    Table as AriaTable,
+    TableBody as AriaTableBody,
+    TableHeader as AriaTableHeader,
+    TableProps,
+    TableBodyProps,
+    TableHeaderProps,
+    CellProps,
+    ColumnProps,
+    RowProps
+} from 'react-aria-components';
+
+interface TableHeaderProperties<T> extends TableHeaderProps<T> { }
+
+interface ColumnProperteis extends ColumnProps { }
+
+interface RowProperties<T> extends RowProps<T> { }
+
+interface CellProperties extends CellProps { }
+
+interface TableBodyProperties<T> extends TableBodyProps<T> { }
+
+export function Column(props: ColumnProperteis) {
+    return (
+        <AriaColumn
+            className="px-6 py-3"
+            {...props}
+        >
+            {props.children}
+        </AriaColumn>
+    )
+}
+
+export function Row<T extends object>(props: RowProperties<T>) {
+    return (
+        <AriaRow
+            className="aria-selected:bg-brand-hover"
+            {...props}
+        >
+            {props.children}
+        </AriaRow>
+    )
+}
+
+export function Cell(props: CellProperties) {
+    return (
+        <AriaCell
+            className="px-6 py-4 font-medium text-gray-primary whitespace-nowra"
+        >
+            {props.children}
+        </AriaCell>
+    )
+}
+
+export function TableHeader<T extends object>(props: TableHeaderProperties<T>) {
+    return (
+        <AriaTableHeader
+            className="h-10 text-xs uppercase text-gray-supporting gray-fill"
+            {...props}
+        >
+            {props.children}
+        </AriaTableHeader>
+    )
+}
+
+export function TableBody<T extends object>(props: TableBodyProperties<T>) {
+    return (
+        <AriaTableBody
+            className="divide-y divide-gray-fill"
+            {...props}
+        >
+            {props.children}
+        </AriaTableBody>
+    )
+}
+
+interface TableProperties extends TableProps { }
+
+export function Table(props: TableProperties) {
+    return (
+        <AriaTable
+            className="w-full text-sm text-left text-gray-stroke-strong"
+            {...props}
+        >
+            {props.children}
+        </AriaTable>
+    )
+}
