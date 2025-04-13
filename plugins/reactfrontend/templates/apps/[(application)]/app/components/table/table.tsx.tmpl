@@ -7,23 +7,24 @@ import {
     Table as AriaTable,
     TableBody as AriaTableBody,
     TableHeader as AriaTableHeader,
+    Checkbox as AriaCheckbox,
     TableProps,
     TableBodyProps,
     TableHeaderProps,
     CellProps,
     ColumnProps,
-    RowProps
+    RowProps,
+    Selection,
+    useTableOptions,
 } from 'react-aria-components';
 
-interface TableHeaderProperties<T> extends TableHeaderProps<T> { }
+import React, { useContext, useState } from "react";
+import classNames from "classnames";
+import { useTable, useTableRow, useTableSelectionCheckbox } from "@react-aria/table";
+import { AriaCheckboxProps, useCheckbox } from "react-aria";
+import { useToggleState } from "react-stately";
 
 interface ColumnProperteis extends ColumnProps { }
-
-interface RowProperties<T> extends RowProps<T> { }
-
-interface CellProperties extends CellProps { }
-
-interface TableBodyProperties<T> extends TableBodyProps<T> { }
 
 export function Column(props: ColumnProperteis) {
     return (
@@ -36,6 +37,8 @@ export function Column(props: ColumnProperteis) {
     )
 }
 
+interface RowProperties<T> extends RowProps<T> { }
+
 export function Row<T extends object>(props: RowProperties<T>) {
     return (
         <AriaRow
@@ -47,6 +50,8 @@ export function Row<T extends object>(props: RowProperties<T>) {
     )
 }
 
+interface CellProperties extends CellProps { }
+
 export function Cell(props: CellProperties) {
     return (
         <AriaCell
@@ -56,6 +61,78 @@ export function Cell(props: CellProperties) {
         </AriaCell>
     )
 }
+
+interface CheckboxProperties {
+    className?: string
+    onChange?: React.ChangeEventHandler<HTMLInputElement>
+    checked?: boolean
+    defaultValue?: boolean
+}
+
+function Checkbox(props: CheckboxProperties) {
+    const [value, setValue] = useState(true);
+
+    return (
+        <input
+            onChange={e => {
+                setValue(e.target.checked);
+                console.info("target checked", e.target.checked)
+                if (props.onChange) {
+                    props.onChange(e);
+                }
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            checked={value}
+            className={classNames(props.className, "block w-6 h-6 border rounded-lg focus:ring-1")}
+        />
+    )
+}
+
+function TmpCheckbox(props: CheckboxProperties) {
+    const [value, setValue] = useState<boolean>(props.checked ?? false);
+    
+    return (
+        <input
+            type="checkbox"
+            onChange={e => {
+                setValue(e.target.checked);
+                console.info("target checked", e.target.checked)
+                if (props.onChange) {
+                    props.onChange(e);
+                }
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            checked={value}
+            className={classNames(props.className, "block w-6 h-6 border rounded-lg focus:ring-1")}
+        />
+    )
+}
+
+function TmpValue() {
+    const [value, setValue] = useState<boolean>(true);
+    const test = true
+    return (
+        <button
+            onClick={(e) => {
+                console.info("checkbox", "onclick", value)
+                setValue(!value)
+            }}
+        >
+            {JSON.stringify(value)}
+        </button>
+    )
+}
+
+function TestCheckbox(props: AriaCheckboxProps) {
+    let ref = React.useRef<HTMLInputElement | null>(null);
+    let state = useToggleState(props);
+    let { inputProps } = useCheckbox(props, state, ref);
+    return <input {...inputProps} ref={ref} />;
+  }
+
+interface TableHeaderProperties<T> extends TableHeaderProps<T> { }
 
 export function TableHeader<T extends object>(props: TableHeaderProperties<T>) {
     return (
@@ -68,6 +145,8 @@ export function TableHeader<T extends object>(props: TableHeaderProperties<T>) {
     )
 }
 
+interface TableBodyProperties<T> extends TableBodyProps<T> { }
+
 export function TableBody<T extends object>(props: TableBodyProperties<T>) {
     return (
         <AriaTableBody
@@ -79,15 +158,117 @@ export function TableBody<T extends object>(props: TableBodyProperties<T>) {
     )
 }
 
-interface TableProperties extends TableProps { }
-
-export function Table(props: TableProperties) {
+export function StyledAriaTable(props: TableProps) {
     return (
         <AriaTable
-            className="w-full text-sm text-left text-gray-stroke-strong"
             {...props}
+            className={classNames(props.className, "w-full text-sm text-left text-gray-stroke-strong")}
         >
             {props.children}
         </AriaTable>
+    )
+}
+
+interface TableProperties<T, K> {
+    columns: K[]
+    entities: T[]
+    toEditLink: (v: T) => string
+    toViewLink: (v: T) => string
+}
+
+export function Table<
+    T extends { id: string },
+    K extends {
+        id: string
+        name: string
+        isRowHeader: boolean
+    }>(props: TableProperties<T, K>) {
+    const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set());
+
+    const [selectedAll, setSelectedAll] = useState<boolean>(false);
+
+    const handleSelectAll = () => {
+        console.info("old set", selectedKeys)
+        let old = new Set(selectedKeys);
+        if (old.size == props.entities.length) {
+            setSelectedKeys(new Set());
+            setSelectedAll(false);
+            return
+        }
+
+        setSelectedAll(true);
+        setSelectedKeys(new Set(props.entities.map(t => t.id)));
+    }
+
+    const addTmp = function(item: {id: string}) {        
+        setSelectedKeys((prev) => {
+            const newSet = new Set(prev);
+
+            if (newSet.has(item.id)) {
+                newSet.delete(item.id);
+                return newSet;
+            }
+
+            newSet.add(item.id)
+            return newSet;
+        });
+    }
+
+    // const isSelected = (item: {id: string}): boolean => {
+    //     return (new Set(selectedKeys)).has(item.id)
+    // }
+
+    console.info("selected keys", selectedKeys)
+
+    const p = useTableOptions();
+
+    return (
+        <>
+            <StyledAriaTable
+                selectedKeys={selectedKeys}
+                selectionMode="multiple"
+                selectionBehavior="toggle"
+            >
+                <TableHeader>
+                    <Column>
+                        <TmpCheckbox
+                            onChange={() => {
+                                handleSelectAll();
+                            }}
+                            checked={selectedAll}
+                        />
+                    </Column>
+                    {props.columns.map(column => (
+                        <Column isRowHeader={column.isRowHeader}>
+                            {column.name}
+                        </Column>
+                    ))}
+                    <Column>
+                        Action
+                    </Column>
+                </TableHeader>
+                <TableBody items={props.entities}>
+                    {item => (
+                        <Row>
+                            <Cell>
+                                <TestCheckbox />
+                            </Cell>
+                            {props.columns.map(column =>
+                                <Cell>
+                                    <Link to={props.toViewLink(item)}>
+                                        {(item as any)[column.id]}
+                                    </Link>
+                                </Cell>
+                            )}
+                            <Cell className="px-6 py-4 text-right">
+                                <Link to={props.toEditLink(item)} className="p-1 font-medium rounded-lg text-brand hover:bg-gray-stroke-weak">
+                                    Edit
+                                </Link>
+                            </Cell>
+                        </Row>
+                    )}
+                </TableBody>
+            </StyledAriaTable>
+        </>
     )
 }
