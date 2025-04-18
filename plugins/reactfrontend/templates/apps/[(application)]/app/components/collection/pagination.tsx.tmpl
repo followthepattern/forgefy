@@ -1,13 +1,13 @@
 import { ArrowLongLeftIcon, ArrowLongRightIcon } from '@heroicons/react/20/solid'
 import classNames from 'classnames';
 
-interface PaginationProperties {
+export interface PaginationProperties {
     currentPage: number
     maxPage: number
     onClick: (page: number) => void
 }
 
-function calculatePaginationSymbol2(totalPages: number, currentPage: number): Array<number> {
+function calculatePaginationSymbol(totalPages: number, currentPage: number): Array<number> {
     const pageNumberLimit = 5;
     let pagination: Array<number> = [];
     const limitPerSide = Math.floor(pageNumberLimit / 2);
@@ -76,7 +76,7 @@ function PageSymbols({ paginationSymbols, onClick, currentPage }: PageSymbolProp
 }
 
 export default function Pagination(props: PaginationProperties) {
-    const paginationSymbols = calculatePaginationSymbol2(props.maxPage, props.currentPage)
+    const paginationSymbols = calculatePaginationSymbol(props.maxPage, props.currentPage)
 
     const arrowButton = "py-2 px-4 border border-gray-fill rounded-lg hover:bg-gray-fill hover:text-gray-supporting focus:bg-gray-fill"
     const arrowIcon = "w-5 h-5 text-gray-supporting"
