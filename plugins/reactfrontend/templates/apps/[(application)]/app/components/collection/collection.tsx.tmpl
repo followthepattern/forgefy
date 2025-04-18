@@ -1,0 +1,29 @@
+import classNames from "classnames"
+import Pagination, { PaginationProperties } from "./pagination"
+import { Table, TableProperties } from "./table"
+
+interface CollectionProperties<T, K> extends TableProperties<T, K>, PaginationProperties{
+}
+
+export default function Collection<
+    T extends { id: string },
+    K extends {
+        id: string
+        name: string
+    }>(props: CollectionProperties<T, K>) {
+    return (
+        <div className={classNames(props.className, "")}>
+            <Table
+                columns={props.columns}
+                items={props.items}
+                toEditLink={props.toEditLink}
+                toViewLink={props.toViewLink}
+            />
+            <Pagination
+                currentPage={props.currentPage}
+                maxPage={props.maxPage}
+                onClick={props.onClick}
+            />
+        </div>
+    )
+}
