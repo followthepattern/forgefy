@@ -30,6 +30,7 @@ interface RowProperties<T> {
 
 interface RowContext {
     isSelected: boolean
+    setRowSelected: (v: boolean) => void
 }
 
 const rowContext = createContext<RowContext | null>(null);
@@ -44,6 +45,9 @@ export function Row<T>(props: RowProperties<T>, key: string) {
             value={
             {
                 isSelected: state.isSelected,
+                setRowSelected: (value: boolean) => {
+
+                }
             }}
         >
             <tr
@@ -70,7 +74,7 @@ interface CellProperties {
 export function Cell(props: CellProperties, key: string) {
     return (
         <td
-            className={classNames(props.className, "py-4 font-medium text-gray-primary whitespace-nowra")}
+            className={classNames(props.className, "py-2 font-medium text-gray-primary whitespace-nowra")}
             key={key}
         >
             {props.children}
@@ -156,27 +160,26 @@ export function TableBody<T extends {
     )
 }
 
-
-interface TableProperties<T, K> {
-    className?: string
-    columns: K[]
-    items: T[]
-    toEditLink: (v: T) => string
-    toViewLink: (v: T) => string
+interface ColumnLabel {
+    id: string
+    name: string
 }
 
-export function Table<
-    T extends { id: string },
-    K extends {
-        id: string
-        name: string
-    }>(props: TableProperties<T, K>) {
+export interface TableProperties<ItemT> {
+    className?: string
+    columns: ColumnLabel[]
+    items: ItemT[]
+    toEditLink: (v: ItemT) => string
+    toViewLink: (v: ItemT) => string
+}
+
+export function Table<T extends { id: string }>(props: TableProperties<T>) {
     const [selectedRows, setSelectedRows] = useState(new Set());
 
     return (
         <>
             <table
-                className={classNames(props.className, "w-full table-auto text-sm text-left text-gray-stroke-strong")}
+                className={classNames(props.className, "w-full table-fixed text-sm text-left text-gray-stroke-strong")}
             >
                 <TableHeader>
                     <Column
@@ -187,14 +190,11 @@ export function Table<
                             onChange={() => {
                                 if (selectedRows.size != props.items.length) {
                                     setSelectedRows(new Set(props.items.map(item => item.id)));
-                                    console.info("after selected", selectedRows.values.length);
-
                                     return;
                                 }
                                 setSelectedRows(new Set())
-                                console.info("after deselect", selectedRows);
                             }}
-                            checked={selectedRows.size == props.items.length}
+                            checked={selectedRows.size == props.items.length && props.items.length != 0}
                         />
                     </Column>
                     {props.columns.map(column => (
@@ -246,7 +246,7 @@ export function Table<
                                     </Link>
                                 </Cell>
                             )}
-                            <Cell className="px-6 py-4 text-right">
+                            <Cell className="px-6 text-right">
                                 <Link to={props.toEditLink(item)} className="p-1 font-medium rounded-lg text-brand hover:bg-gray-stroke-weak">
                                     Edit
                                 </Link>
