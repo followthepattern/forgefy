@@ -1,10 +1,8 @@
 import { ArrowLongLeftIcon, ArrowLongRightIcon } from '@heroicons/react/20/solid'
 import classNames from 'classnames';
 
-export interface PaginationProperties {
-    currentPage: number
-    maxPage: number
-    onClick: (page: number) => void
+export function calculateTotalPages(count: number, pageSize: number): number {
+    return Math.ceil(count / pageSize);
 }
 
 function calculatePaginationSymbol(totalPages: number, currentPage: number): Array<number> {
@@ -24,6 +22,7 @@ function calculatePaginationSymbol(totalPages: number, currentPage: number): Arr
 }
 
 interface PageNumberSymbolProperties {
+    className?: string
     page: number
     onClick: (page: number) => void
     currentPage: number
@@ -31,12 +30,12 @@ interface PageNumberSymbolProperties {
     isLast: boolean
 }
 
-function PageNumberSymbol({ onClick, page, currentPage, isFirst, isLast }: PageNumberSymbolProperties) {
+function PageNumberSymbol({ onClick, page, currentPage, isFirst, isLast, className }: PageNumberSymbolProperties) {
     const isCurrent = page == currentPage;
     return (
         <button
             onClick={() => onClick(page)}
-            className={classNames("py-2 px-4 border-y",
+            className={classNames(className, "py-2 px-4 border-y",
                 {
                     "border-gray-fill focus:bg-gray-fill hover:bg-gray-fill hover:text-gray-supporting": !isCurrent,
                     "border-brand text-white bg-brand": isCurrent,
@@ -52,17 +51,19 @@ function PageNumberSymbol({ onClick, page, currentPage, isFirst, isLast }: PageN
 }
 
 interface PageSymbolProperties {
+    className?: string
     paginationSymbols: number[]
     onClick: (page: number) => void
     currentPage: number
 }
 
-function PageSymbols({ paginationSymbols, onClick, currentPage }: PageSymbolProperties) {
+function PageSymbols({ paginationSymbols, onClick, currentPage, className }: PageSymbolProperties) {
     return (
         <>
             {paginationSymbols.map((symbol, index) => {
                 return (
                     <PageNumberSymbol
+                        className={className}
                         key={index}
                         onClick={onClick}
                         page={symbol}
@@ -75,14 +76,24 @@ function PageSymbols({ paginationSymbols, onClick, currentPage }: PageSymbolProp
     )
 }
 
+export interface PaginationProperties {
+    className?: string
+    currentPage: number
+    pageSize: number
+    count?: number
+    onClick: (page: number) => void
+}
+
 export default function Pagination(props: PaginationProperties) {
-    const paginationSymbols = calculatePaginationSymbol(props.maxPage, props.currentPage)
+    const numberOfTotalPages = calculateTotalPages(props.count ?? 0, props.pageSize);
+
+    const paginationSymbols = calculatePaginationSymbol(numberOfTotalPages, props.currentPage)
 
     const arrowButton = "py-2 px-4 border border-gray-fill rounded-lg hover:bg-gray-fill hover:text-gray-supporting focus:bg-gray-fill"
     const arrowIcon = "w-5 h-5 text-gray-supporting"
 
     return (
-        <nav className="flex justify-center border-gray-fill">
+        <nav className={classNames(props.className, "flex justify-center border-gray-fill")}>
             <div className="flex-auto hidden w-0 sm:flex">
                 <button
                     onClick={() => props.onClick(props.currentPage - 1)}
@@ -96,7 +107,7 @@ export default function Pagination(props: PaginationProperties) {
             </div>
             <div className="justify-end flex-auto hidden w-0 sm:flex">
                 <button
-                    className={classNames(arrowButton, { hidden: props.currentPage >= props.maxPage })}
+                    className={classNames(arrowButton, { hidden: props.currentPage >= numberOfTotalPages })}
                     onClick={() => props.onClick(props.currentPage + 1)}
                 >
                     <ArrowLongRightIcon className={arrowIcon} aria-hidden="true" />
