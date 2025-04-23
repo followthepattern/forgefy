@@ -1,0 +1,47 @@
+import { Outlet, useSearchParams } from "react-router-dom";
+
+import { QueryContextValue, WithQueryContext } from "../contexts/queryContext";
+import { GetPageFromSearchParams, GetPageSizeFromSearchParams, GetSearch, GetSortLabel, SetPageParams, SetSearchPatternParams, SetSortPatternParrams, SortLabel } from "@/lib/query";
+
+export default function ListLayout() {
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const searchString = GetSearch(searchParams);
+    const orderBy = GetSortLabel(searchParams);
+
+    const page = GetPageFromSearchParams(searchParams);
+    const pageSize = GetPageSizeFromSearchParams(searchParams);
+
+    const setOrderBy = (orderBy: SortLabel) => {
+        SetSortPatternParrams(searchParams, setSearchParams, orderBy);
+    }
+
+    const setFilter = (filter: string) => {
+        SetSearchPatternParams(searchParams, setSearchParams, filter);
+    }
+
+    const setCurrentPage = (page: number) => {
+        SetPageParams(searchParams, setSearchParams, page);
+    }
+
+    const queryProps: QueryContextValue = {
+        currentPage: page,
+        pageSize: pageSize,
+        filter: searchString,
+        orderBy: orderBy,
+
+        setCurrentPage: setCurrentPage,
+        setFilter: setFilter,
+        setOrderBy: setOrderBy,
+    }
+
+    return (
+        <WithQueryContext
+            queryProps={queryProps}
+        >
+            <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <Outlet />
+            </div>
+        </WithQueryContext>
+    )
+}
