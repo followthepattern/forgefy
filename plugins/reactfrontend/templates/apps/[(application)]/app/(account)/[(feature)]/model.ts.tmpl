@@ -13,25 +13,27 @@ import { parseDate, Date } from "@/lib/time";
 
 export class {{ $typeName }} {
 	constructor(v: {{ $typeName }}Response) {
-		{{- range $field := .Fields }}
-			{{ if $field | IsType (slist "boolean" "number" "time" "date") | not -}}
-			this.{{ .FieldNameCamelCase }} = v.{{ .FieldNameCamelCase }};
-			{{- end -}}
-			{{ if $field | IsBoolean -}}
-			this.{{ .FieldNameCamelCase }} = Boolean(v.{{ .FieldNameCamelCase }});
-			{{- end -}}
-			{{ if $field | IsNumber -}}
-			this.{{ .FieldNameCamelCase }} = Number(v.{{ .FieldNameCamelCase }});
-			{{- end -}}
-			{{ if $field | IsTime -}}
-			this.{{ .FieldNameCamelCase }} = parseTime(v.{{ .FieldNameCamelCase }});
-			{{- end -}}
-			{{ if $field | IsDate -}}
-			this.{{ .FieldNameCamelCase }} = parseDate(v.{{ .FieldNameCamelCase }});
-			{{- end -}}
+		this.id = v.id ?? "";
+	{{- range $field := .Fields | NoneID }}
+		{{ if $field | IsType (slist "boolean" "number" "time" "date") | not -}}
+		this.{{ .FieldNameCamelCase }} = v.{{ .FieldNameCamelCase }};
 		{{- end -}}
+		{{ if $field | IsBoolean -}}
+		this.{{ .FieldNameCamelCase }} = Boolean(v.{{ .FieldNameCamelCase }});
+		{{- end -}}
+		{{ if $field | IsNumber -}}
+		this.{{ .FieldNameCamelCase }} = Number(v.{{ .FieldNameCamelCase }});
+		{{- end -}}
+		{{ if $field | IsTime -}}
+		this.{{ .FieldNameCamelCase }} = parseTime(v.{{ .FieldNameCamelCase }});
+		{{- end -}}
+		{{ if $field | IsDate -}}
+		this.{{ .FieldNameCamelCase }} = parseDate(v.{{ .FieldNameCamelCase }});
+		{{- end -}}
+	{{- end -}}
 	}
-{{- range $field := .Fields }}
+	id: string
+{{- range $field := .Fields | NoneID }}
 	{{ .FieldNameCamelCase }}?: {{ $field | JSType }} | null
 {{- end }}
 }
