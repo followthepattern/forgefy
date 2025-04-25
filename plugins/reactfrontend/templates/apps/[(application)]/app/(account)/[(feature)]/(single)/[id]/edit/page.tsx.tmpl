@@ -111,7 +111,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
 
     const onSave = () => {
         const values: {{ $feature.FeatureName | UpperCamelCase }} = {
-            id: "",
+            id: id,
             ...getValues(),
         }
 
