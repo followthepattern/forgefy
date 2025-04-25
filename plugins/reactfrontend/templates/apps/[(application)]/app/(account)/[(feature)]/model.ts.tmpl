@@ -4,13 +4,10 @@
 
 import { MutationResourceResponse } from "@/graphql/mutation";
 import { QueryResourceResponse } from "@/graphql/query";
-{{if $feature | HasTime -}}
-import { parseTime, Time } from "@/lib/time";
-{{- end }}
-{{if $feature | HasDate -}}
+{{if $feature | HasTime -}} import { parseTime, Time } from "@/lib/time"; {{- end }}
+{{ if $feature | HasDate -}}
 import { parseDate, Date } from "@/lib/time";
-{{- end }}
-
+{{ end }}
 export class {{ $typeName }} {
 	constructor(v: {{ $typeName }}Response) {
 		this.id = v.id ?? "";
