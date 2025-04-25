@@ -1,0 +1,33 @@
+import { PAGE_DEFAULT, PAGESIZE_DEFAULT, SortLabel } from "@/lib/query";
+import { createContext } from "react";
+
+export interface QueryContextValue {
+    currentPage: number
+    pageSize: number
+    filter?: string
+    orderBy?: SortLabel
+
+    setCurrentPage: (v: number) => void
+    setFilter: (v: string) => void
+    setOrderBy: (v: SortLabel) => void
+}
+
+export const QueryContext = createContext<QueryContextValue>({
+    currentPage: PAGE_DEFAULT,
+    pageSize: PAGESIZE_DEFAULT,
+
+    setCurrentPage: () => {},
+    setFilter: () => {},
+    setOrderBy: () => {}
+});
+
+interface WithQueryContextProperties {
+    queryProps: QueryContextValue
+    children?: any;
+}
+
+export const WithQueryContext = (props: WithQueryContextProperties) => {    
+    return (
+        <QueryContext.Provider value={props.queryProps}>{props.children}</QueryContext.Provider>
+    )
+}

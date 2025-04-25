@@ -1,0 +1,30 @@
+import classNames from "classnames"
+import Pagination, { PaginationProperties } from "./pagination"
+import { Table, TableProperties } from "./table"
+
+export interface CollectionProperties<T> extends TableProperties<T>, PaginationProperties {
+}
+
+export default function Collection<T extends { id: string }>(props: CollectionProperties<T>) {
+    const maxPage = Math.ceil(props.count ?? 0 / props.pageSize);
+
+    return (
+        <div className={classNames(props.className, "")}>
+            <div className="overflow-x-auto sm:rounded-lg">
+                <Table
+                    columns={props.columns}
+                    items={props.items}
+                    toEditLink={props.toEditLink}
+                    toViewLink={props.toViewLink}
+                />
+            </div>
+            {maxPage > 1 && <Pagination
+                className="pt-3"
+                currentPage={props?.currentPage ?? 1}
+                count={props.count}
+                pageSize={props.pageSize}
+                onClick={props.onClick}
+            />}
+        </div >
+    )
+}

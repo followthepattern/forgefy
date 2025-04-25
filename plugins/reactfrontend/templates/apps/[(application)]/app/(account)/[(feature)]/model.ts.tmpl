@@ -4,34 +4,33 @@
 
 import { MutationResourceResponse } from "@/graphql/mutation";
 import { QueryResourceResponse } from "@/graphql/query";
-{{if $feature | HasTime -}}
-import { parseTime, Time } from "@/lib/time";
-{{- end }}
-{{if $feature | HasDate -}}
+{{if $feature | HasTime -}} import { parseTime, Time } from "@/lib/time"; {{- end }}
+{{ if $feature | HasDate -}}
 import { parseDate, Date } from "@/lib/time";
-{{- end }}
-
+{{ end }}
 export class {{ $typeName }} {
 	constructor(v: {{ $typeName }}Response) {
-		{{- range $field := .Fields }}
-			{{ if $field | IsType (slist "boolean" "number" "time" "date") | not -}}
-			this.{{ .FieldNameCamelCase }} = v.{{ .FieldNameCamelCase }};
-			{{- end -}}
-			{{ if $field | IsBoolean -}}
-			this.{{ .FieldNameCamelCase }} = Boolean(v.{{ .FieldNameCamelCase }});
-			{{- end -}}
-			{{ if $field | IsNumber -}}
-			this.{{ .FieldNameCamelCase }} = Number(v.{{ .FieldNameCamelCase }});
-			{{- end -}}
-			{{ if $field | IsTime -}}
-			this.{{ .FieldNameCamelCase }} = parseTime(v.{{ .FieldNameCamelCase }});
-			{{- end -}}
-			{{ if $field | IsDate -}}
-			this.{{ .FieldNameCamelCase }} = parseDate(v.{{ .FieldNameCamelCase }});
-			{{- end -}}
+		this.id = v.id ?? "";
+	{{- range $field := .Fields | NoneID }}
+		{{ if $field | IsType (slist "boolean" "number" "time" "date") | not -}}
+		this.{{ .FieldNameCamelCase }} = v.{{ .FieldNameCamelCase }};
 		{{- end -}}
+		{{ if $field | IsBoolean -}}
+		this.{{ .FieldNameCamelCase }} = Boolean(v.{{ .FieldNameCamelCase }});
+		{{- end -}}
+		{{ if $field | IsNumber -}}
+		this.{{ .FieldNameCamelCase }} = Number(v.{{ .FieldNameCamelCase }});
+		{{- end -}}
+		{{ if $field | IsTime -}}
+		this.{{ .FieldNameCamelCase }} = parseTime(v.{{ .FieldNameCamelCase }});
+		{{- end -}}
+		{{ if $field | IsDate -}}
+		this.{{ .FieldNameCamelCase }} = parseDate(v.{{ .FieldNameCamelCase }});
+		{{- end -}}
+	{{- end -}}
 	}
-{{- range $field := .Fields }}
+	id: string
+{{- range $field := .Fields | NoneID }}
 	{{ .FieldNameCamelCase }}?: {{ $field | JSType }} | null
 {{- end }}
 }

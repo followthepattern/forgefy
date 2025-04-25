@@ -67,7 +67,7 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
         getValues,
         {{if $feature | HasFile -}} setValue, {{- end }}
         handleSubmit,
-    } = useForm<{{ .FeatureNameCamelCaseUpper }}>({
+    } = useForm<Omit<{{ $feature.FeatureName | UpperCamelCase }}, "id">>({
         mode: "onBlur",
         criteriaMode: "all",
         defaultValues: {
@@ -77,7 +77,10 @@ export default function {{ $feature.FeatureNameCamelCaseUpper }}New() {
     });
 
     const onCreate = () => {
-        const values = getValues();
+        const values: {{ $feature.FeatureName | UpperCamelCase }} = {
+            id: "",
+            ...getValues(),
+        }
 
         toastId.current = createToast();
 

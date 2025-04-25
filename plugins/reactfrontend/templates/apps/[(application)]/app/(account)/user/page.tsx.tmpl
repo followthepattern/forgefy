@@ -1,91 +1,127 @@
-import SectionHeader from '../components/listPage/sectionHeader/sectionHeader';
-import List from '../components/listPage/listPage';
-import { RESOURCE_URL, RESOURCE_NAME } from "./const";
-import { ListPageComponentProperties } from '../components/listPage/listPageWrapper/listPageWrapper';
-import { SortLabel, SetPageParams, SetSearchPatternParams, SetSortPatternParrams } from '../components/listPage/listPageWrapper/listingFunctions';
+import { useContext, useEffect } from 'react';
+
+import Collection from '@/app/components/collection/collection';
+import { ListQueryParams, SortLabel } from '@/lib/query';
+
+import { QueryContext } from '../contexts/queryContext';
+import TableSkeleton from '../components/skeletons/tableSkeleton';
+import ListView from '../components/listView/view';
+
+import Error from '../error';
+import { RESOURCE_NAME, RESOURCE_URL } from './const';
+
 import useListUser from './hooks/listUser';
-import CreateTable, { CreateTableProperties } from '../components/listPage/table/table';
 import { User } from './model';
-import { ToHumanReadable } from '@/lib/strings';
 
-const sortByLables: SortLabel[] = [
-  {
-    code: "id",
-    name: "Id",
-    asc: true,
-  },
-  {
-    code: "email",
-    name: "Email",
-    asc: true,
-  },
-  {
-    code: "first_name",
-    name: "First Name",
-    asc: true,
-  },
-  {
-    code: "last_name",
-    name: "Last Name",
-    asc: true,
-  },
-];
+const columns = [
+{
+  id: "email",
+  name: "Email",
+},
+{
+  id: "firstName",
+  name: "First Name",
+}, {
+  id: "lastName",
+  name: "Last Name",
+}]
 
-function userViewLink(value: User): string {
-  return `/${RESOURCE_URL}/${value.id}`
+const orderByLabels: SortLabel[] = [{
+  name: "id",
+  label: "Id",
+  desc: false,
+},
+{
+  name: "email",
+  label: "Email",
+  desc: false,
+},
+{
+  name: "first_name",
+  label: "First Name",
+  desc: false,
+}, {
+  name: "last_name",
+  label: "Last Name",
+  desc: false,
+}];
+
+function viewLink(value: User): string {
+  return `/user/${value.id}`
 }
 
-function userEditLink(value: User): string {
-  return `/${RESOURCE_URL}/${value.id}/edit`
+function editLink(value: User): string {
+  return `/user/${value.id}/edit`
 }
 
-function getCreateTableProperties(): CreateTableProperties<User> {
-  return {
-    headerColumns: ["Email","First Name","Last Name",],
-    getViewLink: userViewLink,
-    getEditLink: userEditLink,
-    getCells: (entity) => [ToHumanReadable(entity.email),ToHumanReadable(entity.firstName),ToHumanReadable(entity.lastName)]
-  }
+export default function UserList() {
+  return (
+    <ListView
+      resourceName={RESOURCE_NAME}
+      resourceUrl={RESOURCE_URL}
+      orderByLabels={orderByLabels}
+    >
+      <UserListComponent />
+    </ListView>
+  )
 }
 
-export default function UserList(props: ListPageComponentProperties) {
-  const sortOnChange = (sortLabel: SortLabel) => {
-    SetSortPatternParrams(props.searchParams, props.setSearchParams, sortLabel);
+function UserListComponent() {
+  const queryProps = useContext(QueryContext);
+
+  const [executeQuery, { data, error, loading, itemNotFound, called }] = useListUser();
+
+  const listQueryParams: ListQueryParams = {
+    page: queryProps.currentPage,
+    pageSize: queryProps.pageSize,
+    search: queryProps.filter,
   }
 
-  const searchInputOnChange = (searchString: string) => {
-    SetSearchPatternParams(props.searchParams, props.setSearchParams, searchString);
+  if (queryProps.orderBy) {
+    listQueryParams.orderBy = [queryProps.orderBy]
   }
 
-  const pageOnChange = (page: number) => {
-    SetPageParams(props.searchParams, props.setSearchParams, page);
+  useEffect(() => {
+    executeQuery(listQueryParams);
+  }, [queryProps.pageSize, queryProps.currentPage, queryProps.filter, queryProps.orderBy])
+
+  if (error) {
+    return <Error error={error} />
   }
 
-  const selectedSortLabel = sortByLables.find(l => l.code == props.sortProps.sortLabel?.code);
+  if (!called) {
+    return <TableSkeleton />
+  }
 
-  const createTableProperties = getCreateTableProperties();
+  if (loading) {
+    return <TableSkeleton />
+  }
 
-  const entityTable = CreateTable(createTableProperties);
+  if (!data?.data) {
+    return <TableSkeleton />
+  }
+
+  if (itemNotFound) {
+    return <div>Item not found</div>
+  }
+
+  const items = data.data ?? [];
 
   return (
-    <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <SectionHeader
-        resourceName={RESOURCE_NAME}
-        resourceUrl={RESOURCE_URL}
-        searchInputOnChange={searchInputOnChange}
-        sortOnChange={sortOnChange}
-        searchInput={props.filterProps.searchString}
-        sortByLables={sortByLables}
-        selectedSortLabel={selectedSortLabel}
-      />
-      <div className="flow-root mt-8 overflow-hidden">
-        <List {...props}
-          sortProps={{ "{{" }}sortLabel: selectedSortLabel {{ "}}" }}
-          onPageChange={pageOnChange}
-          useList={useListUser}
-          tableComponent={entityTable}
+    <>
+      <div className="overflow-x-auto sm:rounded-lg">
+        <Collection
+          items={items}
+          toViewLink={viewLink}
+          toEditLink={editLink}
+          columns={columns}
+
+          currentPage={queryProps?.currentPage ?? 1}
+          count={data.count}
+          pageSize={queryProps?.pageSize ?? 20}
+          onClick={queryProps?.setCurrentPage}
         />
       </div>
-    </div>
+    </>
   )
 }

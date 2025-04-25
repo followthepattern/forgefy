@@ -38,6 +38,7 @@ export default function UserEdit() {
     useEffect(() => {
         if (updateResult && updateResult > 0) {
             upsertToastSuccess(toastId);
+            navigate(`/${RESOURCE_URL}`);
         }
 
         if (updateError) {
@@ -68,7 +69,7 @@ export default function UserEdit() {
         formState: {
             isDirty,
         },
-    } = useForm<User>({
+    } = useForm<Omit<User, "id">>({
         mode: "onBlur",
         criteriaMode: "all",
         defaultValues: {
@@ -91,7 +92,10 @@ export default function UserEdit() {
     }
 
     const onSave = () => {
-        const values = getValues();
+        const values: User = {
+            id: id,
+            ...getValues()
+        }
 
         toastId.current = saveToast()
 

@@ -1,0 +1,25 @@
+import SectionHeader, { SectionHeaderProperties } from "./sectionHeader/sectionHeader";
+
+import { SortLabel } from "@/lib/query";
+
+interface ListViewProperties {
+    children?: any
+    resourceName: string
+    resourceUrl: string
+    orderByLabels: SortLabel[]
+}
+
+export default function ListView(props: ListViewProperties) {
+    return (
+        <>
+            <SectionHeader
+                resourceName={props.resourceName}
+                resourceUrl={props.resourceUrl}
+                orderByLabels={props.orderByLabels}
+            />
+            <div className="mt-8 overflow-hidden">
+                {props.children}
+            </div>
+        </>
+    )
+}

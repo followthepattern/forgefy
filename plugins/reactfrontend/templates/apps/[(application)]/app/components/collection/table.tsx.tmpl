@@ -1,0 +1,261 @@
+import React, { ReactElement, ReactNode, useContext, useState, createContext } from "react";
+import { Link } from "react-router-dom";
+import classNames from "classnames";
+import { ToHumanReadable } from "@/lib/strings";
+
+interface ColumnProperteis {
+    className?: string
+    children?: any
+    key?: string
+}
+
+export function Column(props: ColumnProperteis, key: any) {
+    return (
+        <th
+            {...props}
+            className={classNames(props.className, "py-3")}
+            key={key}
+        >
+            {props.children}
+        </th>
+    )
+}
+
+interface RowProperties<T> {
+    className?: string
+    children?: any
+    element?: T
+    isSelected?: boolean
+    key?: string
+}
+
+interface RowContext {
+    isSelected: boolean
+    setRowSelected: (v: boolean) => void
+}
+
+const rowContext = createContext<RowContext | null>(null);
+
+export function Row<T>(props: RowProperties<T>, key: string) {
+    let state = {
+        isSelected: props.isSelected ?? false,
+    }
+
+    return (
+        <rowContext.Provider
+            value={
+            {
+                isSelected: state.isSelected,
+                setRowSelected: (value: boolean) => {
+
+                }
+            }}
+        >
+            <tr
+                className={
+                    classNames(props.className,
+                        "",
+                        {
+                            "hover:bg-gray-fill": !props.isSelected,
+                            "bg-gray-stroke-weak": props.isSelected,
+                        })}
+                key={key}
+            >
+                {props.children}
+            </tr>
+        </rowContext.Provider>
+    )
+}
+
+interface CellProperties {
+    className?: string
+    children?: any
+}
+
+export function Cell(props: CellProperties, key: string) {
+    return (
+        <td
+            className={classNames(props.className, "py-2 font-medium text-gray-primary whitespace-nowra")}
+            key={key}
+        >
+            {props.children}
+        </td>
+    )
+}
+
+interface CheckboxProperties {
+    className?: string
+    onChange?: React.ChangeEventHandler<HTMLInputElement>
+    checked?: boolean
+    defaultValue?: boolean
+}
+
+function Checkbox(props: CheckboxProperties) {
+    let state = {
+        isSelected: props.checked
+    }
+
+    const rowProps = useContext(rowContext);
+
+    if (rowProps) {
+        if (state.isSelected === undefined) state.isSelected = rowProps.isSelected;
+    }
+
+    return (
+        <input
+            type="checkbox"
+            onChange={e => {
+                if (props.onChange) {
+                    props.onChange(e);
+                }
+            }}
+            className={classNames(props.className, "block w-6 h-6 border rounded-lg focus:ring-1")}
+            checked={state.isSelected}
+        />
+    )
+}
+
+
+interface TableHeaderProperties<T> {
+    children?: any
+    className?: string
+}
+
+export function TableHeader<T>(props: TableHeaderProperties<T>) {
+    return (
+        <thead
+            className={classNames(props.className, "text-xs text-gray-supporting uppercase gray-fill border-b border-gray-fill")}
+            {...props}
+        >
+            <tr>
+                {props.children}
+            </tr>
+        </thead>
+    )
+}
+
+interface TableBodyProperties<T> {
+    children?: (item: T) => ReactElement | any
+    className?: string
+    items?: T[]
+}
+
+export function TableBody<T extends {
+    id: string
+}
+>(props: TableBodyProperties<T>) {
+    let component: any
+
+    if (typeof (props.children) == "function" && props.items) {
+        let fn = props.children
+        component = props.items.map(item => fn(item))
+    }
+
+    return (
+        <tbody
+            className={classNames(props.className, "divide-y divide-gray-fill")}
+            {...props}
+        >
+            {component}
+        </tbody>
+    )
+}
+
+interface ColumnLabel {
+    id: string
+    name: string
+}
+
+export interface TableProperties<ItemT> {
+    className?: string
+    columns: ColumnLabel[]
+    items: ItemT[]
+    toEditLink: (v: ItemT) => string
+    toViewLink: (v: ItemT) => string
+}
+
+export function Table<T extends { id: string }>(props: TableProperties<T>) {
+    const [selectedRows, setSelectedRows] = useState(new Set());
+
+    return (
+        <>
+            <table
+                className={classNames(props.className, "w-full table-fixed text-sm text-left text-gray-stroke-strong")}
+            >
+                <TableHeader>
+                    <Column
+                        key="key-select-all"
+                        className="pl-4 sm:w-10"
+                    >
+                        <Checkbox
+                            onChange={() => {
+                                if (selectedRows.size != props.items.length) {
+                                    setSelectedRows(new Set(props.items.map(item => item.id)));
+                                    return;
+                                }
+                                setSelectedRows(new Set())
+                            }}
+                            checked={selectedRows.size == props.items.length && props.items.length != 0}
+                        />
+                    </Column>
+                    {props.columns.map(column => (
+                        <Column
+                            className="px-6"
+                            key={column.id}
+                        >
+                            {column.name}
+                        </Column>
+                    ))}
+                    <Column
+                        key="key-actions"
+                        className="px-6 text-right "
+                    >
+                        Action
+                    </Column>
+                </TableHeader>
+                <TableBody items={props.items}>
+                    {item => (
+                        <Row
+                            isSelected={selectedRows.has(item.id)}
+                            key={item.id}
+                        >
+                            <Cell
+                                className="px-4"
+                            >
+                                <Checkbox
+                                    onChange={
+                                        () => {
+                                            if (!selectedRows.has(item.id)) {
+                                                setSelectedRows(prev => new Set(prev.add(item.id)));
+                                                return;
+                                            }
+
+                                            setSelectedRows(prev => {
+                                                prev.delete(item.id);
+                                                return new Set(prev);
+                                            })
+                                        }
+                                    } />
+                            </Cell>
+                            {props.columns.map(column =>
+                                <Cell
+                                    key={item.id + column.id}
+                                    className="px-6"
+                                >
+                                    <Link to={props.toViewLink(item)}>
+                                        {ToHumanReadable((item as any)[column.id])}
+                                    </Link>
+                                </Cell>
+                            )}
+                            <Cell className="px-6 text-right">
+                                <Link to={props.toEditLink(item)} className="p-1 font-medium rounded-lg text-brand hover:bg-gray-stroke-weak">
+                                    Edit
+                                </Link>
+                            </Cell>
+                        </Row>
+                    )}
+                </TableBody>
+            </table>
+        </>
+    )
+}

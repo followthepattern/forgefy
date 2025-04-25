@@ -3,11 +3,40 @@ import { SetURLSearchParams } from "react-router-dom";
 export const PAGE_DEFAULT = 1;
 export const PAGESIZE_DEFAULT = 10;
 
-export interface SortLabel {
-    name: string
-    asc: boolean
-    code: string
+export interface SortLabel extends OrderBy {
+    label: string
 }
+
+export interface OrderBy {
+	name: string
+	desc?: boolean
+}
+
+export interface ListQueryParams {
+	page?: number
+	pageSize?: number
+	search?: string
+	orderBy?: OrderBy[]
+}
+
+export class ListResponse<T> {
+	count?: number
+	page?: number
+	pageSize?: number
+	search?: string
+	data?: T[]
+}
+
+export type ListQueryResult<Data = any> = [
+    (params: ListQueryParams) => void,
+    {
+        loading: boolean;
+        data?: Data;
+        error?: any;
+        itemNotFound?: boolean;
+        called: boolean;
+    }
+];
 
 export const SetPageParams = (
     searchParams: URLSearchParams,
@@ -33,7 +62,7 @@ export const SetSortPatternParrams = (
     setSearchParams: SetURLSearchParams,
     sortLabel: SortLabel,
 ) => {
-    const url = `${sortLabel.code}_${sortLabel.asc ? "asc" : "desc"}`
+    const url = `${sortLabel.name}_${!sortLabel.desc ? "asc" : "desc"}`
     searchParams.set("sort", url)
     setSearchParams(searchParams);
 }
@@ -102,9 +131,9 @@ export function GetSortLabel(searchParams: URLSearchParams): SortLabel | undefin
     }
 
     const result: SortLabel = {
-        code: tags.slice(0, -1).join("_"),
-        asc: tags[tags.length - 1] == "asc",
-        name: ""
+        name: tags.slice(0, -1).join("_"),
+        desc: tags[tags.length - 1] == "desc",
+        label: ""
     }
 
     return result

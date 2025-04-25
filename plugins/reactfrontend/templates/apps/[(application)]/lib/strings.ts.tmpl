@@ -1,6 +1,6 @@
 import { Date, Time } from "./time";
 
-export const ToHumanReadable = function (v: any | undefined): string {
+export const ToHumanReadable = function (v?: any): string {
     if (!v) {
         return "";
     }
@@ -8,7 +8,7 @@ export const ToHumanReadable = function (v: any | undefined): string {
     if (v instanceof Date) {
         return v.toDateString();
     } else if (v instanceof Time) {
-        return v.toTimeString();
+        return v.toHourMinute();
     }
 
     return v.toString();

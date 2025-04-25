@@ -7,7 +7,7 @@ interface SearchInputValues {
 }
 
 interface SearchInputProperties {
-    onChange: (s: string) => void
+    onChange?: (s: string) => void
     search?: string
     className?: string
 }
@@ -17,8 +17,9 @@ export default function SearchInput(props: SearchInputProperties) {
 
     const handleInputChange = (_: any) => {
         const formValues = getValues();
-
-        props.onChange(formValues.search);
+        if (props.onChange) {
+            props.onChange(formValues.search);
+        }
     };
 
     return (
@@ -33,7 +34,7 @@ export default function SearchInput(props: SearchInputProperties) {
                 render={({ field: { onChange } }) => (
                     <input
                         type="text"
-                        className="w-full h-full py-2 pl-10 text-gray-primary border border-gray-stroke-weak rounded-lg placeholder:text-gray-stroke-strong focus:ring-0 focus:ring-inset"
+                        className="w-full h-full py-2 pl-10 border rounded-lg text-gray-primary border-gray-stroke-weak placeholder:text-gray-stroke-strong focus:ring-0 focus:ring-inset"
                         placeholder="Search"
                         onChange={(e) => {
                             onChange(e);

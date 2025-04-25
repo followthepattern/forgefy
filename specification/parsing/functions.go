@@ -7,7 +7,7 @@ import (
 	"github.com/followthepattern/forgefy/specification/types"
 )
 
-func CreateTableView(t types.TypeRegistry) func([]models.Field) []models.Field {
+func CreateTableViewFilter(t types.TypeRegistry) func([]models.Field) []models.Field {
 	return func(f []models.Field) []models.Field {
 		copiedFields := slices.Clone(f)
 
