@@ -23,7 +23,7 @@ const columns = [
     id: "{{ $field.Name | LowerSnakeCase }}",
     name: "{{ $field.Name | HumanReadable }}",
   },
-{{ end -}}
+{{- end -}}
 ]
 
 const orderByLabels: SortLabel[] = [
@@ -33,7 +33,7 @@ const orderByLabels: SortLabel[] = [
     label: "{{ $field.Name | HumanReadable }}",
     desc: false,
   },
-{{ end -}}
+{{- end -}}
 ];
 
 function viewLink(value: {{ $feature.FeatureName | UpperCamelCase }}): string {
