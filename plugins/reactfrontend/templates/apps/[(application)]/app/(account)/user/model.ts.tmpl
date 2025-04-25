@@ -1,17 +1,30 @@
 import { MutationResourceResponse } from "@/graphql/mutation";
 import { QueryResourceResponse } from "@/graphql/query";
 
-export interface User {
-	id?: string | null
+export class User {
+	constructor(v: UserResponse) {
+		this.id = v.id ?? "";
+		this.email = v.email;
+		this.firstName = v.firstName;
+		this.lastName = v.lastName;
+	}
+	id: string
 	email?: string | null
 	firstName?: string | null
 	lastName?: string | null
 }
 
+export interface UserResponse {
+	id?: string
+	email?: string
+	firstName?: string
+	lastName?: string
+}
+
 export interface MutationResponse {
-    users: MutationResourceResponse
+	users: MutationResourceResponse
 }
 
 export interface QueryResponse {
-	users?: QueryResourceResponse<User>
+	users?: QueryResourceResponse<UserResponse>
 }

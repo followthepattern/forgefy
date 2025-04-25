@@ -5,8 +5,12 @@ import { User, QueryResponse } from "../model";
 
 export default function useSingleUser(id: string): SingleQueryResult<User> {
     const parseResult = (data?: QueryResponse): User | undefined => {
-        return data?.users?.single
+        if (!data?.users?.single) {
+            return undefined;
+        }
+
+        return new User(data?.users.single);
     }
 
-    return useSingle<User>({id, parseResult, graphQL})
+    return useSingle<User>({ id, parseResult, graphQL })
 }

@@ -46,7 +46,7 @@ export default function SortButton(props: SortButtonProperties) {
                                     {({ selected }) => (
                                         <span
                                             className="flex justify-between px-4 py-2 text-sm cursor-pointer text-gray-supporting hover:bg-gray-fill hover:text-gray-primary"
-                                        >{sortLabel.name} {selected && <CheckIcon className="w-5 h-5" />}</span>
+                                        >{sortLabel.label} {selected && <CheckIcon className="w-5 h-5" />}</span>
                                     )}
                                 </Listbox.Option>
                             ))}

@@ -5,7 +5,24 @@ import useList from "@/graphql/hooks/useList";
 
 export default function useListUser(): ListQueryResult<ListResponse<User>> {
     const parseResult = (data?: QueryResponse): ListResponse<User> | undefined => {
-        return data?.users?.list;
+        if (!data?.users?.list) {
+            return undefined;
+        }
+
+        var result = new ListResponse<User>();
+
+        result.count = data.users?.list.count;
+        result.pageSize = data.users?.list.pageSize;
+        result.page = data.users?.list.page;
+
+        var d = new Array<User>();
+
+        data.users.list.data?.forEach(element => {
+            d.push(new User(element));
+        });
+
+        result.data = d;
+        return result;
     }
 
     return useList<User>({parseResult, graphQL})

@@ -18,7 +18,7 @@ import useList{{ $feature.FeatureName | UpperCamelCase }} from './hooks/list{{ $
 import { {{ $feature.FeatureName | UpperCamelCase }} } from './model';
 
 const columns = [
-{{- range $field := $feature.Fields | NoneID }}
+{{- range $field := $feature.Fields | TableViewFilter }}
   {
     id: "{{ $field.Name | LowerSnakeCase }}",
     name: "{{ $field.Name | HumanReadable }}",

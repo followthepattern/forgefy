@@ -1,6 +1,7 @@
 import React, { ReactElement, ReactNode, useContext, useState, createContext } from "react";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
+import { ToHumanReadable } from "@/lib/strings";
 
 interface ColumnProperteis {
     className?: string
@@ -242,7 +243,7 @@ export function Table<T extends { id: string }>(props: TableProperties<T>) {
                                     className="px-6"
                                 >
                                     <Link to={props.toViewLink(item)}>
-                                        {(item as any)[column.id]}
+                                        {ToHumanReadable((item as any)[column.id])}
                                     </Link>
                                 </Cell>
                             )}

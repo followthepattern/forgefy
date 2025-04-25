@@ -52,4 +52,10 @@ export class Time extends IntTime {
         const second = String(this.second).padStart(2, '0');
         return `${hour}:${minute}:${second}`
     }
+
+    toHourMinute(): string {
+        const hour = String(this.hour).padStart(2, '0');
+        const minute = String(this.minute).padStart(2, '0');
+        return `${hour}:${minute}`
+    }
 }
