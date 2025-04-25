@@ -88,7 +88,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
         getValues,
         {{if $feature | HasFile -}} setValue, {{- end }}
         handleSubmit,
-    } = useForm<{{ $feature.FeatureName | UpperCamelCase }}>({
+    } = useForm<Omit<{{ $feature.FeatureName | UpperCamelCase }}, "id">>({
         mode: "onBlur",
         criteriaMode: "all",
         defaultValues: {
@@ -110,7 +110,10 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
     }
 
     const onSave = () => {
-        const values = getValues();
+        const values: {{ $feature.FeatureName | UpperCamelCase }} = {
+            id: "",
+            ...getValues(),
+        }
 
         toastId.current = saveToast()
 
