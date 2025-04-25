@@ -38,8 +38,13 @@ import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 import useSingle{{ $feature.FeatureName | UpperCamelCase }} from "../../../hooks/single{{ $feature.FeatureName | UpperCamelCase }}";
 import useUpdate{{ $feature.FeatureName | UpperCamelCase }} from "../../../hooks/update{{ $feature.FeatureName | UpperCamelCase }}";
 import useDelete{{ $feature.FeatureName | UpperCamelCase }} from "../../../hooks/delete{{ $feature.FeatureName | UpperCamelCase }}";
+
+{{if $feature | HasFile -}}
+import { RESOURCE_NAME } from "../../../const";
+{{ end -}}
 import { RESOURCE_URL } from "../../../const";
 import { {{ $feature.FeatureName | UpperCamelCase }} } from "../../../model";
+
 
 export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
     const { id = "" } = useParams();
@@ -133,7 +138,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
 
     return (
         <>
-            <SingleLayout.Title>{{ $feature.FeatureName | UpperCamelCase }}: {data?.id}</SingleLayout.Title>
+            <SingleLayout.Title>{{ $feature.FeatureName | HumanReadable }}: {data?.id}</SingleLayout.Title>
             <form action="">
                 <GridFields className="py-6">
                 {{- range $field := $feature.Fields | NoneID }}

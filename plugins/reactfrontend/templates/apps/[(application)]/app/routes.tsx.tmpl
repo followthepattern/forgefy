@@ -1,25 +1,26 @@
 import { RouteObject } from "react-router-dom"
-import Login from "./(auth)/login/page"
-import Register from "./(auth)/register/page"
+
 import AuthLayout from "./(auth)/layout"
 import AccountLayout from "./(account)/layout"
+import ListLayout from "./(account)/layouts/listLayout"
 import UserSingleLayout from "./(account)/user/(single)/layout"
+
+import Login from "./(auth)/login/page"
+import Register from "./(auth)/register/page"
+
+import Profile from "./(account)/profile/page"
+
 import UserList from "./(account)/user/page"
 import UserSingle from "./(account)/user/(single)/[id]/page"
 import UserEdit from "./(account)/user/(single)/[id]/edit/page"
 import UserNew from "./(account)/user/(single)/new/page"
-{{- range $feature := .Features }}
+{{ range $feature := .Features }}
 import {{ $feature.FeatureName | UpperCamelCase }}List from "./(account)/{{ .FeatureNameDir }}/page"
 import {{ $feature.FeatureName | UpperCamelCase }}Single from "./(account)/{{ .FeatureNameDir }}/(single)/[id]/page"
 import {{ $feature.FeatureName | UpperCamelCase }}Edit from "./(account)/{{ .FeatureNameDir }}/(single)/[id]/edit/page"
 import {{ $feature.FeatureName | UpperCamelCase }}New from "./(account)/{{ .FeatureNameDir }}/(single)/new/page"
 import {{ $feature.FeatureName | UpperCamelCase }}SingleLayout from "./(account)/{{ .FeatureNameDir }}/(single)/layout"
-{{- end }}
-
-import Profile from "./(account)/profile/page"
-
-import { ListPageWrapper } from "./(account)/components/listPage/listPageWrapper/listPageWrapper"
-
+{{ end }}
 export const Routes: RouteObject[] = [
     {
         path: "/",
@@ -60,7 +61,13 @@ export const Routes: RouteObject[] = [
             },
             {
                 path: "user",
-                element: <ListPageWrapper Component={UserList} />,
+                element: <ListLayout />,
+                children: [
+                    {
+                        path: "user",
+                        element: <UserList />
+                    }
+                ]
             },
             {
                 path: "user",
@@ -83,7 +90,13 @@ export const Routes: RouteObject[] = [
 {{- range $feature := .Features }}
             {
                 path: "{{ $feature | URL }}",
-                element: <ListPageWrapper Component={{ "{" }}{{ .FeatureNameCamelCaseUpper }}List} />,
+                element: <ListLayout />,
+                children: [
+                    {
+                        path: "",
+                        element: <{{ $feature.FeatureName | UpperCamelCase }}List />
+                    }
+                ]
             },
             {
                 path: "{{ $feature | URL }}",
@@ -91,15 +104,15 @@ export const Routes: RouteObject[] = [
                 children: [
                     {
                         path: ":id",
-                        element: <{{ .FeatureNameCamelCaseUpper }}Single />
+                        element: <{{ $feature.FeatureName | UpperCamelCase }}Single />
                     },
                     {
                         path: "new",
-                        element: <{{ .FeatureNameCamelCaseUpper }}New />
+                        element: <{{ $feature.FeatureName | UpperCamelCase }}New />
                     },
                     {
                         path: ":id/edit",
-                        element: <{{ .FeatureNameCamelCaseUpper }}Edit />
+                        element: <{{ $feature.FeatureName | UpperCamelCase }}Edit />
                     },
                 ]
             },
