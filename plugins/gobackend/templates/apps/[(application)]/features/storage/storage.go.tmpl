@@ -1,8 +1,13 @@
+{{ $app := .App -}}
+
 package storage
 
 import (
+	"log/slog"
 	"mime/multipart"
 	"os"
+
+	"github.com/{{ $app | PackageName }}/log"
 )
 
 const (
@@ -17,6 +22,7 @@ var (
 
 type Config struct {
 	uploadDirectory string
+	logger          *slog.Logger
 }
 
 type Storage interface {
@@ -40,6 +46,12 @@ func WithUploadDirectory(path string) StorageOpt {
 	})
 }
 
+func WithLogger(logger *slog.Logger) StorageOpt {
+	return storageOptFunc(func(cfg *Config) {
+		cfg.logger = logger
+	})
+}
+
 func NewStorage(opts ...StorageOpt) Storage {
 	cfg := &Config{}
 
@@ -49,5 +61,7 @@ func NewStorage(opts ...StorageOpt) Storage {
 
 	return &LocalStorage{
 		cfg: *cfg,
+		logger: cfg.logger.With(
+			log.WithComponent("local storage")),
 	}
 }

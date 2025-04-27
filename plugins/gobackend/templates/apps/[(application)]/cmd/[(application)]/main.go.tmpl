@@ -6,7 +6,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 
@@ -21,6 +20,7 @@ import (
 	"github.com/{{ $app | PackageName }}/controllers"
 	"github.com/{{ $app | PackageName }}/features/mail"
 	"github.com/{{ $app | PackageName }}/hostserver"
+	"github.com/{{ $app | PackageName }}/log"
 
 	_ "github.com/lib/pq"
 )
@@ -28,40 +28,60 @@ import (
 func main() {
 	cfg, err := config.Parse()
 	if err != nil {
-		log.Fatal(err)
+		log.DefaultLogger.Error("failed to parse config", log.WithError(err))
+		os.Exit(1)
 	}
 
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.Level(cfg.Server.LogLevel),
-	}))
+	logger := log.New(cfg)
+	logger.Info("using following config",
+		slog.String("version", cfg.Server.Version),
+		slog.String("host", cfg.Server.Host),
+		slog.String("port", cfg.Server.Port),
+		slog.Int("log level", cfg.Server.LogLevel),
+		slog.String("db", cfg.DB.Host),
+		slog.Int("db port", cfg.DB.Port),
+		slog.String("mail", cfg.Mail.Host),
+		slog.String("organization", cfg.Organization.Name),
+		slog.String("organization email", cfg.Organization.Email),
+		slog.String("cerbos address", cfg.Cerbos.Address),
+	)
 
 	jwt, err := config.GetKeys(logger, cfg.Server)
 	if err != nil {
-		log.Fatal(err)
+		logger.Error("failed to get keys", log.WithError(err))
+		os.Exit(1)
 	}
 
-	db, err := sql.Open("postgres", cfg.DB.ConnectionURL())
+	db, err := createDBConn(cfg)
 	if err != nil {
-		log.Fatal(err)
+		logger.Error("failed to create db connection", log.WithError(err))
+		os.Exit(1)
 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			logger.Error("failed to close db connection", log.WithError(err))
+		}
+	}()
 
 	ctx := context.Background()
 
 	cerbosClient, err := accesscontrol.New(cfg.Cerbos)
 	if err != nil {
-		log.Fatal(err)
+		logger.Error("failed to create cerbos client", log.WithError(err))
+		os.Exit(1)
 	}
 
 	emailClient := mail.NewClient()
 
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-
-	cont := container.New(cerbosClient, emailClient, db, *cfg, logger, jwt)
+	cont := container.New(
+		cerbosClient,
+		emailClient,
+		db,
+		cfg,
+		jwt,
+		container.WithLogger(logger),
+	)
 
 	ctrls := controllers.New(cont)
 
@@ -69,18 +89,33 @@ func main() {
 
 	restHandler := rest.New(ctrls)
 
-	router := api.NewHttpApi(*cfg, jwt, graphqlHandler, restHandler, logger)
+	router := api.NewHttpApi(cfg, jwt, graphqlHandler, restHandler, logger)
 
 	server := hostserver.NewServer(router, logger)
 	ctx, cancel := context.WithCancel(ctx)
 
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
 	go func() {
 		osCall := <-c
-		logger.Info(fmt.Sprintf("Stop server system call:%+v", osCall))
+		logger.Info("received os call", slog.String("os call", osCall.String()))
 		cancel()
 	}()
 
 	if err := server.Serve(ctx, cfg.Server.Host, cfg.Server.Port); err != nil {
-		logger.Error("failed to serve server", err)
+		logger.Error("failed to serve server", log.WithError(err))
 	}
+}
+
+func createDBConn(cfg config.Config) (*sql.DB, error) {
+	db, err := sql.Open("postgres", cfg.DB.ConnectionURL())
+	if err != nil {
+		return nil, fmt.Errorf("failed to open db connection: %w", err)
+	}
+
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to ping db: %w", err)
+	}
+
+	return nil, err
 }

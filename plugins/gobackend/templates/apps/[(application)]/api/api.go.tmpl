@@ -35,7 +35,7 @@ func NewHttpApi(cfg config.Config,
 	r.Use(middlewares.SessionContextID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
-	r.Use(middlewares.Heartbeat("/healthcheck", cfg.Version))
+	r.Use(middlewares.Heartbeat("/healthcheck", cfg.Server.Version))
 
 	middlewares.AddMiddlewareLogger(r, logger)
 
