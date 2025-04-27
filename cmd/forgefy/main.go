@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,6 +17,14 @@ import (
 )
 
 func main() {
+	logHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}).
+		WithAttrs([]slog.Attr{
+			slog.String("app", "forgefy"),
+			slog.String("version", "0.7.0")},
+		)
+
+	logger := slog.New(logHandler)
+
 	var file string
 	var outputDir string
 	var exclude string
@@ -28,12 +36,12 @@ func main() {
 		Long:  `forgefy generates web applications using golang template framework from a forge config file, that uses yaml syntax.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			if file == "" {
-				fmt.Fprintln(os.Stdout, "file can't be empty")
+				logger.Error("file can't be empty")
 				cmd.Help()
 				os.Exit(1)
 			}
 			if outputDir == "" {
-				fmt.Fprintln(os.Stdout, "output can't be empty")
+				logger.Error("output can't be empty")
 				cmd.Help()
 				os.Exit(1)
 			}
@@ -46,23 +54,23 @@ func main() {
 	root.Flags().BoolVarP(&cleanUp, "cleanup", "c", false, "set to true if you want to delete the previous forge")
 
 	if err := root.Execute(); err != nil {
-		fmt.Println(err.Error())
+		logger.Error(err.Error())
 		os.Exit(1)
 	}
 
 	excludedFiles := createExcludeMap(exclude)
 
-	if cleanUp {
+	if _, err := os.Stat(outputDir); !os.IsNotExist(err) && cleanUp {
 		err := remove(outputDir, excludedFiles)
 		if err != nil {
-			fmt.Println(err.Error())
+			logger.Error("could not remove previous forge", slog.String("error", err.Error()))
 			os.Exit(1)
 		}
 	}
 
 	forgeFile, err := os.ReadFile(file)
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Error("could not read forge file", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
 
@@ -72,7 +80,7 @@ func main() {
 
 	fw := forgeio.NewFileWriter(outputDir)
 
-	now := time.Now()
+	forgeStart := time.Now()
 
 	productName, err := f.Forge(
 		string(forgeFile),
@@ -80,12 +88,12 @@ func main() {
 		forgefy.WithExcludedFiles(excludedFiles))
 
 	if err != nil {
-		fmt.Printf("during forging %s following error occured: %s", productName, err.Error())
+		slog.Error("during forging error occured", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
 
-	fmt.Printf("%s is successfully forged to %s\n", productName, outputDir)
-	fmt.Println("forged time", time.Since(now))
+	logger.Info("successfully forged", slog.String("product", productName))
+	logger.Info("forging time", slog.String("duration", time.Since(forgeStart).String()))
 }
 
 func createExcludeMap(exclude string) map[string]struct{} {
