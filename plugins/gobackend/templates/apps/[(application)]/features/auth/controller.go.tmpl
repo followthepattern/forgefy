@@ -8,6 +8,7 @@ import (
 
 	"github.com/{{ $app | PackageName }}/config"
 	"github.com/{{ $app | PackageName }}/container"
+	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -20,7 +21,8 @@ type AuthController struct {
 
 func NewAuthController(cont container.Container) AuthController {
 	authDatabase := NewAuthDatabase(cont.GetDB())
-	authService := NewAuthenticationService(cont.GetConfig(), authDatabase, cont.GetEmail(), cont.GetJWTKeys())
+	authService := NewAuthenticationService(cont.GetConfig(), authDatabase, cont.GetEmail(), cont.GetJWTKeys(), cont.GetLogger().With(
+		log.WithComponent("auth")))
 
 	return AuthController{
 		authService: authService,

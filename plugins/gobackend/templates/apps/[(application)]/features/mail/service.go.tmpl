@@ -3,25 +3,28 @@
 package mail
 
 import (
+	"log/slog"
 	"net/smtp"
 
 	"github.com/{{ $app | PackageName }}/config"
 )
 
 type Mail struct {
-	cfg   config.Mail
-	email Email
+	logger *slog.Logger
+	cfg    config.Config
+	email  Email
 }
 
-func NewMail(cfg config.Mail, emailClient Email) Mail {
+func NewMail(cfg config.Config, emailClient Email, logger *slog.Logger) Mail {
 	return Mail{
-		cfg:   cfg,
-		email: emailClient,
+		logger: logger,
+		cfg:    cfg,
+		email:  emailClient,
 	}
 }
 
 func (service Mail) SendMail(mail MailModel) error {
-	config := service.cfg
+	mailCfg := service.cfg.Mail
 
 	service.email.SetFrom(mail.From)
 	service.email.SetTo(mail.To)
@@ -30,11 +33,16 @@ func (service Mail) SendMail(mail MailModel) error {
 	service.email.SetHTML(mail.HTML)
 
 	err := service.email.
-		Send(config.Addr,
+		Send(service.cfg.Organization.Name,
 			smtp.PlainAuth("",
-				config.Username,
-				config.Password,
-				config.Host))
+				mailCfg.Username,
+				mailCfg.Password,
+				mailCfg.Host))
+
+	if err != nil {
+		service.logger.Error("error sending mail", slog.String("error", err.Error()))
+		return err
+	}
 
 	return err
 }

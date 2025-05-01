@@ -72,15 +72,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	emailClient := mail.NewClient()
+	mail := mail.NewMail(cfg, mail.NewClient(), logger.With(log.WithComponent("mail")))
 
 	cont := container.New(
 		cerbosClient,
-		emailClient,
 		db,
 		cfg,
 		jwt,
 		container.WithLogger(logger),
+		container.WithEMail(mail),
 	)
 
 	ctrls := controllers.New(cont)

@@ -28,22 +28,27 @@ func WithLogger(logger *slog.Logger) ContainerOption {
 	})
 }
 
+func WithEMail(emailService mail.Mail) ContainerOption {
+	return ContainerOptionFn(func(c *Container) {
+		c.email = emailService
+	})
+}
+
 type Container struct {
 	ac      accesscontrol.AccessControl
-	email   mail.Email
+	email   mail.Mail
 	db      *sql.DB
 	cfg     config.Config
 	jwtKeys config.JwtKeyPair
 	logger  *slog.Logger
 }
 
-func New(ac accesscontrol.AccessControl, emailClient mail.Email, db *sql.DB, cfg config.Config, jwtKeys config.JwtKeyPair, opts ...ContainerOption) Container {
+func New(ac accesscontrol.AccessControl, db *sql.DB, cfg config.Config, jwtKeys config.JwtKeyPair, opts ...ContainerOption) Container {
 	c := Container{
 		ac:      ac,
 		db:      db,
 		cfg:     cfg,
 		logger:  log.DefaultLogger,
-		email:   emailClient,
 		jwtKeys: jwtKeys,
 	}
 
@@ -70,7 +75,7 @@ func (c Container) GetLogger() *slog.Logger {
 	return c.logger
 }
 
-func (c Container) GetEmail() mail.Email {
+func (c Container) GetEmail() mail.Mail {
 	return c.email
 }
 
