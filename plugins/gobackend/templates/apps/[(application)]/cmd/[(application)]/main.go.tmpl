@@ -89,7 +89,7 @@ func main() {
 
 	restHandler := rest.New(ctrls)
 
-	router := api.NewHttpApi(cfg, jwt, graphqlHandler, restHandler, logger)
+	router := api.NewHttpApi(cfg, jwt, graphqlHandler, restHandler, logger.With(log.WithComponent("api")))
 
 	server := hostserver.NewServer(router, logger)
 	ctx, cancel := context.WithCancel(ctx)

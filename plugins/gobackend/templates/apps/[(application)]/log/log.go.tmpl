@@ -38,7 +38,7 @@ func New(cfg config.Config) *slog.Logger {
 			Level: slog.Level(cfg.Server.LogLevel),
 		},
 	).WithAttrs([]slog.Attr{
-		slog.String("app", "backend1"),
+		slog.String("app", "{{ $app | PackageName }}"),
 	})
 
 	logger := slog.New(loggerHandler)

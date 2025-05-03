@@ -37,9 +37,10 @@ func NewHttpApi(cfg config.Config,
 	r.Use(middleware.Recoverer)
 	r.Use(middlewares.Heartbeat("/healthcheck", cfg.Server.Version))
 
-	middlewares.AddMiddlewareLogger(r, logger)
-
 	authMiddleware := middlewares.NewJWT(logger, jwtKeys)
+
+	middlewareLogger := middlewares.NewMiddlewareLogger(logger)
+	r.Use(middlewareLogger)
 
 	r.Route("/", func(r chi.Router) {
 		r.With(authMiddleware.Authenticate).Post("/graphql", graphqlHandler.ServeHTTP)

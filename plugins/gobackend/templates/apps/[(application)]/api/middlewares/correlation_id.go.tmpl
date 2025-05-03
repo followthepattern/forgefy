@@ -10,7 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// CorrelationID adds a correlation ID to the request context.
 func CorrelationID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		correlationID := r.Header.Get("X-Correlation-ID")
@@ -21,7 +20,6 @@ func CorrelationID(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), models.CorrelationIDKey, correlationID)
 		r = r.WithContext(ctx)
 
-		// Add the correlation ID to the response header
 		w.Header().Set("X-Correlation-ID", correlationID)
 
 		next.ServeHTTP(w, r)
