@@ -1,0 +1,63 @@
+{{ $app := .App -}}
+
+package models
+
+import (
+	"context"
+	"errors"
+
+	"github.com/{{ $app | PackageName }}/types"
+)
+
+type ContextKey string
+
+const (
+	UserContextKey   = "UserContext"
+	CorrelationIDKey = "CorrelationID"
+)
+
+type UserContext struct {
+	Id        types.String
+	Email     types.String
+	FirstName types.String
+	LastName  types.String
+}
+
+func (u UserContext) IsDefault() bool {
+	return u.Id.IsZero() || u.Email.IsZero() || u.FirstName.IsZero() || u.LastName.IsZero()
+}
+
+func GetUserContext(ctx context.Context) (UserContext, error) {
+	obj := ctx.Value(UserContextKey)
+
+	model, ok := obj.(UserContext)
+	if !ok {
+		return UserContext{}, errors.New("invalid user context")
+	}
+
+	if model.IsDefault() {
+		return UserContext{}, errors.New("invalid user context")
+	}
+
+	return model, nil
+}
+
+func GetUserContextForLogging(ctx context.Context) string {
+	uctx, err := GetUserContext(ctx)
+	if err != nil {
+		return ""
+	}
+
+	if uctx.IsDefault() {
+		return ""
+	}
+
+	return uctx.Id.String()
+}
+
+func GetCorrelationID(ctx context.Context) string {
+	if correlationID, ok := ctx.Value(CorrelationIDKey).(string); ok {
+		return correlationID
+	}
+	return ""
+}

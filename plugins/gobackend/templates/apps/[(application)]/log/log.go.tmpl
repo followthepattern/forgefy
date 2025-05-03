@@ -1,10 +1,14 @@
+{{ $app := .App -}}
+
 package log
 
 import (
+	"context"
 	"log/slog"
 	"os"
 
-	"github.com/backend1/config"
+	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/models"
 )
 
 var (
@@ -17,6 +21,14 @@ func WithComponent(component string) slog.Attr {
 
 func WithError(err error) slog.Attr {
 	return slog.String("error", err.Error())
+}
+
+func WithCorrelationID(ctx context.Context) slog.Attr {
+	return slog.String("correlation_id", models.GetCorrelationID(ctx))
+}
+
+func WithUserContext(ctx context.Context) slog.Attr {
+	return slog.String("user_id", models.GetUserContextForLogging(ctx))
 }
 
 func New(cfg config.Config) *slog.Logger {
