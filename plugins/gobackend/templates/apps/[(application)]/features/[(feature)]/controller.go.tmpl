@@ -18,17 +18,17 @@ import (
 )
 
 type {{ $feature | GoType }}Controller struct {
-	{{ $feature.FeatureNameCamelCase }} {{ $feature | GoType }}Service
+	{{ $feature.FeatureName | LowerCamelCase }} {{ $feature | GoType }}Service
 	logger  *slog.Logger
 	cfg     config.Config
 }
 
 func New{{ $feature | GoType }}Controller(cont container.Container) {{ $feature | GoType }}Controller {
 	authorizationService := auth.NewAuthorizationService(cont, "{{ $feature.FeatureNameCamelCase }}")
-	{{ $feature.FeatureNameCamelCase }}Service := New{{ $feature | GoType }}Service(cont, authorizationService)
+	{{ $feature.FeatureName | LowerCamelCase }}Service := New{{ $feature | GoType }}Service(cont, authorizationService)
 
 	return {{ $feature | GoType }}Controller{
-		{{ $feature.FeatureNameCamelCase }}: {{ $feature.FeatureNameCamelCase }}Service,
+		{{ $feature.FeatureName | LowerCamelCase }}: {{ $feature.FeatureName | LowerCamelCase }}Service,
 		logger:  cont.GetLogger().With(log.WithComponent("{{ $feature.FeatureName | LowerCamelCase }} controller")),
 		cfg:     cont.GetConfig(),
 	}
