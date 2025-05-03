@@ -7,18 +7,14 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-type LoggerInterface interface {
-	Print(v ...interface{})
-}
+type logPrinter func(v ...any)
 
-type logPrinter func(v ...interface{})
-
-func (f logPrinter) Print(v ...interface{}) {
+func (f logPrinter) Print(v ...any) {
 	f(v)
 }
 
 func AddMiddlewareLogger(r *chi.Mux, logger *slog.Logger) {
-	logFunc := logPrinter(func(values ...interface{}) {
+	logFunc := logPrinter(func(values ...any) {
 		logger.Debug("HTTP", slog.Any("values", values))
 	})
 
