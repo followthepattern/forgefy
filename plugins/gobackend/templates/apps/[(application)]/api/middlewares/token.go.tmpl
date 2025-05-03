@@ -8,8 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/{{ $app | PackageName }}/features/auth"
-	"github.com/{{ $app | PackageName }}/features/user/models"
+	"github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/types"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -25,43 +24,41 @@ func invalidTokenError(field string) error {
 	return fmt.Errorf("%s - missing field: %s", InvalidToken, field)
 }
 
-func getAuthorizedUserFromClaims(claims jwt.MapClaims) (*auth.AuthUser, error) {
+func getAuthorizedUserFromClaims(claims jwt.MapClaims) (models.UserContext, error) {
 	id, ok := claims["id"].(string)
 	if !ok {
-		return nil, invalidTokenError("id")
+		return models.UserContext{}, invalidTokenError("id")
 	}
 	email, ok := claims["email"].(string)
 	if !ok {
-		return nil, invalidTokenError("email")
+		return models.UserContext{}, invalidTokenError("email")
 	}
 	firstName, ok := claims["firstName"].(string)
 	if !ok {
-		return nil, invalidTokenError("firstName")
+		return models.UserContext{}, invalidTokenError("firstName")
 	}
 	lastName, ok := claims["lastName"].(string)
 	if !ok {
-		return nil, invalidTokenError("lastName")
+		return models.UserContext{}, invalidTokenError("lastName")
 	}
 	expiresAtStr, ok := claims["expiresAt"].(string)
 	if !ok {
-		return nil, invalidTokenError("expiresAt")
+		return models.UserContext{}, invalidTokenError("expiresAt")
 	}
 	expiresAt, err := time.Parse(time.RFC3339, expiresAtStr)
 	if err != nil {
-		return nil, err
+		return models.UserContext{}, err
 	}
 
 	if time.Now().After(expiresAt) {
-		return nil, errors.New(ExpiredToken)
+		return models.UserContext{}, errors.New(ExpiredToken)
 	}
 
-	return &auth.AuthUser{
-		UserModel: models.UserModel{
-			Id:        types.StringFrom(id),
-			Email:     types.StringFrom(email),
-			FirstName: types.StringFrom(firstName),
-			LastName:  types.StringFrom(lastName),
-		},
+	return models.UserContext{
+		Id:        types.StringFrom(id),
+		Email:     types.StringFrom(email),
+		FirstName: types.StringFrom(firstName),
+		LastName:  types.StringFrom(lastName),
 	}, nil
 }
 
