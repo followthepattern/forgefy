@@ -7,15 +7,15 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-type logPrinter func(v ...any)
+type logFn func(v ...any)
 
-func (f logPrinter) Print(v ...any) {
+func (f logFn) Print(v ...any) {
 	f(v)
 }
 
 func AddMiddlewareLogger(r *chi.Mux, logger *slog.Logger) {
-	logFunc := logPrinter(func(values ...any) {
-		logger.Debug("HTTP", slog.Any("values", values))
+	logFunc := logFn(func(values ...any) {
+		logger.Info("HTTP", slog.Any("values", values))
 	})
 
 	middleware.DefaultLogger = middleware.RequestLogger(&middleware.DefaultLogFormatter{
