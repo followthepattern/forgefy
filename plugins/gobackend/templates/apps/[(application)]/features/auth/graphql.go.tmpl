@@ -72,6 +72,6 @@ func (r AuthGraphQL) Register(ctx context.Context, args struct {
 	return registerResponse, nil
 }
 
-func (graphQL AuthGraphQL) Profile(ctx context.Context) (*AuthUser, error) {
+func (graphQL AuthGraphQL) Profile(ctx context.Context) (*UserPassword, error) {
 	return graphQL.ctrl.Profile(ctx)
 }

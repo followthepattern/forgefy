@@ -11,6 +11,7 @@ import (
 	"github.com/{{ $app | PackageName }}/features/auth"
 	"github.com/{{ $app | PackageName }}/features/user/models"
 	"github.com/{{ $app | PackageName }}/types"
+	"github.com/{{ $app | PackageName }}/log"
 
 	"github.com/google/uuid"
 )
@@ -26,7 +27,7 @@ func NewUserService(cont container.Container, authorizationService auth.Authoriz
 	service := UserService{
 		authorizationService: authorizationService,
 		userRepository:       repository,
-		logger:               cont.GetLogger(),
+		logger:               cont.GetLogger().With(log.WithComponent("user service")),
 	}
 
 	return service
@@ -35,6 +36,7 @@ func NewUserService(cont container.Container, authorizationService auth.Authoriz
 func (service UserService) GetByID(ctx context.Context, id string) (*models.UserModel, error) {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, id)
 	if err != nil {
+		service.logger.Error("failed to authorize user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
@@ -44,6 +46,7 @@ func (service UserService) GetByID(ctx context.Context, id string) (*models.User
 func (service UserService) Get(ctx context.Context, request models.UserListRequestParams) (*models.UserListResponse, error) {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, accesscontrol.ALLRESOURCE)
 	if err != nil {
+		service.logger.Error("failed to authorize user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
@@ -55,6 +58,7 @@ func (service UserService) Get(ctx context.Context, request models.UserListReque
 func (service UserService) Create(ctx context.Context, value models.UserModel) error {
 	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.CREATE, accesscontrol.NEW)
 	if err != nil {
+		service.logger.Error("failed to authorize user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
@@ -67,6 +71,7 @@ func (service UserService) Create(ctx context.Context, value models.UserModel) e
 func (service UserService) Update(ctx context.Context, value models.UserModel) error {
 	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.UPDATE, value.Id.Data)
 	if err != nil {
+		service.logger.Error("failed to authorize user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
@@ -78,6 +83,7 @@ func (service UserService) Update(ctx context.Context, value models.UserModel) e
 func (service UserService) Delete(ctx context.Context, id string) error {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.DELETE, id)
 	if err != nil {
+		service.logger.Error("failed to authorize user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 

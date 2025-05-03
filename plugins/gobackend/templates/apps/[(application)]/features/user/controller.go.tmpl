@@ -28,7 +28,7 @@ func NewUserController(cont container.Container) UserController {
 
 	return UserController{
 		user:   userService,
-		logger: cont.GetLogger().With(log.WithComponent("user")),
+		logger: cont.GetLogger().With(log.WithComponent("user controller")),
 		cfg:    cont.GetConfig(),
 	}
 }
