@@ -59,7 +59,7 @@ func (ctrl {{ $feature | GoType }}Controller) Get(ctx context.Context, request m
 
 func (ctrl {{ $feature | GoType }}Controller) Create(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
 	if err := value.CreateValidate(); err != nil {
-		ctrl.logger.Error("failed to validate creating {{ $feature.FeatureName | LowerCamelCase  }}", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
+		ctrl.logger.Error("failed to validate create item", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 	return ctrl.{{ $feature.FeatureNameCamelCase }}.Create(ctx, value)
@@ -67,7 +67,7 @@ func (ctrl {{ $feature | GoType }}Controller) Create(ctx context.Context, value 
 
 func (ctrl {{ $feature | GoType }}Controller) Update(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
 	if err := value.UpdateValidate(); err != nil {
-		ctrl.logger.Error("failed to validate updating {{ $feature.FeatureName | LowerCamelCase  }}", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
+		ctrl.logger.Error("failed to validate update item", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
@@ -76,7 +76,7 @@ func (ctrl {{ $feature | GoType }}Controller) Update(ctx context.Context, value 
 
 func (ctrl {{ $feature | GoType }}Controller) Delete(ctx context.Context, id string) error {
 	if err := validation.Validate(id, types.Required("{{ $feature.FeatureNameCamelCase }}ID")); err != nil {
-		ctrl.logger.Error("failed to validate deleting single item {{ $feature.FeatureName | LowerCamelCase  }}", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
+		ctrl.logger.Error("failed to validate delete single item", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
