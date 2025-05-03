@@ -9,7 +9,7 @@ import (
 	"net/http"
 
 	"github.com/{{ $app | PackageName }}/config"
-	"github.com/{{ $app | PackageName }}/features/auth"
+	"github.com/{{ $app | PackageName }}/models"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -28,10 +28,10 @@ func NewJWT(logger *slog.Logger, jwtKeys config.JwtKeyPair) JWT {
 
 func (a JWT) Authenticate(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		var userContext auth.AuthUser
+		var userContext models.UserContext
 
 		defer func() {
-			ctx := context.WithValue(r.Context(), auth.CtxUserKey, userContext)
+			ctx := context.WithValue(r.Context(), models.UserContextKey, userContext)
 			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 		}()
@@ -40,12 +40,14 @@ func (a JWT) Authenticate(next http.Handler) http.Handler {
 		tokenString := getToken(headerValue)
 
 		if tokenString == "" {
+			// return with error
 			return
 		}
 
 		token, err := jwt.Parse(tokenString, a.keyFunc)
 		if err != nil {
 			a.logger.Error(err.Error())
+			// return with error
 			return
 		}
 
@@ -61,7 +63,7 @@ func (a JWT) Authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		userContext = *user
+		userContext = user
 	}
 	return http.HandlerFunc(fn)
 }
