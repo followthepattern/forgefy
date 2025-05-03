@@ -7,6 +7,7 @@ import (
 
 	"github.com/{{ $app | PackageName }}/accesscontrol"
 	"github.com/{{ $app | PackageName }}/container"
+	"github.com/{{ $app | PackageName }}/models"
 )
 
 type AuthorizationService struct {
@@ -23,7 +24,7 @@ func NewAuthorizationService(cont container.Container, kind string) Authorizatio
 }
 
 func (service AuthorizationService) AuthorizedUser(ctx context.Context, action string, resourceID string) (string, error) {
-	ctxu, err := GetUserContext(ctx)
+	ctxu, err := models.GetUserContext(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -37,7 +38,7 @@ func (service AuthorizationService) AuthorizedUser(ctx context.Context, action s
 }
 
 func (service AuthorizationService) Authorize(ctx context.Context, action string, resourceID string) error {
-	ctxu, err := GetUserContext(ctx)
+	ctxu, err := models.GetUserContext(ctx)
 	if err != nil {
 		return err
 	}
@@ -51,7 +52,7 @@ func (service AuthorizationService) Authorize(ctx context.Context, action string
 }
 
 func (service AuthorizationService) AuthorizeWithResource(ctx context.Context, resource, resourceID, action string) error {
-	ctxu, err := GetUserContext(ctx)
+	ctxu, err := models.GetUserContext(ctx)
 	if err != nil {
 		return err
 	}

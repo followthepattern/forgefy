@@ -35,13 +35,13 @@ func NewUserController(cont container.Container) UserController {
 
 func (ctrl UserController) GetByID(ctx context.Context, id string) (*models.UserModel, error) {
 	if err := validation.Validate(id, types.Required("userID")); err != nil {
-		ctrl.logger.Error("failed to validate user ID", log.WithError(err))
+		ctrl.logger.Error("failed to validate user ID", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
 	result, err := ctrl.user.GetByID(ctx, id)
 	if err != nil {
-		ctrl.logger.Error("failed to get user by ID", log.WithError(err))
+		ctrl.logger.Error("failed to get user by ID", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
@@ -58,7 +58,7 @@ func (ctrl UserController) Get(ctx context.Context, filter models.UserListReques
 
 func (ctrl UserController) Create(ctx context.Context, value models.UserModel) error {
 	if err := value.CreateValidate(); err != nil {
-		ctrl.logger.Error("failed to validate user model", log.WithError(err))
+		ctrl.logger.Error("failed to validate user model", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 	return ctrl.user.Create(ctx, value)
@@ -66,7 +66,7 @@ func (ctrl UserController) Create(ctx context.Context, value models.UserModel) e
 
 func (ctrl UserController) Update(ctx context.Context, value models.UserModel) error {
 	if err := value.UpdateValidate(); err != nil {
-		ctrl.logger.Error("failed to validate user model", log.WithError(err))
+		ctrl.logger.Error("failed to validate user model", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
@@ -75,7 +75,7 @@ func (ctrl UserController) Update(ctx context.Context, value models.UserModel) e
 
 func (ctrl UserController) Delete(ctx context.Context, id string) error {
 	if err := validation.Validate(id, types.Required("userID")); err != nil {
-		ctrl.logger.Error("failed to validate user ID", log.WithError(err))
+		ctrl.logger.Error("failed to validate user ID", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 

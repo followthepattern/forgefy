@@ -65,22 +65,22 @@ func (s StorageController) DownloadObject(
 	resource, userID, objectID, fileName string) (*os.File, error) {
 
 	if err := validation.Validate(resource, types.Required("resource")); err != nil {
-		s.logger.Error("failed to validate resource", log.WithError(err))
+		s.logger.Error("failed to validate resource", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
 	if err := validation.Validate(userID, types.Required("userID")); err != nil {
-		s.logger.Error("failed to validate userID", log.WithError(err))
+		s.logger.Error("failed to validate userID", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
 	if err := validation.Validate(objectID, types.Required("objectID")); err != nil {
-		s.logger.Error("failed to validate objectID", log.WithError(err))
+		s.logger.Error("failed to validate objectID", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
 	if err := validation.Validate(fileName, types.Required("fileName")); err != nil {
-		s.logger.Error("failed to validate fileName", log.WithError(err))
+		s.logger.Error("failed to validate fileName", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 

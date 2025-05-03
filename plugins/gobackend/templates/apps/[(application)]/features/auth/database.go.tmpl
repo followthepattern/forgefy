@@ -26,7 +26,7 @@ func NewAuthDatabase(database *sql.DB) AuthDatabase {
 	}
 }
 
-func (db AuthDatabase) RegisterUser(registerUser AuthUser) error {
+func (db AuthDatabase) RegisterUser(registerUser UserPassword) error {
 	registerUser.Userlog = models.Userlog{
 		CreatedAt: types.TimeNow(),
 	}
@@ -41,8 +41,8 @@ func (db AuthDatabase) VerifyEmail(email types.String) (bool, error) {
 	return count == 0, err
 }
 
-func (db AuthDatabase) GetAuthUserByEmail(email types.String) (AuthUser, error) {
-	authUser := AuthUser{}
+func (db AuthDatabase) GetAuthUserByEmail(email types.String) (UserPassword, error) {
+	authUser := UserPassword{}
 
 	_, err := db.db.From(AuthUserTable).Where(Ex{"email": email}).ScanStruct(&authUser)
 	if err != nil {
@@ -52,8 +52,8 @@ func (db AuthDatabase) GetAuthUserByEmail(email types.String) (AuthUser, error) 
 	return authUser, err
 }
 
-func (repo AuthDatabase) GetAuthUserByID(id types.String) (*AuthUser, error) {
-	user := AuthUser{}
+func (repo AuthDatabase) GetAuthUserByID(id types.String) (*UserPassword, error) {
+	user := UserPassword{}
 
 	query := repo.db.From(AuthUserTable).Where(Ex{"id": id})
 
