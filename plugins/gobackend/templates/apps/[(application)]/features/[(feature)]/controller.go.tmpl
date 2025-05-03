@@ -11,6 +11,7 @@ import (
 	"github.com/{{ $app | PackageName }}/container"
 	"github.com/{{ $app | PackageName }}/features/auth"
 	"github.com/{{ $app | PackageName }}/features/{{ $feature | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/types"
 
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -28,18 +29,20 @@ func New{{ $feature | GoType }}Controller(cont container.Container) {{ $feature 
 
 	return {{ $feature | GoType }}Controller{
 		{{ $feature.FeatureNameCamelCase }}: {{ $feature.FeatureNameCamelCase }}Service,
-		logger:  cont.GetLogger(),
+		logger:  cont.GetLogger().With(log.WithComponent("{{ $feature.FeatureName | LowerCamelCase }} controller")),
 		cfg:     cont.GetConfig(),
 	}
 }
 
 func (ctrl {{ $feature | GoType }}Controller) GetByID(ctx context.Context, id string) (*models.{{ $feature | GoType }}Model, error) {
 	if err := validation.Validate(id, types.Required("{{ $feature.FeatureNameCamelCase }}ID")); err != nil {
+		ctrl.logger.Error("failed to validate user ID", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
-	result, err := ctrl.{{ $feature.FeatureNameCamelCase }}.GetByID(ctx, id)
+	result, err := ctrl.{{ $feature.FeatureName | LowerCamelCase }}.GetByID(ctx, id)
 	if err != nil {
+		ctrl.logger.Error("failed to get {{ $feature.FeatureName | LowerCamelCase }} by ID", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
@@ -50,12 +53,13 @@ func (ctrl {{ $feature | GoType }}Controller) GetByID(ctx context.Context, id st
 	return result, nil
 }
 
-func (ctrl {{ $feature | GoType }}Controller) Get(ctx context.Context, filter models.{{ $feature | GoType }}ListRequestParams) (*models.{{ $feature | GoType }}ListResponse, error) {
-	return ctrl.{{ $feature.FeatureNameCamelCase }}.Get(ctx, filter)
+func (ctrl {{ $feature | GoType }}Controller) Get(ctx context.Context, request models.{{ $feature | GoType }}ListRequestParams) (*models.{{ $feature | GoType }}ListResponse, error) {
+	return ctrl.{{ $feature.FeatureName | LowerCamelCase  }}.Get(ctx, request)
 }
 
 func (ctrl {{ $feature | GoType }}Controller) Create(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
 	if err := value.CreateValidate(); err != nil {
+		ctrl.logger.Error("failed to validate creating {{ $feature.FeatureName | LowerCamelCase  }}", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 	return ctrl.{{ $feature.FeatureNameCamelCase }}.Create(ctx, value)
@@ -63,6 +67,7 @@ func (ctrl {{ $feature | GoType }}Controller) Create(ctx context.Context, value 
 
 func (ctrl {{ $feature | GoType }}Controller) Update(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
 	if err := value.UpdateValidate(); err != nil {
+		ctrl.logger.Error("failed to validate updating {{ $feature.FeatureName | LowerCamelCase  }}", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
@@ -71,6 +76,7 @@ func (ctrl {{ $feature | GoType }}Controller) Update(ctx context.Context, value 
 
 func (ctrl {{ $feature | GoType }}Controller) Delete(ctx context.Context, id string) error {
 	if err := validation.Validate(id, types.Required("{{ $feature.FeatureNameCamelCase }}ID")); err != nil {
+		ctrl.logger.Error("failed to validate deleting single item {{ $feature.FeatureName | LowerCamelCase  }}", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
