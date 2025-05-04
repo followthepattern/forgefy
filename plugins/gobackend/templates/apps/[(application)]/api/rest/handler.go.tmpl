@@ -18,7 +18,6 @@ import (
 func New(ctrls controllers.Controllers) http.Handler {
 	r := chi.NewMux()
 
-	auth := auth.NewAuthRest(ctrls.Auth())
 	storage := storage.NewStorageRest(ctrls.Storage())
 	r.Route("/storage", storage)
 	{{ range $feature := .Features }}
@@ -30,9 +29,6 @@ func New(ctrls controllers.Controllers) http.Handler {
 		r.Post("/id", {{ .FeatureNameCamelCase }}.Update)
 	})
 	{{ end }}
-	r.Route("/authuser", func(r chi.Router) {
-		r.Get("/activate/{userID}", auth.ActivateUser)
-	})
 
 	return r
 }
