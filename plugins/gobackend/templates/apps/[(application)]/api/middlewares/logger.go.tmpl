@@ -40,7 +40,6 @@ func NewMiddlewareLogger(logger *slog.Logger) func(http.Handler) http.Handler {
 				slog.Int("status code", sw.statusCode),
 				slog.Duration("duration", duration),
 				log.WithCorrelationID(r.Context()),
-				log.WithUserContext(r.Context()),
 			)
 		})
 	}

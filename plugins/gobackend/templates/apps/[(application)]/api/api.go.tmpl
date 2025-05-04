@@ -32,19 +32,19 @@ func NewHttpApi(cfg config.Config,
 		MaxAge:           300,
 	}))
 
+	middlewareLogger := middlewares.NewMiddlewareLogger(logger)
+	authMiddleware := middlewares.NewJWT(logger, jwtKeys)
+
 	r.Use(middlewares.CorrelationID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
 	r.Use(middlewares.Heartbeat("/healthcheck", cfg.Server.Version))
-
-	authMiddleware := middlewares.NewJWT(logger, jwtKeys)
-
-	middlewareLogger := middlewares.NewMiddlewareLogger(logger)
 	r.Use(middlewareLogger)
 
 	r.Route("/", func(r chi.Router) {
-		r.With(authMiddleware.Authenticate).Post("/graphql", graphqlHandler.ServeHTTP)
-		r.With(authMiddleware.Authenticate).Mount("/", restHandler)
+		r.Use(authMiddleware.Authenticate)
+		r.Post("/graphql", graphqlHandler.ServeHTTP)
+		r.Mount("/", restHandler)
 	})
 
 	return r
