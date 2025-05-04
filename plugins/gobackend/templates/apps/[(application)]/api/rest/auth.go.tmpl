@@ -1,0 +1,24 @@
+{{ $app := .App -}}
+
+package rest
+
+import (
+	"net/http"
+
+	"github.com/{{ $app | PackageName }}/controllers"
+	"github.com/{{ $app | PackageName }}/features/auth"
+	"github.com/go-chi/chi/v5"
+)
+
+func NewAuth(ctrls controllers.Controllers) http.Handler {
+	r := chi.NewMux()
+
+	auth := auth.NewAuthRest(ctrls.Auth())
+
+	r.Route("/", func(r chi.Router) {
+		r.Get("/activate/{userID}", auth.ActivateUser)
+		r.Post("/login", auth.Login)
+	})
+
+	return r
+}

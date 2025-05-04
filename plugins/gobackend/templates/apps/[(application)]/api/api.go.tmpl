@@ -7,8 +7,11 @@ import (
 
 	"log/slog"
 
+	"github.com/{{ $app | PackageName }}/api/graphql"
 	"github.com/{{ $app | PackageName }}/api/middlewares"
+	"github.com/{{ $app | PackageName }}/api/rest"
 	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/controllers"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -17,11 +20,14 @@ import (
 
 func NewHttpApi(cfg config.Config,
 	jwtKeys config.JwtKeyPair,
-	graphqlHandler http.Handler,
-	restHandler http.Handler,
+	ctrls controllers.Controllers,
 	logger *slog.Logger,
 ) *chi.Mux {
 	r := chi.NewRouter()
+
+	graphqlHandler := graphql.NewHandler(ctrls)
+	restHandler := rest.New(ctrls)
+	authHandler := rest.NewAuth(ctrls)
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"*"},
@@ -42,10 +48,11 @@ func NewHttpApi(cfg config.Config,
 	r.Use(middlewareLogger)
 
 	r.Route("/", func(r chi.Router) {
-		r.Use(authMiddleware.Authenticate)
-		r.Post("/graphql", graphqlHandler.ServeHTTP)
-		r.Mount("/", restHandler)
+		r.With(authMiddleware.Authenticate).Post("/graphql", graphqlHandler.ServeHTTP)
+		r.With(authMiddleware.Authenticate).Mount("/", restHandler)
 	})
+
+	r.Mount("/auth", authHandler)
 
 	return r
 }

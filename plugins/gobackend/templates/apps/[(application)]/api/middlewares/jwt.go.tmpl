@@ -4,9 +4,12 @@ package middlewares
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/{{ $app | PackageName }}/api/httpresponses"
 	"github.com/{{ $app | PackageName }}/config"
