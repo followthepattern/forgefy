@@ -13,8 +13,6 @@ import (
 
 	"github.com/{{ $app | PackageName }}/accesscontrol"
 	"github.com/{{ $app | PackageName }}/api"
-	"github.com/{{ $app | PackageName }}/api/graphql"
-	"github.com/{{ $app | PackageName }}/api/rest"
 	"github.com/{{ $app | PackageName }}/config"
 	"github.com/{{ $app | PackageName }}/container"
 	"github.com/{{ $app | PackageName }}/controllers"
@@ -85,11 +83,7 @@ func main() {
 
 	ctrls := controllers.New(cont)
 
-	graphqlHandler := graphql.NewHandler(ctrls)
-
-	restHandler := rest.New(ctrls)
-
-	router := api.NewHttpApi(cfg, jwt, graphqlHandler, restHandler, logger.With(log.WithComponent("api")))
+	router := api.NewHttpApi(cfg, jwt, ctrls, logger.With(log.WithComponent("api")))
 
 	server := hostserver.NewServer(router, logger)
 	ctx, cancel := context.WithCancel(ctx)

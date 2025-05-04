@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/{{ $app | PackageName }}/controllers"
-	"github.com/{{ $app | PackageName }}/features/auth"
 	"github.com/{{ $app | PackageName }}/features/storage"
 {{- $AppNameToPackageName := $app | PackageName }}
 {{- range $feature := .Features }}
@@ -29,6 +28,5 @@ func New(ctrls controllers.Controllers) http.Handler {
 		r.Post("/id", {{ .FeatureNameCamelCase }}.Update)
 	})
 	{{ end }}
-
 	return r
 }
