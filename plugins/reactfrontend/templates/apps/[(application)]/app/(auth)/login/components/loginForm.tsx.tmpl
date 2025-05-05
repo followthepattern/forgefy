@@ -1,36 +1,41 @@
-import { gql, useMutation } from "@apollo/client";
-import { login } from "../../graphql/login";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { useTokenStore } from "@/lib/store";
 import { ErrorParser } from "@/lib/errorParser";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
+import { usePost } from "@/http/usePost";
+import { BACKEND_URL } from "@/lib/config";
 
 type FormValues = {
     email: string;
     password: string;
 };
 
+type LoginResponse = {
+    jwt: string
+}
+
 export default function LoginForm() {
     const { register, handleSubmit } = useForm<FormValues>();
 
-    const [executeLogin, { data, loading, error }] = useMutation(gql(login), { errorPolicy: "all" });
+    const { post, data, error, loading } = usePost<LoginResponse>();
 
     const { setToken } = useTokenStore();
 
+    const url = `${BACKEND_URL}/auth/login`
+
     const onSubmit: SubmitHandler<FormValues> = (formValues) => {
-        executeLogin({
-            variables: {
-                email: formValues.email,
-                password: formValues.password,
-            },
-        });
+        console.info("values", formValues);
+        post(
+            url, {
+                body: formValues,
+            })
     };
 
     useEffect(() => {
-        if (data?.authentication?.login?.jwt?.length > 0) {
-            const newToken = data?.authentication?.login?.jwt;
-            setToken(newToken);
+        if (data) {
+            console.info(data.jwt);
+            setToken(data.jwt);
         }
     }, [data, setToken]);
 
@@ -78,11 +83,12 @@ export default function LoginForm() {
                     <PrimaryButton
                         type="submit"
                         className="w-full"
+                        state={loading ? "loading": "active"}
                     >
                         Sign In
                     </PrimaryButton>
                     {error && <p className="mt-2 text-sm font-bold text-error">
-                        {ErrorParser(error.message)}
+                        {ErrorParser(error)}
                     </p>}
                 </div>
 
