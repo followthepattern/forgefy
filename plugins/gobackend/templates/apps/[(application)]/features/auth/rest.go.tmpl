@@ -3,6 +3,7 @@
 package auth
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/{{ $app | PackageName }}/api/httpresponses"
@@ -28,4 +29,21 @@ func (rest AuthRest) ActivateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	httpresponses.Success(w)
+}
+
+func (rest AuthRest) Login(w http.ResponseWriter, r *http.Request) {
+	var value LoginRequestParams
+	err := json.NewDecoder(r.Body).Decode(&value)
+	if err != nil {
+		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
+		return
+	}
+
+	res, err := rest.auth.Login(r.Context(), value)
+	if err != nil {
+		httpresponses.BadRequest(w, err.Error())
+		return
+	}
+
+	httpresponses.Write(w, http.StatusOK, res)
 }

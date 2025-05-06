@@ -8,6 +8,7 @@ import (
 
 	"github.com/{{ $app | PackageName }}/config"
 	"github.com/{{ $app | PackageName }}/container"
+	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -20,12 +21,13 @@ type AuthController struct {
 
 func NewAuthController(cont container.Container) AuthController {
 	authDatabase := NewAuthDatabase(cont.GetDB())
-	authService := NewAuthenticationService(cont.GetConfig(), authDatabase, cont.GetEmail(), cont.GetJWTKeys())
+	authService := NewAuthenticationService(cont.GetConfig(), authDatabase, cont.GetEmail(), cont.GetJWTKeys(), cont.GetLogger().With(
+		log.WithComponent("auth controller")))
 
 	return AuthController{
 		authService: authService,
 		cfg:         cont.GetConfig(),
-		logger:      cont.GetLogger(),
+		logger:      cont.GetLogger().With(log.WithComponent("auth controller")),
 	}
 }
 
@@ -53,7 +55,7 @@ func (ctrl AuthController) ActivateUser(ctx context.Context, userID string) erro
 	return ctrl.authService.ActivateUser(ctx, userID)
 }
 
-func (ctrl AuthController) Profile(ctx context.Context) (*AuthUser, error) {
+func (ctrl AuthController) Profile(ctx context.Context) (*UserPassword, error) {
 	user, err := ctrl.authService.Profile(ctx)
 	if err != nil {
 		return nil, err

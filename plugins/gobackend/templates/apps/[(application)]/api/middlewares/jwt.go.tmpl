@@ -4,14 +4,28 @@ package middlewares
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
+	"time"
 
+	"github.com/{{ $app | PackageName }}/api/httpresponses"
 	"github.com/{{ $app | PackageName }}/config"
-	"github.com/{{ $app | PackageName }}/features/auth"
+	"github.com/{{ $app | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/types"
 	"github.com/golang-jwt/jwt/v4"
 )
+
+const (
+	AuthorizationHeader = "Authorization"
+	BearerPrefix        = "Bearer"
+	InvalidToken        = "invalid user token"
+	ExpiredToken        = "ExpiredToken"
+)
+
+var tokenError = errors.New(InvalidToken)
 
 type JWT struct {
 	logger  *slog.Logger
@@ -26,49 +40,100 @@ func NewJWT(logger *slog.Logger, jwtKeys config.JwtKeyPair) JWT {
 	return result
 }
 
-func (a JWT) Authenticate(next http.Handler) http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		var userContext auth.AuthUser
-
-		defer func() {
-			ctx := context.WithValue(r.Context(), auth.CtxUserKey, userContext)
-			r = r.WithContext(ctx)
-			next.ServeHTTP(w, r)
-		}()
-
+func (j JWT) Authenticate(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		headerValue := r.Header.Get(AuthorizationHeader)
-		tokenString := getToken(headerValue)
 
-		if tokenString == "" {
-			return
-		}
-
-		token, err := jwt.Parse(tokenString, a.keyFunc)
+		userContext, err := j.getContextUserFromTokenString(headerValue)
 		if err != nil {
-			a.logger.Error(err.Error())
+			httpresponses.BadRequest(w, fmt.Errorf(err.Error()))
 			return
 		}
 
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok || !token.Valid {
-			a.logger.Error(InvalidToken)
-			return
-		}
-
-		user, err := getAuthorizedUserFromClaims(claims)
-		if err != nil {
-			a.logger.Error(err.Error())
-			return
-		}
-
-		userContext = *user
-	}
-	return http.HandlerFunc(fn)
+		ctx := context.WithValue(r.Context(), models.UserContextKey, userContext)
+		r = r.WithContext(ctx)
+		next.ServeHTTP(w, r)
+	})
 }
 
-func (a JWT) keyFunc(token *jwt.Token) (interface{}, error) {
+func (j JWT) keyFunc(token *jwt.Token) (any, error) {
 	if _, ok := token.Method.(*jwt.SigningMethodEd25519); !ok {
 		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 	}
-	return a.jwtKeys.Public, nil
+	return j.jwtKeys.Public, nil
+}
+
+func (j JWT) getContextUserFromTokenString(headerString string) (models.UserContext, error) {
+	tokenString := removeBearerPrefix(headerString)
+	if len(tokenString) == 0 {
+		return models.UserContext{}, tokenError
+	}
+
+	token, err := jwt.Parse(tokenString, j.keyFunc)
+	if err != nil {
+		return models.UserContext{}, fmt.Errorf("invalid token %s", err.Error())
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return models.UserContext{}, tokenError
+	}
+
+	user, err := getAuthorizedUserFromClaims(claims)
+	if err != nil {
+		return models.UserContext{}, tokenError
+	}
+	return user, nil
+}
+
+func invalidTokenError(field string) error {
+	return fmt.Errorf("%s - missing field: %s", InvalidToken, field)
+}
+
+func getAuthorizedUserFromClaims(claims jwt.MapClaims) (models.UserContext, error) {
+	id, ok := claims["id"].(string)
+	if !ok {
+		return models.UserContext{}, invalidTokenError("id")
+	}
+	email, ok := claims["email"].(string)
+	if !ok {
+		return models.UserContext{}, invalidTokenError("email")
+	}
+	firstName, ok := claims["firstName"].(string)
+	if !ok {
+		return models.UserContext{}, invalidTokenError("firstName")
+	}
+	lastName, ok := claims["lastName"].(string)
+	if !ok {
+		return models.UserContext{}, invalidTokenError("lastName")
+	}
+	expiresAtStr, ok := claims["expiresAt"].(string)
+	if !ok {
+		return models.UserContext{}, invalidTokenError("expiresAt")
+	}
+	expiresAt, err := time.Parse(time.RFC3339, expiresAtStr)
+	if err != nil {
+		return models.UserContext{}, err
+	}
+
+	if time.Now().After(expiresAt) {
+		return models.UserContext{}, errors.New(ExpiredToken)
+	}
+
+	return models.UserContext{
+		Id:        types.StringFrom(id),
+		Email:     types.StringFrom(email),
+		FirstName: types.StringFrom(firstName),
+		LastName:  types.StringFrom(lastName),
+	}, nil
+}
+
+func removeBearerPrefix(tokenString string) string {
+	tokens := strings.Split(tokenString, BearerPrefix)
+
+	if len(tokens) < 2 {
+		return ""
+	}
+
+	return strings.TrimSpace(tokens[1])
 }

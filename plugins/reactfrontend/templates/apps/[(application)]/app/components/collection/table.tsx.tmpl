@@ -180,7 +180,7 @@ export function Table<T extends { id: string }>(props: TableProperties<T>) {
     return (
         <>
             <table
-                className={classNames(props.className, "w-full table-fixed text-sm text-left text-gray-stroke-strong")}
+                className={classNames(props.className, "min-w-full table-fixed text-sm text-left text-gray-stroke-strong")}
             >
                 <TableHeader>
                     <Column

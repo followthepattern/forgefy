@@ -11,7 +11,6 @@ import (
 )
 
 type Config struct {
-	Version      string
 	Server       Server
 	DB           DB
 	Mail         Mail
@@ -19,7 +18,7 @@ type Config struct {
 	Cerbos       Cerbos
 }
 
-func Parse() (result *Config, err error) {
+func Parse() (result Config, err error) {
 	viper.SetConfigName("config")
 	viper.AddConfigPath("configs")
 	viper.SetEnvPrefix("{{ $app.AppName | EnvVariable }}")
@@ -28,17 +27,17 @@ func Parse() (result *Config, err error) {
 	viper.SetConfigType("yml")
 
 	if err = viper.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("error reading config file, %s", err)
+		return Config{}, fmt.Errorf("error reading config file, %s", err)
 	}
 
 	err = viper.Unmarshal(&result)
 	if err != nil {
-		return nil, fmt.Errorf("unable to decode into worker, %v", err)
+		return Config{}, fmt.Errorf("unable to decode into worker, %v", err)
 	}
 
 	err = result.Validate()
 	if err != nil {
-		return nil, fmt.Errorf("invalid configuration provided %v", err)
+		return Config{}, fmt.Errorf("invalid configuration provided %v", err)
 	}
 
 	return

@@ -13,6 +13,9 @@ import (
 	"github.com/{{ $app | PackageName }}/accesscontrol"
 	"github.com/{{ $app | PackageName }}/container"
 	"github.com/{{ $app | PackageName }}/features/auth"
+	"github.com/{{ $app | PackageName }}/log"
+	"github.com/{{ $app | PackageName }}/models"
+	
 	"github.com/google/uuid"
 )
 
@@ -30,7 +33,7 @@ type StorageService struct {
 
 func NewStorageService(cfg StorageServiceConfig) StorageService {
 	return StorageService{
-		logger:               cfg.GetLogger(),
+		logger:               cfg.GetLogger().With(log.WithComponent("storage service")),
 		authorizationService: cfg.AuthorizationService,
 		storage:              cfg.Storage,
 	}
@@ -54,7 +57,7 @@ func (s StorageService) UploadObject(
 		return "", err
 	}
 
-	user, err := auth.GetUserContext(ctx)
+	user, err := models.GetUserContext(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -80,12 +83,14 @@ func (s StorageService) DownloadObject(
 	)
 
 	if err != nil {
+		s.logger.Error("failed to authorize", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
 	filePath := path.Join(resource, userID, objectID, fileName)
 	file, err := s.storage.Download(filePath)
 	if err != nil {
+		s.logger.Error("failed to download file", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, fmt.Errorf("unable to return the file: %s", err.Error())
 	}
 

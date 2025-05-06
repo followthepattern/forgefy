@@ -11,6 +11,7 @@ import (
 	"github.com/{{ $app | PackageName }}/config"
 	"github.com/{{ $app | PackageName }}/container"
 	"github.com/{{ $app | PackageName }}/features/auth"
+	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -22,14 +23,19 @@ type StorageController struct {
 }
 
 func NewStorageController(cont container.Container) StorageController {
+	storage := NewStorage(
+		WithUploadDirectory(DEFAULT_DIRECTORY),
+		WithLogger(cont.GetLogger()),
+	)
+
 	storageService := NewStorageService(StorageServiceConfig{
 		Container:            cont,
-		Storage:              NewStorage(WithUploadDirectory(DEFAULT_DIRECTORY)),
+		Storage:              storage,
 		AuthorizationService: auth.NewAuthorizationService(cont, ""),
 	})
 
 	return StorageController{
-		logger:         cont.GetLogger(),
+		logger:         cont.GetLogger().With(log.WithComponent("storage controller")),
 		cfg:            cont.GetConfig(),
 		storageService: storageService,
 	}
@@ -42,6 +48,7 @@ func (s StorageController) UploadObject(
 	fileHeader *multipart.FileHeader,
 ) (string, error) {
 	if err := validation.Validate(resource, types.Required("resource")); err != nil {
+		s.logger.Error("failed to validate resource", log.WithError(err))
 		return "", err
 	}
 
@@ -58,18 +65,22 @@ func (s StorageController) DownloadObject(
 	resource, userID, objectID, fileName string) (*os.File, error) {
 
 	if err := validation.Validate(resource, types.Required("resource")); err != nil {
+		s.logger.Error("failed to validate resource", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
 	if err := validation.Validate(userID, types.Required("userID")); err != nil {
+		s.logger.Error("failed to validate userID", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
 	if err := validation.Validate(objectID, types.Required("objectID")); err != nil {
+		s.logger.Error("failed to validate objectID", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
 	if err := validation.Validate(fileName, types.Required("fileName")); err != nil {
+		s.logger.Error("failed to validate fileName", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 

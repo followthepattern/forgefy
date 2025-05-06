@@ -53,7 +53,7 @@ type Password struct {
 	PasswordHash string `db:"password_hash"`
 }
 
-type AuthUser struct {
+type UserPassword struct {
 	models.UserModel
 	Password
 }

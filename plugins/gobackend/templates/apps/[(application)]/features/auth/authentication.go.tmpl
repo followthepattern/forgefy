@@ -7,13 +7,15 @@ import (
 	"crypto"
 	"errors"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/{{ $app | PackageName }}/config"
 	"github.com/{{ $app | PackageName }}/features/mail"
-	"github.com/{{ $app | PackageName }}/features/user/models"
-
+	usermodels "github.com/{{ $app | PackageName }}/features/user/models"
+	"github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/types"
+	
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -29,11 +31,11 @@ type AuthenticationService struct {
 	jwtKeys      config.JwtKeyPair
 }
 
-func NewAuthenticationService(cfg config.Config, repository AuthDatabase, emailClient mail.Email, jwtKeys config.JwtKeyPair) AuthenticationService {
+func NewAuthenticationService(cfg config.Config, repository AuthDatabase, emailClient mail.Mail, jwtKeys config.JwtKeyPair, logger *slog.Logger) AuthenticationService {
 	return AuthenticationService{
 		cfg:          cfg,
 		authDatabase: repository,
-		mail:         mail.NewMail(cfg.Mail, emailClient),
+		mail:         emailClient,
 		jwtKeys:      jwtKeys,
 	}
 }
@@ -54,7 +56,7 @@ func (service AuthenticationService) Login(ctx context.Context, email types.Stri
 
 	expiresAt := time.Now().Add(time.Hour * 24)
 
-	tokenString, err := GenerateTokenStringFromUser(authUser, service.jwtKeys.Private)
+	tokenString, err := GenerateTokenStringFromUser(authUser.UserModel, service.jwtKeys.Private)
 	if err != nil {
 		return nil, err
 	}
@@ -66,9 +68,9 @@ func (service AuthenticationService) Login(ctx context.Context, email types.Stri
 }
 
 func (service AuthenticationService) Register(ctx context.Context, register RegisterRequestParams) (*RegisterResponse, error) {
-	ctxu := GetModelFromContext[AuthUser](ctx, CtxUserKey)
-	if ctxu == nil {
-		return nil, fmt.Errorf("invalid user context")
+	_, err := models.GetUserContext(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	valid, err := service.authDatabase.VerifyEmail(register.Email)
@@ -85,8 +87,8 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 		return nil, err
 	}
 
-	creationUser := AuthUser{
-		UserModel: models.UserModel{
+	creationUser := UserPassword{
+		UserModel: usermodels.UserModel{
 			Id:        types.StringFrom(uuid.NewString()),
 			Email:     register.Email,
 			FirstName: register.FirstName,
@@ -117,7 +119,7 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 	}, nil
 }
 
-func GenerateTokenStringFromUser(model AuthUser, privateKey crypto.PrivateKey) (string, error) {
+func GenerateTokenStringFromUser(model usermodels.UserModel, privateKey crypto.PrivateKey) (string, error) {
 	expiresAt := time.Now().Add(time.Hour * 24)
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("EdDSA"), jwt.MapClaims{
 		"id":        model.Id,
@@ -154,8 +156,8 @@ func (service AuthenticationService) ActivateUser(ctx context.Context, userID st
 	return service.authDatabase.ActivateUser(userID)
 }
 
-func (service AuthenticationService) Profile(ctx context.Context) (*AuthUser, error) {
-	ctxu, err := GetUserContext(ctx)
+func (service AuthenticationService) Profile(ctx context.Context) (*UserPassword, error) {
+	ctxu, err := models.GetUserContext(ctx)
 	if err != nil {
 		return nil, err
 	}

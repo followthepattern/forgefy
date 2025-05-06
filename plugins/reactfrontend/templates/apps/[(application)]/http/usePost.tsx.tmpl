@@ -1,0 +1,48 @@
+import { useState } from 'react';
+
+interface UsePostResponse<T> {
+    data: T | null;
+    error: string | null;
+    loading: boolean;
+    post: (url: string, options: PostOptions) => Promise<void>;
+}
+
+interface PostOptions {
+    headers?: Record<string, string>;
+    body?: any;
+}
+
+export function usePost<T>(): UsePostResponse<T> {
+    const [data, setData] = useState<T | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setIsLoading] = useState<boolean>(false);
+
+    const post = async (url: string, options: PostOptions) => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(options.headers || {}),
+                },
+                body: JSON.stringify(options.body),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+
+            const responseData = await response.json();
+            setData(responseData);
+        } catch (err: any) {
+            setError(err.message || 'Something went wrong');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return { post, data, error, loading };
+}

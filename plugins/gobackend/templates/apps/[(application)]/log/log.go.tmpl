@@ -1,0 +1,47 @@
+{{ $app := .App -}}
+
+package log
+
+import (
+	"context"
+	"log/slog"
+	"os"
+
+	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/models"
+)
+
+var (
+	DefaultLogger = slog.New(slog.NewTextHandler(os.Stdout, nil))
+)
+
+func WithComponent(component string) slog.Attr {
+	return slog.String("component", component)
+}
+
+func WithError(err error) slog.Attr {
+	return slog.String("error", err.Error())
+}
+
+func WithCorrelationID(ctx context.Context) slog.Attr {
+	return slog.String("correlation_id", models.GetCorrelationID(ctx))
+}
+
+func WithUserContext(ctx context.Context) slog.Attr {
+	return slog.String("user_id", models.GetUserContextForLogging(ctx))
+}
+
+func New(cfg config.Config) *slog.Logger {
+	loggerHandler := slog.NewJSONHandler(
+		os.Stdout,
+		&slog.HandlerOptions{
+			Level: slog.Level(cfg.Server.LogLevel),
+		},
+	).WithAttrs([]slog.Attr{
+		slog.String("app", "{{ $app | PackageName }}"),
+	})
+
+	logger := slog.New(loggerHandler)
+
+	return logger
+}

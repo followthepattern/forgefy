@@ -9,26 +9,54 @@ import (
 	"github.com/{{ $app | PackageName }}/accesscontrol"
 	"github.com/{{ $app | PackageName }}/config"
 	"github.com/{{ $app | PackageName }}/features/mail"
+	"github.com/{{ $app | PackageName }}/log"
 )
+
+type ContainerOption interface {
+	Apply(c *Container)
+}
+
+type ContainerOptionFn func(c *Container)
+
+func (f ContainerOptionFn) Apply(c *Container) {
+	f(c)
+}
+
+func WithLogger(logger *slog.Logger) ContainerOption {
+	return ContainerOptionFn(func(c *Container) {
+		c.logger = logger
+	})
+}
+
+func WithEMail(emailService mail.Mail) ContainerOption {
+	return ContainerOptionFn(func(c *Container) {
+		c.email = emailService
+	})
+}
 
 type Container struct {
 	ac      accesscontrol.AccessControl
-	email   mail.Email
+	email   mail.Mail
 	db      *sql.DB
 	cfg     config.Config
 	jwtKeys config.JwtKeyPair
 	logger  *slog.Logger
 }
 
-func New(ac accesscontrol.AccessControl, emailClient mail.Email, db *sql.DB, cfg config.Config, logger *slog.Logger, jwtKeys config.JwtKeyPair) Container {
-	return Container{
+func New(ac accesscontrol.AccessControl, db *sql.DB, cfg config.Config, jwtKeys config.JwtKeyPair, opts ...ContainerOption) Container {
+	c := Container{
 		ac:      ac,
 		db:      db,
 		cfg:     cfg,
-		logger:  logger,
-		email:   emailClient,
+		logger:  log.DefaultLogger,
 		jwtKeys: jwtKeys,
 	}
+
+	for _, opt := range opts {
+		opt.Apply(&c)
+	}
+
+	return c
 }
 
 func (c Container) GetAccessControl() accesscontrol.AccessControl {
@@ -47,7 +75,7 @@ func (c Container) GetLogger() *slog.Logger {
 	return c.logger
 }
 
-func (c Container) GetEmail() mail.Email {
+func (c Container) GetEmail() mail.Mail {
 	return c.email
 }
 

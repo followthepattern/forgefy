@@ -12,6 +12,7 @@ import (
 	"github.com/{{ $app | PackageName }}/container"
 	"github.com/{{ $app | PackageName }}/features/auth"
 	"github.com/{{ $app | PackageName }}/features/{{ $feature | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/types"
 	"github.com/google/uuid"
 )
@@ -19,14 +20,14 @@ import (
 type {{ $feature | GoType }}Service struct {
 	authorizationService auth.AuthorizationService
 	logger               *slog.Logger
-	{{ .FeatureNameCamelCase }}Repository	{{ $feature | GoType }}Database
+	{{ $feature.FeatureName | LowerCamelCase }}Repository	{{ $feature | GoType }}Database
 }
 
 func New{{ $feature | GoType }}Service(cont container.Container, authorizationService auth.AuthorizationService) {{ $feature | GoType }}Service {
 	repository := New{{ $feature | GoType }}Database(cont.GetDB())
 	service := {{ $feature | GoType }}Service{
 		authorizationService: authorizationService,
-		{{ .FeatureNameCamelCase }}Repository:    repository,
+		{{ $feature.FeatureName | LowerCamelCase }}Repository:    repository,
 		logger:	cont.GetLogger(),
 	}
 
@@ -36,51 +37,56 @@ func New{{ $feature | GoType }}Service(cont container.Container, authorizationSe
 func (service {{ $feature | GoType }}Service) GetByID(ctx context.Context, id string) (*models.{{ $feature | GoType }}Model, error) {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, id)
 	if err != nil {
+		service.logger.Error("Error authorizing user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
-	return service.{{ .FeatureNameCamelCase }}Repository.GetByID(id)
+	return service.{{ $feature.FeatureName | LowerCamelCase }}Repository.GetByID(id)
 }
 
 func (service {{ $feature | GoType }}Service) Get(ctx context.Context, request models.{{ $feature | GoType }}ListRequestParams) (*models.{{ $feature | GoType }}ListResponse, error) {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.READ, accesscontrol.ALLRESOURCE)
 	if err != nil {
+		service.logger.Error("Error authorizing user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
 	}
 
 	request.Pagination.SetDefaultIfEmpty()
 
-	return service.{{ .FeatureNameCamelCase }}Repository.Get(request)
+	return service.{{ $feature.FeatureName | LowerCamelCase }}Repository.Get(request)
 }
 
 func (service {{ $feature | GoType }}Service) Create(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
 	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.CREATE, accesscontrol.NEW)
 	if err != nil {
+		service.logger.Error("Error authorizing user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
 	value.{{ $idField.FieldNameCamelCaseUpper }} = types.StringFrom(uuid.NewString())
 	value.Userlog.CreationUserID = types.StringFrom(userID)
 
-	return service.{{ .FeatureNameCamelCase }}Repository.Create([]models.{{ $feature | GoType }}Model{value})
+	return service.{{ $feature.FeatureName | LowerCamelCase }}Repository.Create([]models.{{ $feature | GoType }}Model{value})
 }
 
 func (service {{ $feature | GoType }}Service) Update(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
 	userID, err := service.authorizationService.AuthorizedUser(ctx, accesscontrol.UPDATE, value.{{ $idField.FieldNameCamelCaseUpper }}.Data)
 	if err != nil {
+		service.logger.Error("Error authorizing user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
 	value.UpdateUserID = types.StringFrom(userID)
 
-	return service.{{ .FeatureNameCamelCase }}Repository.Update(value)
+	return service.{{ $feature.FeatureName | LowerCamelCase }}Repository.Update(value)
 }
 
 func (service {{ $feature | GoType }}Service) Delete(ctx context.Context, id string) error {
 	err := service.authorizationService.Authorize(ctx, accesscontrol.DELETE, id)
 	if err != nil {
+		service.logger.Error("Error authorizing user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
-	return service.{{ .FeatureNameCamelCase }}Repository.Delete(id)
+	return service.{{ $feature.FeatureName | LowerCamelCase }}Repository.Delete(id)
 }

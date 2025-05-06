@@ -1,0 +1,64 @@
+{{ $app := .App -}}
+
+package middlewares
+
+import (
+	"log/slog"
+	"net"
+	"net/http"
+	"strings"
+	"time"
+
+	"github.com/{{ $app | PackageName }}/log"
+)
+
+type statusResponseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (w *statusResponseWriter) WriteHeader(code int) {
+	w.statusCode = code
+	w.ResponseWriter.WriteHeader(code)
+}
+
+func NewMiddlewareLogger(logger *slog.Logger) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			start := time.Now()
+
+			sw := &statusResponseWriter{ResponseWriter: w, statusCode: 200}
+			next.ServeHTTP(sw, r)
+
+			duration := time.Since(start)
+
+			logger.Info("http",
+				slog.String("host", r.Host),
+				slog.String("method", r.Method),
+				slog.String("url path", r.URL.Path),
+				slog.String("from", getClientIP(r)),
+				slog.Int("status code", sw.statusCode),
+				slog.Duration("duration", duration),
+				log.WithCorrelationID(r.Context()),
+			)
+		})
+	}
+}
+
+func getClientIP(r *http.Request) string {
+	headers := []string{"X-Forwarded-For", "X-Real-IP"}
+
+	for _, h := range headers {
+		ips := r.Header.Get(h)
+		if ips != "" {
+			ipList := strings.Split(ips, ",")
+			return strings.TrimSpace(ipList[0])
+		}
+	}
+
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return r.RemoteAddr
+	}
+	return ip
+}

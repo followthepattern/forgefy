@@ -1,15 +1,21 @@
+{{ $app := .App -}}
+
 package storage
 
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"mime/multipart"
 	"os"
 	"path"
+
+	"github.com/{{ $app | PackageName }}/log"
 )
 
 type LocalStorage struct {
-	cfg Config
+	logger *slog.Logger
+	cfg    Config
 }
 
 func (l LocalStorage) Upload(directoryPath string, file multipart.File, fileHeader multipart.FileHeader) (string, error) {
@@ -55,4 +61,19 @@ func (l LocalStorage) Download(filePath string) (*os.File, error) {
 	full := path.Join(l.cfg.uploadDirectory, filePath)
 
 	return os.Open(full)
+}
+
+func NewLocalStorage(opts ...StorageOpt) Storage {
+	cfg := &Config{
+		logger: log.DefaultLogger.With(log.WithComponent("local storage")),
+	}
+
+	for _, opt := range opts {
+		opt.setStorageOpt(cfg)
+	}
+
+	return &LocalStorage{
+		cfg:    *cfg,
+		logger: cfg.logger,
+	}
 }
