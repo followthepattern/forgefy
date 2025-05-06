@@ -25,7 +25,6 @@ export default function LoginForm() {
     const url = `${BACKEND_URL}/auth/login`
 
     const onSubmit: SubmitHandler<FormValues> = (formValues) => {
-        console.info("values", formValues);
         post(
             url, {
                 body: formValues,
@@ -34,7 +33,6 @@ export default function LoginForm() {
 
     useEffect(() => {
         if (data) {
-            console.info(data.jwt);
             setToken(data.jwt);
         }
     }, [data, setToken]);
