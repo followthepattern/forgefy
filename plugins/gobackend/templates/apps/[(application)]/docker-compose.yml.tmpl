@@ -26,7 +26,7 @@ services:
       - shared-volume:/sock
 
   {{ .App.AppNameCamelCase }}_backend:
-    image: golang:1.22
+    image: golang:1.24.2
     hostname: {{ .App.AppNameCamelCase }}_backend
     container_name: {{ .App.AppNameCamelCase }}_backend
     command: bash -c "go get ./... && go run ./cmd/{{ .App.AppNameCamelCase }}"

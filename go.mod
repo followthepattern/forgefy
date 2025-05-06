@@ -1,6 +1,6 @@
 module github.com/followthepattern/forgefy
 
-go 1.22.1
+go 1.24.3
 
 require (
 	github.com/onsi/ginkgo/v2 v2.17.1
