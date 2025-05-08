@@ -1,0 +1,19 @@
+package config
+
+import validation "github.com/go-ozzo/ozzo-validation"
+
+type SPA struct {
+	IndexFile string `mapstructure:"index_file"`
+	StaticDir string `mapstructure:"static_dir"`
+}
+
+func (s SPA) IsSPA() bool {
+	return len(s.IndexFile) > 0
+}
+
+func (s SPA) Validate() error {
+	return validation.ValidateStruct(&s,
+		validation.Field(&s.StaticDir, validation.Required),
+		validation.Field(&s.IndexFile, validation.Required),
+	)
+}

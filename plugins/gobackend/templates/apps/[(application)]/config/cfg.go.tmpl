@@ -16,6 +16,7 @@ type Config struct {
 	Mail         Mail
 	Organization Organization
 	Cerbos       Cerbos
+	SPA          SPA
 }
 
 func Parse() (result Config, err error) {
@@ -44,10 +45,18 @@ func Parse() (result Config, err error) {
 }
 
 func (cfg Config) Validate() error {
-	return validation.ValidateStruct(&cfg,
+	fields := []*validation.FieldRules{
 		validation.Field(&cfg.Server, validation.Required),
 		validation.Field(&cfg.DB, validation.Required),
 		validation.Field(&cfg.Mail, validation.Required),
 		validation.Field(&cfg.Organization, validation.Required),
-	)
+	}
+
+	if cfg.SPA.IsSPA() {
+		fields = append(fields,
+			validation.Field(&cfg.SPA, validation.Required),
+		)
+	}
+
+	return validation.ValidateStruct(&cfg, fields...)
 }

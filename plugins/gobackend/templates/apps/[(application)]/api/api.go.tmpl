@@ -4,6 +4,9 @@ package api
 
 import (
 	"log/slog"
+	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/{{ $app | PackageName }}/api/graphql"
 	"github.com/{{ $app | PackageName }}/api/middlewares"
@@ -46,11 +49,31 @@ func NewHttpApi(cfg config.Config,
 	r.Use(middlewareLogger)
 
 	r.Route("/", func(r chi.Router) {
+		if cfg.SPA.IsSPA() {
+			r.Handle("/*", spaHandler(cfg.SPA.StaticDir, cfg.SPA.IndexFile))
+		}
+
 		r.With(authMiddleware.Authenticate).Post("/graphql", graphqlHandler.ServeHTTP)
-		r.With(authMiddleware.Authenticate).Mount("/", restHandler)
+		r.With(authMiddleware.Authenticate).Mount("/api", restHandler)
 	})
 
 	r.Mount("/auth", authHandler)
 
 	return r
+}
+
+func spaHandler(staticPath, indexFile string) http.HandlerFunc {
+	fs := http.FileServer(http.Dir(staticPath))
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		requestedPath := filepath.Join(staticPath, r.URL.Path)
+
+		info, err := os.Stat(requestedPath)
+		if err == nil && !info.IsDir() {
+			fs.ServeHTTP(w, r)
+			return
+		}
+
+		http.ServeFile(w, r, filepath.Join(staticPath, indexFile))
+	}
 }
