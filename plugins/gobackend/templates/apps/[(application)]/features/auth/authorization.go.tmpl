@@ -4,15 +4,18 @@ package auth
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/{{ $app | PackageName }}/accesscontrol"
 	"github.com/{{ $app | PackageName }}/container"
+	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/models"
 )
 
 type AuthorizationService struct {
 	authDatabase AuthDatabase
 	ac           accesscontrol.AccessControl
+	logger       *slog.Logger
 }
 
 func NewAuthorizationService(cont container.Container, kind string) AuthorizationService {
@@ -26,11 +29,13 @@ func NewAuthorizationService(cont container.Container, kind string) Authorizatio
 func (service AuthorizationService) AuthorizedUser(ctx context.Context, action string, resourceID string) (string, error) {
 	ctxu, err := models.GetUserContext(ctx)
 	if err != nil {
+		service.logger.Error("failed to get authorized user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return "", err
 	}
 
 	roles, err := service.authDatabase.GetRoleIDs(ctxu.Id.Data)
 	if err != nil {
+		service.logger.Error("failed to get user roles", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return "", err
 	}
 
@@ -40,11 +45,13 @@ func (service AuthorizationService) AuthorizedUser(ctx context.Context, action s
 func (service AuthorizationService) Authorize(ctx context.Context, action string, resourceID string) error {
 	ctxu, err := models.GetUserContext(ctx)
 	if err != nil {
+		service.logger.Error("failed to get authorized user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
 	roles, err := service.authDatabase.GetRoleIDs(ctxu.Id.Data)
 	if err != nil {
+		service.logger.Error("failed to get user roles", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
@@ -54,11 +61,13 @@ func (service AuthorizationService) Authorize(ctx context.Context, action string
 func (service AuthorizationService) AuthorizeWithResource(ctx context.Context, resource, resourceID, action string) error {
 	ctxu, err := models.GetUserContext(ctx)
 	if err != nil {
+		service.logger.Error("failed to get authorized user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
 	roles, err := service.authDatabase.GetRoleIDs(ctxu.Id.Data)
 	if err != nil {
+		service.logger.Error("failed to get user roles", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 

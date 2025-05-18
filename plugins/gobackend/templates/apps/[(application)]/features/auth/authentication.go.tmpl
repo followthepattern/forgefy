@@ -11,8 +11,10 @@ import (
 	"time"
 
 	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/container"
 	"github.com/{{ $app | PackageName }}/features/mail"
 	usermodels "github.com/{{ $app | PackageName }}/features/user/models"
+	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/types"
 	
@@ -29,20 +31,25 @@ type AuthenticationService struct {
 	cfg          config.Config
 	mail         mail.Mail
 	jwtKeys      config.JwtKeyPair
+	logger       *slog.Logger
 }
 
-func NewAuthenticationService(cfg config.Config, repository AuthDatabase, emailClient mail.Mail, jwtKeys config.JwtKeyPair, logger *slog.Logger) AuthenticationService {
+func NewAuthenticationService(cont container.Container) AuthenticationService {
+	authDatabase := NewAuthDatabase(cont.GetDB())
+
 	return AuthenticationService{
-		cfg:          cfg,
-		authDatabase: repository,
-		mail:         emailClient,
-		jwtKeys:      jwtKeys,
+		cfg:          cont.GetConfig(),
+		authDatabase: authDatabase,
+		mail:         cont.GetEmail(),
+		jwtKeys:      cont.GetJWTKeys(),
+		logger:       cont.GetLogger().With(log.WithComponent("auth service")),
 	}
 }
 
 func (service AuthenticationService) Login(ctx context.Context, email types.String, password types.String) (*LoginResponse, error) {
 	authUser, err := service.authDatabase.GetAuthUserByEmail(email)
 	if err != nil {
+		service.logger.Error("failed to login", log.WithError(err), log.WithCorrelationID(ctx))
 		return nil, err
 	}
 
@@ -58,6 +65,7 @@ func (service AuthenticationService) Login(ctx context.Context, email types.Stri
 
 	tokenString, err := GenerateTokenStringFromUser(authUser.UserModel, service.jwtKeys.Private)
 	if err != nil {
+		service.logger.Error("failed to generate token", log.WithError(err), log.WithCorrelationID(ctx))
 		return nil, err
 	}
 
@@ -70,11 +78,13 @@ func (service AuthenticationService) Login(ctx context.Context, email types.Stri
 func (service AuthenticationService) Register(ctx context.Context, register RegisterRequestParams) (*RegisterResponse, error) {
 	_, err := models.GetUserContext(ctx)
 	if err != nil {
+		service.logger.Error("failed to receive user context", log.WithError(err), log.WithCorrelationID(ctx))
 		return nil, err
 	}
 
 	valid, err := service.authDatabase.VerifyEmail(register.Email)
 	if err != nil {
+		service.logger.Error("failed to verify email", log.WithError(err), log.WithCorrelationID(ctx))
 		return nil, err
 	}
 
@@ -84,6 +94,7 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(register.Password.Data), bcrypt.DefaultCost)
 	if err != nil {
+		service.logger.Error("failed to generate password", log.WithError(err), log.WithCorrelationID(ctx))
 		return nil, err
 	}
 
@@ -102,14 +113,15 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 
 	err = service.authDatabase.RegisterUser(creationUser)
 	if err != nil {
+		service.logger.Error("failed to register user", log.WithError(err), log.WithCorrelationID(ctx))
 		return nil, err
 	}
 
 	go func() {
 		mail := GetActivationMailTemplate(service.cfg, creationUser.Id, creationUser.Email)
 
-		service.mail.SendMail(mail)
-		// log
+		emailErr := service.mail.SendMail(mail)
+		service.logger.Error("failed to send activation email", log.WithError(emailErr), log.WithCorrelationID(ctx))
 	}()
 
 	return &RegisterResponse{
