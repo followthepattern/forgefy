@@ -33,6 +33,10 @@ func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specificatio
 			return nil
 		}
 
+		if forgeio.ExcludeMonitoring(filepath, !productSpec.Monitoring) {
+			return nil
+		}
+
 		if !forgeio.IsForgeTemplate(filepath) {
 			return nil
 		}
@@ -43,6 +47,7 @@ func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specificatio
 		}
 
 		newFilepath := forgeio.CleanFilepath(filepath, forgeio.DAGGER_FILE_TOKEN)
+		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.MONITORING_FILE_TOKEN)
 		newFilepath = forgeio.RemoveTemplateExtension(newFilepath)
 		newFilepath = path.Join(productmap.ROOT_DIRECTORY, newFilepath)
 

@@ -5,10 +5,11 @@ import (
 )
 
 const (
-	TMPL_SUFFIX       = ".tmpl"
-	DAGGER_FILE_TOKEN = "($dagger$)"
-	APP_FILE_TOKEN    = "[(application)]"
-	FEATURE_TOKEN     = "[(feature)]"
+	TMPL_SUFFIX           = ".tmpl"
+	DAGGER_FILE_TOKEN     = "($dagger$)"
+	MONITORING_FILE_TOKEN = "($monitoring$)"
+	APP_FILE_TOKEN        = "[(application)]"
+	FEATURE_TOKEN         = "[(feature)]"
 )
 
 func IsForgeTemplate(filepath string) bool {
@@ -17,6 +18,10 @@ func IsForgeTemplate(filepath string) bool {
 
 func ExcludeTemplate(filepath string, excludeDagger bool) bool {
 	return excludeDagger && strings.Contains(filepath, DAGGER_FILE_TOKEN)
+}
+
+func ExcludeMonitoring(filepath string, excludeMonitoring bool) bool {
+	return excludeMonitoring && strings.Contains(filepath, MONITORING_FILE_TOKEN)
 }
 
 func RemoveTemplateExtension(filepath string) string {

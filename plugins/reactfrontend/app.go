@@ -107,6 +107,10 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 			return nil
 		}
 
+		if forgeio.ExcludeMonitoring(filepath, !reactApp.Monitoring) {
+			return nil
+		}
+
 		content, err := fs.ReadFile(templates.Files, filepath)
 		if err != nil {
 			return err
@@ -121,6 +125,7 @@ func (plugin ReactFrontend) createWalkFn(pm productmap.ProductMap, reactApp App)
 		newFilepath = forgeio.RemoveTemplateExtension(newFilepath)
 		newFilepath = path.Join(productmap.ROOT_DIRECTORY, newFilepath)
 		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.DAGGER_FILE_TOKEN)
+		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.MONITORING_FILE_TOKEN)
 
 		if !strings.Contains(newFilepath, forgeio.FEATURE_TOKEN) {
 			file := productmap.NewFile(

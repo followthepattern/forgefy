@@ -1,0 +1,20 @@
+[SERVICE]
+    Flush        1
+    Daemon       Off
+    Log_Level    info
+    Parsers_File parsers.conf
+
+[INPUT]
+    Name              forward
+    Listen            0.0.0.0
+    Port              24224
+    Buffer_Chunk_Size 1M
+    Buffer_Max_Size   6M
+
+[OUTPUT]
+    name   loki
+    host   loki
+    uri     /loki/api/v1/push
+    port    3100
+    match  *
+    labels job=fluentbit,container=$container_name

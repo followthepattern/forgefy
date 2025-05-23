@@ -1,3 +1,5 @@
+{{ $app := .App -}}
+
 services:
   {{ .App.AppNameCamelCase }}_db:
     image: postgres:latest
@@ -12,6 +14,15 @@ services:
       POSTGRES_PASSWORD: dbpass
     volumes:
       - ./tests/integration/testdata/database.sql:/docker-entrypoint-initdb.d/database.sql
+{{ if $app.Monitoring }}
+    logging:
+      driver: "fluentd"
+      options:
+        tag: docker.{{ .App.AppNameCamelCase }}_db
+
+    depends_on:
+      - fluent-bit
+{{- end }}
 
   {{ .App.AppNameCamelCase }}_cerbos:
     image: ghcr.io/cerbos/cerbos:latest
@@ -24,6 +35,15 @@ services:
     volumes:
       - ./policies:/policies:rw
       - shared-volume:/sock
+{{ if $app.Monitoring }}
+    logging:
+      driver: "fluentd"
+      options:
+        tag: docker.{{ .App.AppNameCamelCase }}_cerbos
+
+    depends_on:
+      - fluent-bit
+{{- end }}
 
   {{ .App.AppNameCamelCase }}_backend:
     image: golang:1.24.2
@@ -31,14 +51,26 @@ services:
     container_name: {{ .App.AppNameCamelCase }}_backend
     command: bash -c "go get ./... && go run ./cmd/{{ .App.AppNameCamelCase }}"
     working_dir: /backend
+
     depends_on:
+{{- if $app.Monitoring }}
+      - fluent-bit
+{{- end }}
       - {{ .App.AppNameCamelCase }}_db
       - {{ .App.AppNameCamelCase }}_cerbos
+
     ports:
       - {{ .App.AppPort }}:8080
+
     volumes:
       - ./:/backend:rw
       - shared-volume:/sock
+{{ if $app.Monitoring }}
+    logging:
+      driver: "fluentd"
+      options:
+        tag: docker.{{ .App.AppNameCamelCase }}_backend
+{{- end }}
 
 volumes:
   shared-volume:

@@ -1,8 +1,53 @@
+{{ $product := . -}}
+
 version: '3'
 
-{{if .Apps }}
+{{ if .Apps -}}
 include:
 {{- range .Apps }}
   - apps/{{ .AppNameDir }}/docker-compose.yml
 {{- end }}
 {{ end }}
+
+{{- if $product.Monitoring -}}
+services:
+  fluent-bit:
+    image: cr.fluentbit.io/fluent/fluent-bit:2.2.2
+    container_name: fluent-bit
+    ports:
+      - "24224:24224"
+    volumes:
+      - ./monitoring/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./monitoring/fluent-bit/parsers.conf:/fluent-bit/etc/parsers.conf
+      - ./monitoring/fluent-bit/db:/fluent-bit/db
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    depends_on:
+      loki:
+        condition: service_healthy
+
+  loki:
+    image: grafana/loki:2.8.2
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3100/ready"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana:10.2.3
+    container_name: grafana
+    ports:
+      - "3200:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - loki
+{{- end -}}

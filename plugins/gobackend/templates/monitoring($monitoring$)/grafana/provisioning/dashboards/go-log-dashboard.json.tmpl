@@ -1,0 +1,45 @@
+{{ $app := .App -}}
+
+{
+  "id": null,
+  "title": "Container Logs",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "logs",
+      "title": "Go App Logs",
+      "targets": [
+        {
+          "expr": "{job=\"fluentbit\", container=\"/{{ $app.AppName | LowerCamelCase }}_backend\"} | json log | line_format \"{{"{{"}}.log{{"}}"}}\"",
+          "refId": "Go-A"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 10 }
+    },
+    {
+      "type": "logs",
+      "title": "Postgres Logs",
+      "targets": [
+        {
+          "expr": "{job=\"fluentbit\", container=\"/{{ $app.AppName | LowerCamelCase }}_db\"} | json log | line_format \"{{"{{"}}.log{{"}}"}}\"",
+          "refId": "Go-B"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 10, "w": 24, "h": 10 }
+    },
+    {
+      "type": "logs",
+      "title": "Cerbos Logs",
+      "targets": [
+        {
+          "expr": "{job=\"fluentbit\", container=\"/{{ $app.AppName | LowerCamelCase }}_cerbos\"} | json log | line_format \"{{"{{"}}.log{{"}}"}}\"",
+          "refId": "Go-C"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 10, "w": 24, "h": 10 }
+    }
+  ],
+  "schemaVersion": 30,
+  "version": 1,
+  "refresh": "5s"
+}
