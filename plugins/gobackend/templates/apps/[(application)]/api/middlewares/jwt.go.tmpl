@@ -13,6 +13,7 @@ import (
 
 	"github.com/{{ $app | PackageName }}/api/httpresponses"
 	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/types"
 	"github.com/golang-jwt/jwt/v4"
@@ -34,7 +35,7 @@ type JWT struct {
 
 func NewJWT(logger *slog.Logger, jwtKeys config.JwtKeyPair) JWT {
 	result := JWT{
-		logger:  logger,
+		logger:  logger.With(log.WithComponent("jwt middleware")),
 		jwtKeys: jwtKeys,
 	}
 	return result
@@ -46,7 +47,8 @@ func (j JWT) Authenticate(next http.Handler) http.Handler {
 
 		userContext, err := j.getContextUserFromTokenString(headerValue)
 		if err != nil {
-			httpresponses.BadRequest(w, fmt.Errorf(err.Error()))
+			httpresponses.BadRequest(w, err.Error())
+			j.logger.Error("failed to get user context from token", log.WithError(err), log.WithCorrelationID(r.Context()))
 			return
 		}
 

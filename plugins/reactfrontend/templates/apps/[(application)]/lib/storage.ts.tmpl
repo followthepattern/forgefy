@@ -12,7 +12,7 @@ interface UseUploadFile {
 
 export const useUploadFile = (): UseUploadFile => {
     const { token } = useTokenStore();
-    const uploadBaseURL = `${BACKEND_URL}/storage/upload`;
+    const uploadBaseURL = `${BACKEND_URL}/api/storage/upload`;
 
     const [data, setData] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -64,7 +64,7 @@ export const useStorage = (): {
 } => {
     const { token } = useTokenStore();
 
-    const downloadBaseURL = `${BACKEND_URL}/storage/download`
+    const downloadBaseURL = `${BACKEND_URL}/api/storage/download`
 
     return {
         download: (filePath: string) => {
