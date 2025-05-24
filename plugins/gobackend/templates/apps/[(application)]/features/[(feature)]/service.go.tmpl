@@ -28,7 +28,7 @@ func New{{ $feature | GoType }}Service(cont container.Container, authorizationSe
 	service := {{ $feature | GoType }}Service{
 		authorizationService: authorizationService,
 		{{ $feature.FeatureName | LowerCamelCase }}Repository:    repository,
-		logger:	cont.GetLogger(),
+		logger:	cont.GetLogger().With(log.WithComponent("{{ $feature.FeatureName | LowerCamelCase }} service")),
 	}
 
 	return service
