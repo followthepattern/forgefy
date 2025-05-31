@@ -3,6 +3,7 @@ package parsing
 import (
 	"slices"
 
+	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/models"
 	"github.com/followthepattern/forgefy/specification/types"
 )
@@ -27,4 +28,14 @@ func CreateTableViewFilter(t types.TypeRegistry) func([]models.Field) []models.F
 
 func SList(a ...string) []string {
 	return a
+}
+
+func TypeCRUD(features []specification.Feature) []specification.Feature {
+	copiedFields := slices.Clone(features)
+
+	result := slices.DeleteFunc(copiedFields, func(e specification.Feature) bool {
+		return e.FeatureType == specification.CRUD
+	})
+
+	return result
 }

@@ -20,7 +20,7 @@ type Feature struct {
 	FeatureName    string         `yaml:"name"`
 	Fields         []models.Field `yaml:"fields"`
 	DefinedRecords []string       `yaml:"records"`
-	Type           FeatureType    `yaml:"type,omitempty"`
+	FeatureType    FeatureType    `yaml:"type,omitempty"`
 }
 
 func (f Feature) FeatureNameCamelCase() string {
