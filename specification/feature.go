@@ -9,11 +9,18 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
+type FeatureType string
+
+const (
+	CRUD FeatureType = "CRUD"
+)
+
 type Feature struct {
 	App
 	FeatureName    string         `yaml:"name"`
 	Fields         []models.Field `yaml:"fields"`
 	DefinedRecords []string       `yaml:"records"`
+	FeatureType    FeatureType    `yaml:"type,omitempty"`
 }
 
 func (f Feature) FeatureNameCamelCase() string {
