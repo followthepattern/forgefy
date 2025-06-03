@@ -14,6 +14,7 @@ services:
   fluent-bit:
     image: cr.fluentbit.io/fluent/fluent-bit:2.2.2
     container_name: fluent-bit
+    restart: unless-stopped
     ports:
       - "24224:24224"
     volumes:
@@ -29,6 +30,7 @@ services:
   loki:
     image: grafana/loki:2.8.2
     container_name: loki
+    restart: unless-stopped
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
@@ -41,6 +43,7 @@ services:
   grafana:
     image: grafana/grafana:10.2.3
     container_name: grafana
+    restart: unless-stopped
     ports:
       - "3200:3000"
     environment:
