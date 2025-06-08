@@ -23,6 +23,7 @@ func NewAuthorizationService(cont container.Container, kind string) Authorizatio
 	return AuthorizationService{
 		ac:           cont.GetAccessControl().WithKind(kind),
 		authDatabase: authDatabase,
+		logger:      cont.GetLogger().With(log.WithComponent("auth service")),
 	}
 }
 
