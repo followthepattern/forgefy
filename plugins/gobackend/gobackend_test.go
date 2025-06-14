@@ -15,9 +15,40 @@ var _ = Describe("Go Back-end Plugin", func() {
 		dummyWriter = forgeio.NewDummyWriter()
 	})
 
-	Context("Go back-end plugin Forge", func() {
-		var (
-			yaml = `
+	Context("Forging vscode config", func() {
+		It("should contain vscode config", func() {
+			yaml := `
+version: 0
+product_name: "Test Product Name"
+vscode: true
+apps:
+  - name: backend
+    type: go-backend
+features:
+  - name: photos
+    fields:
+      - name: ID
+        type: string
+      - name: Name
+        type: string
+      - name: Type
+        type: string
+`
+
+			f := forgefy.New()
+			f.InstallPlugins(gobackend.Plugin{})
+
+			productName, err := f.Forge(yaml, &dummyWriter)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(productName).To(Equal("Test Product Name"))
+
+			Expect(dummyWriter).To(forgeio.ContainFiles(
+				".vscode/launch.json",
+			))
+		})
+
+		It("should not contain vscode config", func() {
+			yaml := `
 version: 0
 product_name: "Test Product Name"
 apps:
@@ -33,9 +64,7 @@ features:
       - name: Type
         type: string
 `
-		)
 
-		It("forges files", func() {
 			f := forgefy.New()
 			f.InstallPlugins(gobackend.Plugin{})
 
@@ -43,7 +72,9 @@ features:
 			Expect(err).NotTo(HaveOccurred())
 			Expect(productName).To(Equal("Test Product Name"))
 
-			Expect(dummyWriter).To(forgeio.ContainFiles())
+			Expect(dummyWriter).NotTo(forgeio.ContainFiles(
+				".vscode/launch.json",
+			))
 		})
 	})
 
@@ -104,7 +135,7 @@ features:
 
 			productName, err := f.Forge(yaml, &dummyWriter)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(productName).NotTo(Equal("Test Product Name"))
+			Expect(productName).To(Equal("Test Product Name"))
 
 			Expect(err).To(Succeed())
 
