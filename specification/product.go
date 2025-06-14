@@ -17,6 +17,7 @@ type Product struct {
 	Features      []Feature `yaml:"features"`
 	ExcludeDagger bool      `yaml:"exclude_dagger"`
 	Monitoring    bool      `yaml:"monitoring"`
+	VSCode        bool      `yaml:"vscode"`
 }
 
 func (fs Product) Validate() error {

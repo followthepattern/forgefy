@@ -1,0 +1,22 @@
+{{ $app := .App -}}
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Go ",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/apps/{{ $app.AppName | LowerCamelCase }}/cmd/{{ $app.AppName | LowerCamelCase }}",
+            "cwd": "${workspaceFolder}/apps/{{ $app.AppName | LowerCamelCase }}",
+            "env": {
+                "{{ $app.AppName | EnvVariable }}_CERBOS_ADDRESS": "localhost:3592",
+                "{{ $app.AppName | EnvVariable }}_DB_HOST": "localhost",
+                "{{ $app.AppName | EnvVariable }}_DB_PORT": "5433",
+            }
+        }
+    ]
+}
