@@ -2,6 +2,7 @@
 version: 0
 product_name: "Adapticc"
 monitoring: true
+vscode: true
 apps:
   - name: backend1
     type: go-backend
