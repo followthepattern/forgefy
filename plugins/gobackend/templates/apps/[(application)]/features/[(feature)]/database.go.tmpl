@@ -107,10 +107,10 @@ func (repo {{ $feature | GoType }}Database) Update(model models.{{ $feature | Go
 	return err
 }
 
-func (repo {{ $feature | GoType }}Database) Delete(id []string) error {
+func (repo {{ $feature | GoType }}Database) Delete(ids []string) error {
 	res, err := repo.db.
 		Delete({{ $feature | GoType }}Table).
-		Where(C("{{ $idField | DBName }}").Eq(id)).
+		Where(C("{{ $idField | DBName }}").In(ids)).
 		Executor().
 		Exec()
 

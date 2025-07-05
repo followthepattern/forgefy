@@ -86,9 +86,9 @@ func (graphQL {{ $feature | GoType }}GraphQL) Update(ctx context.Context, args s
 }
 
 func (graphQL {{ $feature | GoType }}GraphQL) Delete(ctx context.Context, args struct {
-	Id string
+	Ids []string
 }) (*basemodels.ResponseStatus, error) {
-	err := graphQL.ctrl.Delete(ctx, args.Id)
+	err := graphQL.ctrl.Delete(ctx, args.Ids)
 	if err != nil {
 		return nil, err
 	}

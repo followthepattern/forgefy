@@ -101,14 +101,14 @@ func (service {{ $feature | GoType }}Service) Update(ctx context.Context, value 
 	return nil
 }
 
-func (service {{ $feature | GoType }}Service) Delete(ctx context.Context, id string) error {
-	err := service.authorizationService.Authorize(ctx, accesscontrol.DELETE, id)
+func (service {{ $feature | GoType }}Service) Delete(ctx context.Context, ids []string) error {
+	err := service.authorizationService.Authorize(ctx, accesscontrol.DELETE, accesscontrol.ALLRESOURCE)
 	if err != nil {
 		service.logger.Error("Error authorizing user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
-	err = service.{{ $feature.FeatureName | LowerCamelCase }}Repository.Delete(id)
+	err = service.{{ $feature.FeatureName | LowerCamelCase }}Repository.Delete(ids)
 	if err != nil {
 		service.logger.Error("failed to delete item", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
