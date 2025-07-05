@@ -45,3 +45,42 @@ func AdminUser() models.User {
 
 	return user
 }
+
+func WorkflowUser() models.User {
+	workflowUser := models.User{
+		ID: models.Field{
+			Name:  "Id",
+			Type:  "uuid",
+			Value: uuid.NewString(),
+		},
+		Email: models.Field{
+			Name:  "Email",
+			Type:  "string",
+			Value: "workflow@admin.com",
+		},
+		FirstName: models.Field{
+			Name:  "FirstName",
+			Type:  "string",
+			Value: "Workflow",
+		},
+		LastName: models.Field{
+			Name:  "LastName",
+			Type:  "string",
+			Value: "User",
+		},
+		Password: models.Field{
+			Name:  "Password",
+			Type:  "string",
+			Value: "$2a$10$1UZWtyK2f6BvSlqp6SBzkeGiTP5pdkiuRgvlt4Gd4MZIyfpVWCkYq",
+		},
+		Active: models.Field{
+			Name:  "Active",
+			Type:  "boolean",
+			Value: "true",
+		},
+	}
+
+	workflowUser.Userlog = DefaultUserlog(workflowUser)
+
+	return workflowUser
+}
