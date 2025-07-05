@@ -134,7 +134,7 @@ type {{ $feature | NameGraphQL }}Query {
 type {{ $feature | NameGraphQL }}Mutation {
 	create(model: Create{{ $feature | NameGraphQL }}!): ResponseStatus
 	update(id: String!, model: Update{{ $feature | NameGraphQL }}!): ResponseStatus
-	delete(id: String!): ResponseStatus
+	delete(ids: [String!]): ResponseStatus
 }
 
 {{- end }}
