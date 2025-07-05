@@ -8,6 +8,7 @@ const (
 	TMPL_SUFFIX           = ".tmpl"
 	DAGGER_FILE_TOKEN     = "($dagger$)"
 	MONITORING_FILE_TOKEN = "($monitoring$)"
+	VSCODE_FILE_TOKEN     = "($vscode$)"
 	APP_FILE_TOKEN        = "[(application)]"
 	FEATURE_TOKEN         = "[(feature)]"
 )
@@ -22,6 +23,10 @@ func ExcludeTemplate(filepath string, excludeDagger bool) bool {
 
 func ExcludeMonitoring(filepath string, excludeMonitoring bool) bool {
 	return excludeMonitoring && strings.Contains(filepath, MONITORING_FILE_TOKEN)
+}
+
+func ExcludeVSCode(filepath string, excludeVSCode bool) bool {
+	return excludeVSCode && strings.Contains(filepath, VSCODE_FILE_TOKEN)
 }
 
 func RemoveTemplateExtension(filepath string) string {
