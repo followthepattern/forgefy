@@ -18,9 +18,9 @@ mutation CreateUser($model: CreateUser!) {
 
 
 export const deleteUser = `
-mutation DeleteUser($id: String!) {
+mutation DeleteUser($ids: [String!]!) {
 	users {
-		delete(id: $id) {
+		delete(ids: $ids) {
 			code
 		}
 	}

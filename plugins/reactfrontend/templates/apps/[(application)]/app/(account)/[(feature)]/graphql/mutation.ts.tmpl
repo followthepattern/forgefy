@@ -18,9 +18,9 @@ mutation Create{{ .FeatureNameCamelCaseUpper }}($model: Create{{ .FeatureNameCam
 
 
 export const delete{{ .FeatureNameCamelCaseUpper }} = `
-mutation Delete{{ .FeatureNameCamelCaseUpper }}($id: String!) {
+mutation Delete{{ .FeatureNameCamelCaseUpper }}($ids: [String!]!) {
 	{{ .FeatureNameCamelCase }}s {
-		delete(id: $id) {
+		delete(ids: $ids) {
 			code
 		}
 	}

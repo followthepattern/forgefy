@@ -92,7 +92,7 @@ type UserQuery {
 type UserMutation {
 	create(model: CreateUser!): ResponseStatus
 	update(id: String!, model: UpdateUser!): ResponseStatus
-	delete(id: String!): ResponseStatus
+	delete(ids: [String!]!): ResponseStatus
 }
 
 {{- range $feature := .Features }}
@@ -134,7 +134,7 @@ type {{ $feature | NameGraphQL }}Query {
 type {{ $feature | NameGraphQL }}Mutation {
 	create(model: Create{{ $feature | NameGraphQL }}!): ResponseStatus
 	update(id: String!, model: Update{{ $feature | NameGraphQL }}!): ResponseStatus
-	delete(ids: [String!]): ResponseStatus
+	delete(ids: [String!]!): ResponseStatus
 }
 
 {{- end }}

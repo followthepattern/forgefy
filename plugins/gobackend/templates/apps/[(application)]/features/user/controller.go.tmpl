@@ -73,11 +73,11 @@ func (ctrl UserController) Update(ctx context.Context, value models.UserModel) e
 	return ctrl.user.Update(ctx, value)
 }
 
-func (ctrl UserController) Delete(ctx context.Context, id string) error {
-	if err := validation.Validate(id, types.Required("userID")); err != nil {
+func (ctrl UserController) Delete(ctx context.Context, ids []string) error {
+	if err := validation.Validate(ids, types.Required("userID")); err != nil {
 		ctrl.logger.Error("failed to validate user ID", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
-	return ctrl.user.Delete(ctx, id)
+	return ctrl.user.Delete(ctx, ids)
 }

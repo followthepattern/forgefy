@@ -105,10 +105,10 @@ func (repo UserDatabase) Update(model models.UserModel) error {
 	return err
 }
 
-func (repo UserDatabase) Delete(id string) error {
+func (repo UserDatabase) Delete(ids []string) error {
 	res, err := repo.db.
 		Delete(UserTable).
-		Where(C("id").Eq(id)).
+		Where(C("id").Eq(ids)).
 		Executor().
 		Exec()
 
