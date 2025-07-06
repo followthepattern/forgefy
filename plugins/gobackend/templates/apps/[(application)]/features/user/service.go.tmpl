@@ -100,14 +100,14 @@ func (service UserService) Update(ctx context.Context, value models.UserModel) e
 	return nil
 }
 
-func (service UserService) Delete(ctx context.Context, id string) error {
-	err := service.authorizationService.Authorize(ctx, accesscontrol.DELETE, id)
+func (service UserService) Delete(ctx context.Context, ids []string) error {
+	err := service.authorizationService.Authorize(ctx, accesscontrol.DELETE, accesscontrol.ALLRESOURCE)
 	if err != nil {
 		service.logger.Error("failed to authorize user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
-	err = service.userRepository.Delete(id)
+	err = service.userRepository.Delete(ids)
 	if err != nil {
 		service.logger.Error("failed to delete item", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err

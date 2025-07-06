@@ -27,7 +27,7 @@ export type UpdateMutationResult<Entity = any, TResult = any> = [
 ];
 
 export type DeleteMutationResult<Entity = any, TResult = any> = [
-    (id: Entity) => void,
+    (id: Entity[]) => void,
     {
         deleteLoading: boolean;
         deleteResult?: TResult;

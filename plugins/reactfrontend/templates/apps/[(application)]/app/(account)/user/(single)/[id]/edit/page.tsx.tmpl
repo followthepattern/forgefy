@@ -106,7 +106,7 @@ export default function UserEdit() {
     const onDelete = () => {
         toastId.current = deleteToast();
 
-        executeDeleteMutation(id)
+        executeDeleteMutation([id])
     }
 
     const onCancel = () => {

@@ -9,10 +9,10 @@ interface DeleteProperties {
 export default function useDelete({ graphQL, parseResult }: DeleteProperties): DeleteMutationResult<string, number | undefined> {
     const [executeMutation, { data, loading, error }] = useMutation(gql(graphQL), { errorPolicy: "all" });
 
-    const execute = (id: string) => {
+    const execute = (ids: string[]) => {
         executeMutation({
             variables: {
-                id: id
+                ids: ids
             }
         });
     };
