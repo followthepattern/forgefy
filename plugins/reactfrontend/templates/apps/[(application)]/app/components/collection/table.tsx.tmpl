@@ -2,6 +2,7 @@ import React, { ReactElement, ReactNode, useContext, useState, createContext } f
 import { Link } from "react-router-dom";
 import classNames from "classnames";
 import { ToHumanReadable } from "@/lib/strings";
+import EllipsisVerticalIcon from "@/app/icons/ellipsisVertical";
 
 interface ColumnProperteis {
     className?: string
@@ -209,9 +210,7 @@ export function Table<T extends { id: string }>(props: TableProperties<T>) {
                     <Column
                         key="key-actions"
                         className="px-6 text-right "
-                    >
-                        Action
-                    </Column>
+                    />
                 </TableHeader>
                 <TableBody items={props.items}>
                     {item => (
@@ -248,8 +247,8 @@ export function Table<T extends { id: string }>(props: TableProperties<T>) {
                                 </Cell>
                             )}
                             <Cell className="px-6 text-right">
-                                <Link to={props.toEditLink(item)} className="p-1 font-medium rounded-lg text-brand hover:bg-gray-stroke-weak">
-                                    Edit
+                                <Link to={props.toEditLink(item)} className="flex justify-end font-medium rounded-lg">
+                                    <EllipsisVerticalIcon className="h-5 rounded-md hover:bg-gray-stroke-weak" />
                                 </Link>
                             </Cell>
                         </Row>
