@@ -1,8 +1,20 @@
-import React, { ReactElement, ReactNode, useContext, useState, createContext } from "react";
+import { createPortal } from 'react-dom';
+import React, {
+    ReactElement,
+    useContext,
+    useState,
+    createContext,
+    Fragment,
+    useRef
+} from "react";
+
 import { Link } from "react-router-dom";
 import classNames from "classnames";
 import { ToHumanReadable } from "@/lib/strings";
 import EllipsisVerticalIcon from "@/app/icons/ellipsisVertical";
+import { Transition, Popover } from '@headlessui/react'
+import { Identifable, CollectionItem } from './itemCollection';
+import ConfirmModal from '@/app/(account)/components/modals/confirmModal';
 
 interface ColumnProperteis {
     className?: string
@@ -28,6 +40,7 @@ interface RowProperties<T> {
     element?: T
     isSelected?: boolean
     key?: string
+    onContextMenu?: React.MouseEventHandler<HTMLTableRowElement>
 }
 
 interface RowContext {
@@ -45,14 +58,15 @@ export function Row<T>(props: RowProperties<T>, key: string) {
     return (
         <rowContext.Provider
             value={
-            {
-                isSelected: state.isSelected,
-                setRowSelected: (value: boolean) => {
+                {
+                    isSelected: state.isSelected,
+                    setRowSelected: (value: boolean) => {
 
-                }
-            }}
+                    }
+                }}
         >
             <tr
+                onContextMenu={props.onContextMenu}
                 className={
                     classNames(props.className,
                         "",
@@ -117,12 +131,12 @@ function Checkbox(props: CheckboxProperties) {
 }
 
 
-interface TableHeaderProperties<T> {
+interface TableHeaderProperties {
     children?: any
     className?: string
 }
 
-export function TableHeader<T>(props: TableHeaderProperties<T>) {
+export function TableHeader<T>(props: TableHeaderProperties) {
     return (
         <thead
             className={classNames(props.className, "text-xs text-gray-supporting uppercase gray-fill border-b border-gray-fill")}
@@ -135,16 +149,13 @@ export function TableHeader<T>(props: TableHeaderProperties<T>) {
     )
 }
 
-interface TableBodyProperties<T> {
-    children?: (item: T) => ReactElement | any
+interface TableBodyProperties<T extends Identifable> {
+    children?: (item: CollectionItem<T>) => ReactElement | any
     className?: string
-    items?: T[]
+    items?: CollectionItem<T>[]
 }
 
-export function TableBody<T extends {
-    id: string
-}
->(props: TableBodyProperties<T>) {
+export function TableBody<T extends Identifable>(props: TableBodyProperties<T>) {
     let component: any
 
     if (typeof (props.children) == "function" && props.items) {
@@ -167,21 +178,26 @@ interface ColumnLabel {
     name: string
 }
 
-export interface TableProperties<ItemT> {
+export interface TableProperties<T extends Identifable> {
     className?: string
     columns: ColumnLabel[]
-    items: ItemT[]
-    toEditLink: (v: ItemT) => string
-    toViewLink: (v: ItemT) => string
+    items: CollectionItem<T>[]
+    toEditLink: (v: T) => string
+    toViewLink: (v: T) => string
+
+    areAllSelected: boolean
+    onToggle?: (v: string) => void
+    onUnselectAll?: () => void
+    onSelectAll?: () => void
+
+    onDelete?: (v: T[]) => void
 }
 
-export function Table<T extends { id: string }>(props: TableProperties<T>) {
-    const [selectedRows, setSelectedRows] = useState(new Set());
-
+export function Table<T extends Identifable>(props: TableProperties<T>) {
     return (
         <>
             <table
-                className={classNames(props.className, "min-w-full table-fixed text-sm text-left text-gray-stroke-strong")}
+                className={classNames(props.className, "relative min-w-full table-fixed text-sm text-left text-gray-stroke-strong")}
             >
                 <TableHeader>
                     <Column
@@ -190,13 +206,13 @@ export function Table<T extends { id: string }>(props: TableProperties<T>) {
                     >
                         <Checkbox
                             onChange={() => {
-                                if (selectedRows.size != props.items.length) {
-                                    setSelectedRows(new Set(props.items.map(item => item.id)));
+                                if (props.areAllSelected) {
+                                    props.onUnselectAll?.()
                                     return;
                                 }
-                                setSelectedRows(new Set())
+                                props.onSelectAll?.()
                             }}
-                            checked={selectedRows.size == props.items.length && props.items.length != 0}
+                            checked={props.areAllSelected}
                         />
                     </Column>
                     {props.columns.map(column => (
@@ -213,9 +229,9 @@ export function Table<T extends { id: string }>(props: TableProperties<T>) {
                     />
                 </TableHeader>
                 <TableBody items={props.items}>
-                    {item => (
+                    {(item) => (
                         <Row
-                            isSelected={selectedRows.has(item.id)}
+                            isSelected={item.selected}
                             key={item.id}
                         >
                             <Cell
@@ -224,17 +240,12 @@ export function Table<T extends { id: string }>(props: TableProperties<T>) {
                                 <Checkbox
                                     onChange={
                                         () => {
-                                            if (!selectedRows.has(item.id)) {
-                                                setSelectedRows(prev => new Set(prev.add(item.id)));
-                                                return;
+                                            if (props.onToggle) {
+                                                props.onToggle(item.id);
                                             }
-
-                                            setSelectedRows(prev => {
-                                                prev.delete(item.id);
-                                                return new Set(prev);
-                                            })
                                         }
-                                    } />
+                                    }
+                                />
                             </Cell>
                             {props.columns.map(column =>
                                 <Cell
@@ -246,10 +257,18 @@ export function Table<T extends { id: string }>(props: TableProperties<T>) {
                                     </Link>
                                 </Cell>
                             )}
-                            <Cell className="px-6 text-right">
-                                <Link to={props.toEditLink(item)} className="flex justify-end font-medium rounded-lg">
-                                    <EllipsisVerticalIcon className="h-5 rounded-md hover:bg-gray-stroke-weak" />
-                                </Link>
+                            <Cell className="flex justify-end px-6 text-right" key={item.id}>
+                                <PopoverWithPortal
+                                    item={item}
+                                    toEdit={props.toEditLink(item)}
+                                    onDelete={v => {
+                                        if (props.onDelete) {
+                                            props.onDelete([v])
+                                        }
+                                    }}
+                                >
+                                    <EllipsisVerticalIcon className="h-5" />
+                                </PopoverWithPortal>
                             </Cell>
                         </Row>
                     )}
@@ -257,4 +276,87 @@ export function Table<T extends { id: string }>(props: TableProperties<T>) {
             </table>
         </>
     )
+}
+
+interface PopoverProperties<T extends Identifable> {
+    item: T
+    toEdit: string
+    onDelete?: (v: T) => void
+    children?: any
+}
+
+function PopoverWithPortal<T extends Identifable>(props: PopoverProperties<T>) {
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const [coords, setCoords] = useState({ x: 0, y: 0 });
+
+    return (
+        <Popover>
+            {() => (
+                <>
+                    <Popover.Button
+                        ref={buttonRef}
+                        onClick={() => {
+                            const rect = buttonRef.current?.getBoundingClientRect();
+                            if (rect) {
+                                const menuWidth = 140;
+                                const right = rect.right;
+                                setCoords({ x: right - menuWidth, y: rect.bottom + 5 });
+                            }
+                        }}
+                        className="px-2 py-1 bg-gray-200 rounded"
+                    >
+                        {props.children}
+                    </Popover.Button>
+
+                    {createPortal(
+                        <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-100"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95"
+                        >
+                            <Popover.Panel
+                                static
+                                className="fixed right-0 z-50 flex flex-col w-[140px] bg-white border rounded-md shadow-lg border-gray-stroke-weak"
+                                style={{ "{{" }} top: coords.y, left: coords.x }}
+                            >
+                                <ul className="flex flex-col">
+                                    <li className="flex">
+                                        <Link
+                                            className="w-full px-4 py-2 text-base text-left hover:bg-gray-fill active:bg-gray-stroke-weak"
+                                            to={props.toEdit}
+                                        >
+                                            Edit
+                                        </Link>
+                                    </li>
+                                    <li className="flex">
+                                        <ConfirmModal
+                                            className="flex w-full"
+                                            onConfirm={() => {
+                                                if (props.onDelete) {
+                                                    props.onDelete(props.item)
+                                                }
+                                            }}
+                                            title="Delete item?"
+                                            body={`This action will permanently delete ${props.item.id}. This cannot be undone.`}
+                                        >
+                                            <button
+                                                className="w-full px-4 py-2 text-base text-left hover:bg-gray-fill active:bg-gray-stroke-weak"
+                                            >
+                                                Delete
+                                            </button>
+                                        </ConfirmModal>
+                                    </li>
+                                </ul>
+                            </Popover.Panel>
+                        </Transition>,
+                        document.body
+                    )}
+                </>
+            )}
+        </Popover>
+    );
 }
