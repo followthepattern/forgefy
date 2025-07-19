@@ -1,10 +1,13 @@
 {{ $feature := . -}}
 {{ $idField := $feature | IDField -}}
 
-import { useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
+
+import { Id } from 'react-toastify';
 
 import Collection from '@/app/components/collection/collection';
 import { ListQueryParams, SortLabel } from '@/lib/query';
+import { deleteToast, upsertToastError, upsertToastSuccess } from '../components/toastContainer/toasts';
 
 import { QueryContext } from '../contexts/queryContext';
 import TableSkeleton from '../components/skeletons/tableSkeleton';
@@ -16,6 +19,7 @@ import { RESOURCE_NAME, RESOURCE_URL } from './const';
 
 import useList{{ $feature.FeatureName | UpperCamelCase }} from './hooks/list{{ $feature.FeatureName | UpperCamelCase }}';
 import { {{ $feature.FeatureName | UpperCamelCase }} } from './model';
+import useDelete{{ $feature.FeatureName | UpperCamelCase }} from './hooks/delete{{ $feature.FeatureName | UpperCamelCase }}';
 
 const columns = [
 {{- range $field := $feature.Fields | TableViewFilter }}
@@ -61,6 +65,10 @@ function {{ $feature.FeatureName | UpperCamelCase }}ListComponent() {
 
   const [executeQuery, { data, error, loading, itemNotFound, called }] = useList{{ $feature.FeatureName | UpperCamelCase }}();
 
+  const [executeDelete, { deleteError, deleteResult }] = useDelete{{ $feature.FeatureName | UpperCamelCase }}();
+
+  const toastId = React.useRef<Id | null>(null);
+
   const listQueryParams: ListQueryParams = {
     page: queryProps.currentPage,
     pageSize: queryProps.pageSize,
@@ -70,6 +78,21 @@ function {{ $feature.FeatureName | UpperCamelCase }}ListComponent() {
   if (queryProps.orderBy) {
     listQueryParams.orderBy = [queryProps.orderBy]
   }
+
+  useEffect(() => {
+    if (deleteResult && deleteResult > 0) {
+      upsertToastSuccess(toastId);
+
+      listQueryParams.fetchPolicy = "network-only";
+      
+      executeQuery(listQueryParams);
+    }
+
+    if (deleteError) {
+      upsertToastError(toastId);
+      console.error(deleteError);
+    }
+  }, [deleteResult, deleteError])
 
   useEffect(() => {
     executeQuery(listQueryParams);
@@ -105,6 +128,12 @@ function {{ $feature.FeatureName | UpperCamelCase }}ListComponent() {
           toViewLink={viewLink}
           toEditLink={editLink}
           columns={columns}
+
+          onDelete={deleteItems => {
+            toastId.current = deleteToast();
+
+            executeDelete(deleteItems.map(i => i.id))
+          }}
 
           currentPage={queryProps?.currentPage ?? 1}
           count={data.count}
