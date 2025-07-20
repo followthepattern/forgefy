@@ -1,0 +1,149 @@
+import { useState, useCallback } from 'react';
+
+export type Identifable = { id: string }
+
+export type CollectionItem<T extends Identifable> = T & { selected: boolean }
+
+export class ItemCollection<T extends Identifable> {
+  private _map = new Map<string, CollectionItem<T>>()
+
+  constructor(initialItems: T[] = []) {
+    initialItems.forEach(item => this.add(item))
+  }
+
+  add(item: T, selected = false): void {
+    this._map.set(item.id, { ...item, selected })
+  }
+
+  remove(id: string): void {
+    this._map.delete(id)
+  }
+
+  select(id: string): void {
+    const item = this._map.get(id)
+    if (item) item.selected = true
+  }
+
+  selectAll(): void {
+    for (const item of this._map.values()) {
+      item.selected = true
+    }
+  }
+
+  unselect(id: string): void {
+    const item = this._map.get(id)
+    if (item) item.selected = false
+  }
+
+  unselectAll(): void {
+    for (const item of this._map.values()) {
+      item.selected = false
+    }
+  }
+
+  toggle(id: string): void {
+    const item = this._map.get(id)
+    if (item) item.selected = !item.selected
+  }
+
+  isSelected(id: string): boolean {
+    return this._map.get(id)?.selected ?? false
+  }
+
+  get(id: string): CollectionItem<T> | undefined {
+    return this._map.get(id)
+  }
+
+  has(id: string): boolean {
+    return this._map.has(id)
+  }
+
+  clear(): void {
+    this._map.clear()
+  }
+
+  map<U>(callback: (item: CollectionItem<T>, index: number) => U): U[] {
+    return this.values().map(callback)
+  }
+
+  values(): CollectionItem<T>[] {
+    return Array.from(this._map.values())
+  }
+
+  selectedItems(): CollectionItem<T>[] {
+    return Array.from(this._map.values()).filter(item => item.selected)
+  }
+
+  areAllSelected(): boolean {
+    const items = this.values()
+    return items.length > 0 && items.every(item => item.selected)
+  }
+
+  unselectedItems(): CollectionItem<T>[] {
+    return Array.from(this._map.values()).filter(item => !item.selected)
+  }
+
+  size(): number {
+    return this._map.size
+  }
+}
+
+export function useItemCollection<T extends { id: string }>(initial: T[] = []) {
+  const [store] = useState(() => new ItemCollection<T>(initial))
+  const [, forceUpdate] = useState({})
+
+  const update = () => forceUpdate({})
+
+  const add = useCallback((item: T, selected = false) => {
+    store.add(item, selected)
+    update()
+  }, [store])
+
+  const remove = useCallback((id: string) => {
+    store.remove(id)
+    update()
+  }, [store])
+
+  const toggle = useCallback((id: string) => {
+    store.toggle(id)
+    update()
+  }, [store])
+
+  const select = useCallback((id: string) => {
+    store.select(id)
+    update()
+  }, [store])
+
+  const selectAll = useCallback(() => {
+    store.selectAll();
+    update()
+  }, [store])
+
+  const unselectAll = useCallback(() => {
+    store.unselectAll()
+    update()
+  }, [store])
+
+  const unselect = useCallback((id: string) => {
+    store.unselect(id)
+    update()
+  }, [store])
+
+  const isSelected = useCallback((id: string) => {
+    return store.isSelected(id)
+  }, [store])
+
+  return {
+    items: store.values(),
+    selectedItems: store.selectedItems(),
+    areAllSelected: store.areAllSelected(),
+    add,
+    remove,
+    toggle,
+    select,
+    selectAll,
+    isSelected,
+    unselect,
+    unselectAll
+  }
+}

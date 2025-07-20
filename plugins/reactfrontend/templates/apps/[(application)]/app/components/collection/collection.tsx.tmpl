@@ -1,21 +1,74 @@
 import classNames from "classnames"
 import Pagination, { PaginationProperties } from "./pagination"
-import { Table, TableProperties } from "./table"
+import { Table } from "./table"
+import { Identifable, useItemCollection } from "./itemCollection";
+import { useEffect } from "react";
+import TrashIcon from "@/app/icons/trash";
+import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 
-export interface CollectionProperties<T> extends TableProperties<T>, PaginationProperties {
+interface ColumnLabel {
+    id: string
+    name: string
 }
 
-export default function Collection<T extends { id: string }>(props: CollectionProperties<T>) {
+export interface CollectionProperties<T extends Identifable> extends PaginationProperties {
+    className?: string
+    items: T[]
+    columns: ColumnLabel[]
+
+    toEditLink: (v: T) => string
+    toViewLink: (v: T) => string
+    onSelectChange?: (selected: T[]) => void
+    onDelete?: (v: T[]) => void
+}
+
+export default function Collection<T extends Identifable>(props: CollectionProperties<T>) {
     const maxPage = Math.ceil(props.count ?? 0 / props.pageSize);
+
+    const {
+        items,
+        areAllSelected,
+        selectedItems,
+        toggle,
+        selectAll,
+        unselectAll,
+    } = useItemCollection(props.items);
+
+    useEffect(() => {
+        if (props.onSelectChange) {
+            props.onSelectChange(selectedItems);
+        }
+    }, [selectedItems, props.onSelectChange]);
 
     return (
         <div className={classNames(props.className, "")}>
+            <ActionToolbar
+                onDeleteClick={() => {
+                    if (props.onDelete && selectedItems.length > 0) {
+                        props.onDelete(selectedItems);
+                    }
+                }}
+
+                showActions={selectedItems.length > 0}
+            />
             <div className="overflow-x-auto sm:rounded-lg">
                 <Table
                     columns={props.columns}
-                    items={props.items}
+                    items={items}
+
+                    areAllSelected={areAllSelected}
+
+                    onToggle={v => {
+                        toggle(v);
+                    }}
+
+                    onSelectAll={selectAll}
+                    onUnselectAll={unselectAll}
+
                     toEditLink={props.toEditLink}
                     toViewLink={props.toViewLink}
+
+                    onDelete={props.onDelete}
                 />
             </div>
             {maxPage > 1 && <Pagination
@@ -26,5 +79,39 @@ export default function Collection<T extends { id: string }>(props: CollectionPr
                 onClick={props.onClick}
             />}
         </div >
+    )
+}
+
+interface ActionToolbarProperties<T extends Identifable> {
+    className?: string
+
+    onDeleteClick?: () => void
+    showActions: boolean
+}
+
+function ActionToolbar<T extends Identifable>(props: ActionToolbarProperties<T>) {
+    return (
+        <div
+            className={classNames(props.className, "p-1 sm:p-2 pl-6 sm:pl-8 h-8 flex justify-end")}
+        >
+            {props.showActions && <div>
+                <ConfirmModal
+                    title="Delete selected items?"
+                    body="This action will permanently remove all selected items. This cannot be undone."
+                    onConfirm={() => {
+                        if (props.onDeleteClick) {
+                            props.onDeleteClick()
+                        }
+                    }}
+                >
+                    <button>
+                        <div className="flex justify-center px-2 py-1 space-x-1 border rounded-lg hover:bg-gray-fill active:bg-gray-stroke-weak border-gray-fill">
+                            <span className="text-sm font-medium text-gray-supporting/70">Delete</span>
+                            <TrashIcon className="w-4 h-4 fill-gray-stroke-strong" />
+                        </div>
+                    </button>
+                </ConfirmModal>
+            </div>}
+        </div>
     )
 }
