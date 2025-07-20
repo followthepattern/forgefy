@@ -1,5 +1,5 @@
 import { ListResponse, ListQueryParams, ListQueryResult } from "@/lib/query";
-import { gql, useLazyQuery } from "@apollo/client";
+import { gql, useLazyQuery, WatchQueryFetchPolicy } from "@apollo/client";
 
 interface ListProperties<T> {
     parseResult: (data?: any) => ListResponse<T> | undefined
@@ -9,14 +9,15 @@ interface ListProperties<T> {
 export default function useList<T>({ parseResult, graphQL }: ListProperties<T>): ListQueryResult<ListResponse<T>> {
     const [executeQuery, { data, called, loading, error }] = useLazyQuery(gql(graphQL));
 
-    const execute = ({ page, pageSize, search, orderBy }: ListQueryParams) => {
+    const execute = ({ page, pageSize, search, orderBy, fetchPolicy }: ListQueryParams) => {
         executeQuery({
             variables: {
                 page: page,
                 pageSize: pageSize,
                 search: search,
                 orderBy: orderBy,
-            }
+            },
+            fetchPolicy: fetchPolicy,
         });
     };
 

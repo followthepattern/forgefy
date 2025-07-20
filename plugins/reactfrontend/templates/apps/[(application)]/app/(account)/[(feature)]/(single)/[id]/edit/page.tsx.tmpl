@@ -130,7 +130,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
     const onDelete = () => {
         toastId.current = deleteToast();
 
-        executeDeleteMutation(id)
+        executeDeleteMutation([id])
     }
 
     const onCancel = () => {

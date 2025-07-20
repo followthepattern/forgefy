@@ -74,11 +74,11 @@ func (ctrl {{ $feature | GoType }}Controller) Update(ctx context.Context, value 
 	return ctrl.{{ $feature.FeatureNameCamelCase }}.Update(ctx, value)
 }
 
-func (ctrl {{ $feature | GoType }}Controller) Delete(ctx context.Context, id string) error {
-	if err := validation.Validate(id, types.Required("{{ $feature.FeatureNameCamelCase }}ID")); err != nil {
+func (ctrl {{ $feature | GoType }}Controller) Delete(ctx context.Context, ids []string) error {
+	if err := validation.Validate(ids, types.Required("{{ $feature.FeatureNameCamelCase }}ID")); err != nil {
 		ctrl.logger.Error("failed to validate delete single item", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
 	}
 
-	return ctrl.{{ $feature.FeatureNameCamelCase }}.Delete(ctx, id)
+	return ctrl.{{ $feature.FeatureNameCamelCase }}.Delete(ctx, ids)
 }
