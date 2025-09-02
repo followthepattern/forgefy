@@ -1,0 +1,54 @@
+package testing
+
+import (
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
+	"github.com/testcontainers/testcontainers-go"
+)
+
+func WithNetwork(networkName string) testcontainers.ContainerCustomizer {
+	return testcontainers.CustomizeRequestOption(
+		func(req *testcontainers.GenericContainerRequest) error {
+			req.Networks = append(req.Networks, networkName)
+			return nil
+		},
+	)
+}
+
+func WithMount(source, target string) testcontainers.ContainerCustomizer {
+	return testcontainers.CustomizeRequestOption(
+		func(req *testcontainers.GenericContainerRequest) error {
+			fn := req.HostConfigModifier
+
+			req.HostConfigModifier = func(hc *container.HostConfig) {
+				if fn != nil {
+					fn(hc)
+				}
+
+				hc.Mounts = append(hc.Mounts,
+					mount.Mount{
+						Source: source,
+						Target: target,
+						Type:   mount.TypeBind,
+					},
+				)
+			}
+
+			return nil
+		},
+	)
+}
+
+func WithEnv(key, value string) testcontainers.ContainerCustomizer {
+	return testcontainers.CustomizeRequestOption(
+		func(req *testcontainers.GenericContainerRequest) error {
+			if req.Env == nil {
+				req.Env = map[string]string{}
+			}
+
+			req.Env[key] = value
+
+			return nil
+		},
+	)
+}

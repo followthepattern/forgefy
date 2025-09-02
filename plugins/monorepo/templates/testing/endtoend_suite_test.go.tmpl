@@ -1,0 +1,24 @@
+package testing
+
+import (
+	"os"
+	"testing"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+)
+
+func TestEndToEnd(t *testing.T) {
+	os.Setenv("TESTCONTAINERS_RYUK_DISABLED", "true")
+
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "End to End Test Suite")
+}
+
+var testFunctions []func() = make([]func(), 0)
+
+var _ = Describe("end to end testing", Ordered, func() {
+	for _, testFn := range testFunctions {
+		testFn()
+	}
+})
