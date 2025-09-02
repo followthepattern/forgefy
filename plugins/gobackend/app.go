@@ -142,7 +142,7 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 		newFilepath := filepath
 
 		if strings.Contains(newFilepath, forgeio.APP_FILE_TOKEN) {
-			newFilepath = forgeio.ReplaceAppName(newFilepath, goApp.AppName)
+			newFilepath = forgeio.ReplaceAppName(newFilepath, naming.ToLowerCamelCase(goApp.AppName))
 		}
 
 		newFilepath = forgeio.RemoveTemplateExtension(newFilepath)
