@@ -1,4 +1,6 @@
-package testing
+{{ $app := .App -}}
+
+package tests
 
 import (
 	"context"
@@ -15,7 +17,7 @@ func TryRunWGet(
 	opts ...testcontainers.ContainerCustomizer) {
 	req := testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{
-			Image:      BackendImageReference,
+			Image:      {{ $app.AppName | UpperCamelCase }}GoImageReference,
 			Name:       "wget",
 			Cmd:        []string{"wget", "-qO-", url},
 			WaitingFor: wait.ForLog("0.0.0"),

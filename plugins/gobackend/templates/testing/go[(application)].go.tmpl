@@ -1,0 +1,221 @@
+{{ $app := .App -}}
+
+package tests
+
+import (
+	"context"
+	"os"
+	"path"
+	"path/filepath"
+	"strings"
+
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
+	. "github.com/onsi/ginkgo/v2"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/modules/postgres"
+	"github.com/testcontainers/testcontainers-go/network"
+	"github.com/testcontainers/testcontainers-go/wait"
+
+	. "github.com/onsi/gomega"
+)
+
+const (
+	{{ $app.AppName | UpperCamelCase }}GoImageReference = "golang:1.24.2"
+	{{ $app.AppName | UpperCamelCase }}ImageReference   = "alpine:3.22.1"
+)
+
+func skipBinary() bool {
+	return strings.ToLower(os.Getenv("{{ $app.AppName | EnvVariable }}_SKIP_BUILD")) == "true"
+}
+
+func testing{{ $app.AppName | UpperCamelCase }}() {
+	{{ $app.AppName | LowerCamelCase }}SourceDir := "../apps/{{ $app.AppName | LowerCamelCase }}"
+	distDir := "./dist"
+
+	Describe("End to end tests for Go Back-end", func() {
+		var (
+			ctx          context.Context
+			testNet      *testcontainers.DockerNetwork
+			{{ $app.AppName | LowerCamelCase }}Cont  testcontainers.Container
+			postgresCont testcontainers.Container
+		)
+
+		BeforeAll(func() {
+			var err error
+			distDir, err = filepath.Abs(distDir)
+			Expect(err).To(BeNil())
+			{{ $app.AppName | LowerCamelCase }}SourceDir, err = filepath.Abs({{ $app.AppName | LowerCamelCase }}SourceDir)
+			Expect(err).To(BeNil())
+
+			configFilePath := path.Join({{ $app.AppName | LowerCamelCase }}SourceDir, "configs", "config.yaml")
+
+			TryCreateDist(distDir)
+			if !skipBinary() {
+				TryBuildBinary({{ $app.AppName | LowerCamelCase }}SourceDir, distDir, configFilePath)
+			}
+		})
+
+		BeforeEach(func() {
+			ctx = context.Background()
+
+			var err error
+			testNet, err = network.New(ctx)
+			Expect(err).To(BeNil())
+			defer testcontainers.CleanupNetwork(GinkgoTB(), testNet)
+
+			testData := filepath.Join({{ $app.AppName | LowerCamelCase }}SourceDir, "tests", "integration", "testdata", "database.sql")
+
+			{{ $app.AppName | LowerCamelCase }}Cont, postgresCont = TryRun{{ $app.AppName | UpperCamelCase }}AsService(
+				{{ $app.AppName | LowerCamelCase }}SourceDir,
+				testNet.Name,
+				testData,
+			)
+
+		})
+
+		It("calls healthcheck on {{ $app.AppName | LowerCamelCase }}", func() {
+			TryRunWGet(
+				ctx,
+				"http://{{ $app.AppName | LowerCamelCase }}:8080/healthcheck",
+				WithNetwork(testNet.Name),
+			)
+		})
+
+		AfterEach(func() {
+			testcontainers.CleanupContainer(GinkgoTB(), postgresCont)
+			testcontainers.CleanupContainer(GinkgoTB(), {{ $app.AppName | LowerCamelCase }}Cont)
+		})
+	})
+}
+
+func TryCreateDist(distDir string) {
+	err := os.MkdirAll(distDir, os.ModePerm)
+	Expect(err).To(BeNil())
+}
+
+func TryBuildBinary(sourceDir, distDir, configFilePath string) {
+	workingDir := "/src"
+
+	var err error
+	sourceDir, err = filepath.Abs(sourceDir)
+	Expect(err).To(BeNil())
+
+	distDir, err = filepath.Abs(distDir)
+	Expect(err).To(BeNil())
+
+	ctx := context.Background()
+	req := testcontainers.ContainerRequest{
+		Image:      {{ $app.AppName | UpperCamelCase }}GoImageReference,
+		WaitingFor: wait.ForExit(),
+		ConfigModifier: func(c *container.Config) {
+			c.WorkingDir = workingDir
+		},
+		Files: []testcontainers.ContainerFile{
+			{
+				HostFilePath:      configFilePath,
+				ContainerFilePath: "/dist/configs/config.yaml",
+				FileMode:          0o700,
+			}},
+		Env: map[string]string{
+			"CGO_ENABLED": "0",
+			"GOOS":        "linux",
+			"GOARCH":      "amd64",
+		},
+		HostConfigModifier: func(hc *container.HostConfig) {
+			hc.Mounts = append(hc.Mounts,
+				mount.Mount{
+					Type:   mount.TypeBind,
+					Source: sourceDir,
+					Target: workingDir,
+				},
+				mount.Mount{
+					Type:   mount.TypeBind,
+					Source: distDir,
+					Target: "/dist",
+				},
+			)
+		},
+		Cmd: []string{"sh", "-c", "go get ./... && go build -o /dist/app ./cmd/{{ $app.AppName | LowerCamelCase }}"},
+	}
+	goBuilder, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	})
+	testcontainers.CleanupContainer(GinkgoTB(), goBuilder)
+	Expect(err).To(BeNil())
+}
+
+func TryRun{{ $app.AppName | UpperCamelCase }}(
+	ctx context.Context,
+	dist string,
+	opts ...testcontainers.ContainerCustomizer) testcontainers.Container {
+	req := testcontainers.GenericContainerRequest{
+		ContainerRequest: testcontainers.ContainerRequest{
+			Image: {{ $app.AppName | UpperCamelCase }}ImageReference,
+			Name:  "{{ $app.AppName | LowerCamelCase }}",
+			Env: map[string]string{
+				"{{ $app.AppName | EnvVariable }}_SERVER_ED25519_PRIVATE_KEY": "",
+				"{{ $app.AppName | EnvVariable }}_SERVER_ED25519_PUBLIC_KEY":  "",
+			},
+			WorkingDir:   "/dist",
+			ExposedPorts: []string{"8080/tcp"},
+			Cmd:          []string{"./app"},
+			WaitingFor:   wait.ForLog("Server start listnening on"),
+		},
+		Started: true,
+	}
+
+	opts = append(opts,
+		WithMount(dist, req.WorkingDir),
+	)
+
+	for _, opt := range opts {
+		err := opt.Customize(&req)
+		Expect(err).To(BeNil())
+	}
+	{{ $app.AppName | LowerCamelCase }}, err := testcontainers.GenericContainer(ctx, req)
+	Expect(err).To(BeNil())
+
+	return {{ $app.AppName | LowerCamelCase }}
+}
+
+func TryRun{{ $app.AppName | UpperCamelCase }}AsService(
+	{{ $app.AppName | LowerCamelCase }}SourceDir string,
+	networkName string,
+	testData string) ({{ $app.AppName | LowerCamelCase }}Cont testcontainers.Container, postgresCont testcontainers.Container) {
+	ctx := context.Background()
+	distDir := "./dist"
+	var err error
+
+	distDir, err = filepath.Abs(distDir)
+	Expect(err).To(BeNil())
+	{{ $app.AppName | LowerCamelCase }}SourceDir, err = filepath.Abs({{ $app.AppName | LowerCamelCase }}SourceDir)
+	Expect(err).To(BeNil())
+
+	configFilePath := path.Join({{ $app.AppName | LowerCamelCase }}SourceDir, "configs", "config.yaml")
+
+	TryCreateDist(distDir)
+	if !skipBinary() {
+		TryBuildBinary({{ $app.AppName | LowerCamelCase }}SourceDir, distDir, configFilePath)
+	}
+
+	// configures dependencies
+	postgresCont, err = postgres.Run(ctx,
+		"postgres:16-alpine",
+		testcontainers.WithName("{{ $app.AppName | LowerCamelCase }}_db"),
+		postgres.WithInitScripts(testData),
+		postgres.WithDatabase("{{ $app.AppName | LowerCamelCase }}"),
+		postgres.WithUsername("{{ $app.AppName | LowerCamelCase }}user"),
+		postgres.WithPassword("dbpass"),
+		postgres.BasicWaitStrategies(),
+		WithNetwork(networkName),
+	)
+	Expect(err).To(BeNil())
+
+	return TryRun{{ $app.AppName | UpperCamelCase }}(
+		ctx,
+		distDir,
+		WithNetwork(networkName),
+	), postgresCont
+}
