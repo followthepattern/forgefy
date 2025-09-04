@@ -23,7 +23,7 @@ const (
 
 func testing{{ $app.AppName | UpperCamelCase }}() {
 	{{ $app.AppName | LowerCamelCase }}SourceDir := "../apps/{{ $app.AppName | LowerCamelCase }}"
-	backendSourceDir := "../apps/backend"
+	{{ $app.Backend | LowerCamelCase }}SourceDir := "../apps/{{ $app.Backend | LowerCamelCase }}"
 
 	Describe("End to end tests for Go Back-end", func() {
 		var (
@@ -36,7 +36,7 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 			{{ $app.AppName | LowerCamelCase }}SourceDir, err = filepath.Abs({{ $app.AppName | LowerCamelCase }}SourceDir)
 			Expect(err).To(BeNil())
 
-			backendSourceDir, err = filepath.Abs(backendSourceDir)
+			{{ $app.Backend | LowerCamelCase }}SourceDir, err = filepath.Abs({{ $app.Backend | LowerCamelCase }}SourceDir)
 			Expect(err).To(BeNil())
 		})
 
@@ -51,13 +51,12 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 
 		It("runs cypress tests", func() {
 			ctx := context.Background()
-			backendCont, postgresCont := TryRunBackendAsService(
-				backendSourceDir,
+			cleanUpFn := TryRun{{ $app.Backend | UpperCamelCase }}AsService(
+				{{ $app.AppName | LowerCamelCase }}SourceDir,
 				testNet.Name,
-				filepath.Join(backendSourceDir, "tests", "integration", "testdata", "database.sql"),
+				filepath.Join({{ $app.Backend | LowerCamelCase }}SourceDir, "tests", "integration", "testdata", "database.sql"),
 			)
-			defer testcontainers.CleanupContainer(GinkgoTB(), backendCont)
-			defer testcontainers.CleanupContainer(GinkgoTB(), postgresCont)
+			defer cleanUpFn()
 
 			cont := TryRun{{ $app.AppName | UpperCamelCase }}(
 				ctx,

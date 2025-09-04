@@ -37,8 +37,7 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 		var (
 			ctx          context.Context
 			testNet      *testcontainers.DockerNetwork
-			{{ $app.AppName | LowerCamelCase }}Cont  testcontainers.Container
-			postgresCont testcontainers.Container
+			{{ $app.AppName | LowerCamelCase }}CleanUpFn func()
 		)
 
 		BeforeAll(func() {
