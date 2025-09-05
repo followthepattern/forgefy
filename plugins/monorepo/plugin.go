@@ -29,10 +29,6 @@ func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specificatio
 			return err
 		}
 
-		if forgeio.ExcludeTemplate(filepath, productSpec.ExcludeDagger) {
-			return nil
-		}
-
 		if forgeio.ExcludeMonitoring(filepath, !productSpec.Monitoring) {
 			return nil
 		}
@@ -46,8 +42,7 @@ func (builder MonoRepo) Build(pm productmap.ProductMap, productSpec specificatio
 			return err
 		}
 
-		newFilepath := forgeio.CleanFilepath(filepath, forgeio.DAGGER_FILE_TOKEN)
-		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.MONITORING_FILE_TOKEN)
+		newFilepath := forgeio.CleanFilepath(filepath, forgeio.MONITORING_FILE_TOKEN)
 		newFilepath = forgeio.RemoveTemplateExtension(newFilepath)
 		newFilepath = path.Join(productmap.ROOT_DIRECTORY, newFilepath)
 

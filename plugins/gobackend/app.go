@@ -122,10 +122,6 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 			return nil
 		}
 
-		if forgeio.ExcludeTemplate(filepath, goApp.ExcludeDagger) {
-			return nil
-		}
-
 		if forgeio.ExcludeMonitoring(filepath, !goApp.Monitoring) {
 			return nil
 		}
@@ -147,7 +143,6 @@ func (b GoBackendPluginApp) createWalkFn(pm productmap.ProductMap, goApp App) fu
 
 		newFilepath = forgeio.RemoveTemplateExtension(newFilepath)
 		newFilepath = path.Join(productmap.ROOT_DIRECTORY, newFilepath)
-		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.DAGGER_FILE_TOKEN)
 		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.MONITORING_FILE_TOKEN)
 		newFilepath = forgeio.CleanFilepath(newFilepath, forgeio.VSCODE_FILE_TOKEN)
 
