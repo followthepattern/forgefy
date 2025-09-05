@@ -47,12 +47,8 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 			{{ $app.AppName | LowerCamelCase }}SourceDir, err = filepath.Abs({{ $app.AppName | LowerCamelCase }}SourceDir)
 			Expect(err).To(BeNil())
 
-			configFilePath := path.Join({{ $app.AppName | LowerCamelCase }}SourceDir, "configs", "config.yaml")
-
 			TryCreateDist(distDir)
-			if !skipBinary() {
-				TryBuildBinary({{ $app.AppName | LowerCamelCase }}SourceDir, distDir, configFilePath)
-			}
+			TryRunBackendBeforeAll({{ $app.AppName | LowerCamelCase }}SourceDir)
 		})
 
 		BeforeEach(func() {
@@ -65,8 +61,7 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 
 			testData := filepath.Join({{ $app.AppName | LowerCamelCase }}SourceDir, "tests", "integration", "testdata", "database.sql")
 
-			{{ $app.AppName | LowerCamelCase }}Cont, postgresCont = TryRun{{ $app.AppName | UpperCamelCase }}AsService(
-				{{ $app.AppName | LowerCamelCase }}SourceDir,
+			{{ $app.AppName | LowerCamelCase }}CleanUpFn = TryRun{{ $app.AppName | UpperCamelCase }}AsService(
 				testNet.Name,
 				testData,
 			)
@@ -82,8 +77,7 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 		})
 
 		AfterEach(func() {
-			testcontainers.CleanupContainer(GinkgoTB(), postgresCont)
-			testcontainers.CleanupContainer(GinkgoTB(), {{ $app.AppName | LowerCamelCase }}Cont)
+			{{ $app.AppName | LowerCamelCase }}CleanUpFn()
 		})
 	})
 }
@@ -179,28 +173,30 @@ func TryRun{{ $app.AppName | UpperCamelCase }}(
 	return {{ $app.AppName | LowerCamelCase }}
 }
 
-func TryRun{{ $app.AppName | UpperCamelCase }}AsService(
+func TryRun{{ $app.AppName | UpperCamelCase }}BeforeAll(
 	{{ $app.AppName | LowerCamelCase }}SourceDir string,
-	networkName string,
-	testData string) ({{ $app.AppName | LowerCamelCase }}Cont testcontainers.Container, postgresCont testcontainers.Container) {
-	ctx := context.Background()
+) {
 	distDir := "./dist"
-	var err error
-
-	distDir, err = filepath.Abs(distDir)
-	Expect(err).To(BeNil())
-	{{ $app.AppName | LowerCamelCase }}SourceDir, err = filepath.Abs({{ $app.AppName | LowerCamelCase }}SourceDir)
-	Expect(err).To(BeNil())
-
 	configFilePath := path.Join({{ $app.AppName | LowerCamelCase }}SourceDir, "configs", "config.yaml")
 
 	TryCreateDist(distDir)
 	if !skipBinary() {
 		TryBuildBinary({{ $app.AppName | LowerCamelCase }}SourceDir, distDir, configFilePath)
 	}
+}
+
+func TryRun{{ $app.AppName | UpperCamelCase }}AsService(
+	networkName string,
+	testData string) (cleanUpFn func()) {
+	ctx := context.Background()
+	distDir := "./dist"
+	var err error
+
+	distDir, err = filepath.Abs(distDir)
+	Expect(err).To(BeNil())
 
 	// configures dependencies
-	postgresCont, err = postgres.Run(ctx,
+	postgresCont, err := postgres.Run(ctx,
 		"postgres:16-alpine",
 		testcontainers.WithName("{{ $app.AppName | LowerCamelCase }}_db"),
 		postgres.WithInitScripts(testData),
@@ -212,9 +208,14 @@ func TryRun{{ $app.AppName | UpperCamelCase }}AsService(
 	)
 	Expect(err).To(BeNil())
 
-	return TryRun{{ $app.AppName | UpperCamelCase }}(
+	{{ $app.AppName | LowerCamelCase }}Cont := TryRun{{ $app.AppName | UpperCamelCase }}(
 		ctx,
 		distDir,
 		WithNetwork(networkName),
-	), postgresCont
+	)
+
+	return func() {
+		testcontainers.CleanupContainer(GinkgoTB(), {{ $app.AppName | LowerCamelCase }}Cont)
+		testcontainers.CleanupContainer(GinkgoTB(), postgresCont)
+	}
 }

@@ -29,6 +29,7 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 		var (
 			ctx     context.Context
 			testNet *testcontainers.DockerNetwork
+            {{ $app.Backend | LowerCamelCase }}CleanUpFn func()
 		)
 
 		BeforeAll(func() {
@@ -38,6 +39,8 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 
 			{{ $app.Backend | LowerCamelCase }}SourceDir, err = filepath.Abs({{ $app.Backend | LowerCamelCase }}SourceDir)
 			Expect(err).To(BeNil())
+
+            TryRunBackendBeforeAll({{ $app.Backend | LowerCamelCase }}SourceDir)
 		})
 
 		BeforeEach(func() {
@@ -47,16 +50,15 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 			testNet, err = network.New(ctx)
 			Expect(err).To(BeNil())
 			defer testcontainers.CleanupNetwork(GinkgoTB(), testNet)
+
+            {{ $app.Backend | LowerCamelCase }}CleanUpFn = TryRun{{ $app.Backend | UpperCamelCase }}AsService(
+			    testNet.Name,
+			    filepath.Join({{ $app.Backend | LowerCamelCase }}SourceDir, "tests", "integration", "testdata", "database.sql"),
+			)
 		})
 
 		It("runs cypress tests", func() {
 			ctx := context.Background()
-			cleanUpFn := TryRun{{ $app.Backend | UpperCamelCase }}AsService(
-				{{ $app.AppName | LowerCamelCase }}SourceDir,
-				testNet.Name,
-				filepath.Join({{ $app.Backend | LowerCamelCase }}SourceDir, "tests", "integration", "testdata", "database.sql"),
-			)
-			defer cleanUpFn()
 
 			cont := TryRun{{ $app.AppName | UpperCamelCase }}(
 				ctx,
@@ -72,6 +74,9 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 			)
 		})
 
+        AfterEach(func() {
+            {{ $app.Backend | LowerCamelCase }}CleanUpFn()
+        })
 	})
 }
 
@@ -83,6 +88,9 @@ func TryRun{{ $app.AppName | UpperCamelCase }}(
 		ContainerRequest: testcontainers.ContainerRequest{
 			Image:        NodeImage,
 			Name:         "{{ $app.AppName | LowerCamelCase }}",
+            Env:          map[string]string{
+			    "{{ $app.Backend | EnvVariable }}_URL": "http://{{ $app.Backend | LowerCamelCase }}:8080",
+			},
 			WorkingDir:   "/src",
 			ExposedPorts: []string{"3000/tcp"},
 			Cmd:          []string{"bash", "-c", "npm install && npm run dev"},
