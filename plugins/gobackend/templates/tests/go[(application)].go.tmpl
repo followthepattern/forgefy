@@ -23,6 +23,7 @@ import (
 const (
 	{{ $app.AppName | UpperCamelCase }}GoImageReference = "golang:1.24.2"
 	{{ $app.AppName | UpperCamelCase }}ImageReference   = "alpine:3.22.1"
+	{{ $app.AppName | UpperCamelCase }}CerbosImageReference = "ghcr.io/cerbos/cerbos:0.46.0"
 )
 
 func skipBinary() bool {
@@ -48,7 +49,7 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 			Expect(err).To(BeNil())
 
 			TryCreateDist(distDir)
-			TryRunBackendBeforeAll({{ $app.AppName | LowerCamelCase }}SourceDir)
+			TryRun{{ $app.AppName | UpperCamelCase }}BeforeAll({{ $app.AppName | LowerCamelCase }}SourceDir)
 		})
 
 		BeforeEach(func() {
@@ -137,6 +138,47 @@ func TryBuildBinary(sourceDir, distDir, configFilePath string) {
 	})
 	testcontainers.CleanupContainer(GinkgoTB(), goBuilder)
 	Expect(err).To(BeNil())
+}
+
+func TryRunCerbos(
+	ctx context.Context,
+	dist string,
+	policies string,
+	opts ...testcontainers.ContainerCustomizer,
+) testcontainers.Container {
+	req := testcontainers.GenericContainerRequest{
+		ContainerRequest: testcontainers.ContainerRequest{
+			Image:        {{ $app.AppName | UpperCamelCase }}CerbosImageReference,
+			Name:         "{{ $app.AppName | LowerCamelCase }}_cerbos",
+			WorkingDir:   "/dist",
+			ExposedPorts: []string{"8080/tcp"},
+			Cmd:          []string{"./app"},
+			WaitingFor:   wait.ForLog("Server start listnening on"),
+			Mounts: []testcontainers.ContainerMount{
+				{
+					Source: testcontainers.GenericVolumeMountSource{
+						Name: "{{ $app.AppName | LowerCamelCase }}-shared-volume",
+					},
+					Target: "/policies",
+				},
+			},
+		},
+		Started: true,
+	}
+
+	opts = append(opts,
+		WithMount(dist, req.WorkingDir),
+		WithMount(policies, "policies"),
+	)
+
+	for _, opt := range opts {
+		err := opt.Customize(&req)
+		Expect(err).To(BeNil())
+	}
+	cerbos, err := testcontainers.GenericContainer(ctx, req)
+	Expect(err).To(BeNil())
+
+	return cerbos
 }
 
 func TryRun{{ $app.AppName | UpperCamelCase }}(
