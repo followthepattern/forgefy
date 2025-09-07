@@ -1,0 +1,28 @@
+
+version: 0
+product_name: "Orders"
+monitoring: true
+vscode: true
+apps:
+  - name: backend
+    type: go-backend
+  - name: frontend
+    type: react-frontend
+    backend: backend
+features:
+  - name: partner
+    fields:
+      - name: Id
+        type: id
+      - name: Name
+        type: string
+      - name: Enabled
+        type: boolean
+  - name: webhook
+    fields:
+      - name: Partner Id
+        type: id
+        nullable: false
+      - name: Callback Url
+        type: string
+        nullable: false
