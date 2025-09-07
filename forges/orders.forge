@@ -26,3 +26,11 @@ features:
       - name: Callback Url
         type: string
         nullable: false
+  - name: order
+    fields:
+      - name: Order Id
+        type: id
+        nullable: false
+      - name: Total
+        type: number
+        nullable: false
