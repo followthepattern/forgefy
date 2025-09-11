@@ -21,8 +21,8 @@ import (
 )
 
 const (
-	{{ $app.AppName | UpperCamelCase }}GoImageReference = "golang:1.24.2"
-	{{ $app.AppName | UpperCamelCase }}ImageReference   = "alpine:3.22.1"
+	{{ $app.AppName | UpperCamelCase }}GoImageReference     = "golang:1.24.2"
+	{{ $app.AppName | UpperCamelCase }}ImageReference       = "alpine:3.22.1"
 	{{ $app.AppName | UpperCamelCase }}CerbosImageReference = "ghcr.io/cerbos/cerbos:0.46.0"
 )
 
@@ -36,8 +36,8 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 
 	Describe("End to end tests for Go Back-end", func() {
 		var (
-			ctx          context.Context
-			testNet      *testcontainers.DockerNetwork
+			ctx              context.Context
+			testNet          *testcontainers.DockerNetwork
 			{{ $app.AppName | LowerCamelCase }}CleanUpFn func()
 		)
 
@@ -48,7 +48,6 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 			{{ $app.AppName | LowerCamelCase }}SourceDir, err = filepath.Abs({{ $app.AppName | LowerCamelCase }}SourceDir)
 			Expect(err).To(BeNil())
 
-			TryCreateDist(distDir)
 			TryRun{{ $app.AppName | UpperCamelCase }}BeforeAll({{ $app.AppName | LowerCamelCase }}SourceDir)
 		})
 
@@ -61,10 +60,12 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 			defer testcontainers.CleanupNetwork(GinkgoTB(), testNet)
 
 			testData := filepath.Join({{ $app.AppName | LowerCamelCase }}SourceDir, "tests", "integration", "testdata", "database.sql")
+			policiesDir := filepath.Join({{ $app.AppName | LowerCamelCase }}SourceDir, "policies")
 
 			{{ $app.AppName | LowerCamelCase }}CleanUpFn = TryRun{{ $app.AppName | UpperCamelCase }}AsService(
 				testNet.Name,
 				testData,
+				policiesDir,
 			)
 
 		})
@@ -83,15 +84,25 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
 	})
 }
 
-func TryCreateDist(distDir string) {
+func TryBuildPackage(sourceDir, distDir, configFilePath, policiesDir string) {
 	err := os.MkdirAll(distDir, os.ModePerm)
 	Expect(err).To(BeNil())
+
+	if !skipBinary() {
+		TryBuildBinary(
+			sourceDir,
+			distDir,
+			configFilePath,
+		)
+	}
 }
 
 func TryBuildBinary(sourceDir, distDir, configFilePath string) {
-	workingDir := "/src"
-
 	var err error
+	err = os.MkdirAll(distDir, os.ModePerm)
+	Expect(err).To(BeNil())
+
+	workingDir := "/src"
 	sourceDir, err = filepath.Abs(sourceDir)
 	Expect(err).To(BeNil())
 
@@ -110,7 +121,8 @@ func TryBuildBinary(sourceDir, distDir, configFilePath string) {
 				HostFilePath:      configFilePath,
 				ContainerFilePath: "/dist/configs/config.yaml",
 				FileMode:          0o700,
-			}},
+			},
+		},
 		Env: map[string]string{
 			"CGO_ENABLED": "0",
 			"GOOS":        "linux",
@@ -143,23 +155,20 @@ func TryBuildBinary(sourceDir, distDir, configFilePath string) {
 func TryRunCerbos(
 	ctx context.Context,
 	dist string,
-	policies string,
+	policiesDir string,
 	opts ...testcontainers.ContainerCustomizer,
 ) testcontainers.Container {
 	req := testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{
 			Image:        {{ $app.AppName | UpperCamelCase }}CerbosImageReference,
 			Name:         "{{ $app.AppName | LowerCamelCase }}_cerbos",
-			WorkingDir:   "/dist",
-			ExposedPorts: []string{"8080/tcp"},
-			Cmd:          []string{"./app"},
-			WaitingFor:   wait.ForLog("Server start listnening on"),
-			Mounts: []testcontainers.ContainerMount{
+			ExposedPorts: []string{"3592/tcp"},
+			WaitingFor:   wait.ForLog("Starting HTTP server at"),
+			Files: []testcontainers.ContainerFile{
 				{
-					Source: testcontainers.GenericVolumeMountSource{
-						Name: "{{ $app.AppName | LowerCamelCase }}-shared-volume",
-					},
-					Target: "/policies",
+					HostFilePath:      policiesDir,
+					ContainerFilePath: "/policies",
+					FileMode:          0o700,
 				},
 			},
 		},
@@ -167,8 +176,7 @@ func TryRunCerbos(
 	}
 
 	opts = append(opts,
-		WithMount(dist, req.WorkingDir),
-		WithMount(policies, "policies"),
+		WithMount(dist, "/sock"),
 	)
 
 	for _, opt := range opts {
@@ -220,22 +228,32 @@ func TryRun{{ $app.AppName | UpperCamelCase }}BeforeAll(
 ) {
 	distDir := "./dist"
 	configFilePath := path.Join({{ $app.AppName | LowerCamelCase }}SourceDir, "configs", "config.yaml")
+	policiesDir := path.Join({{ $app.AppName | LowerCamelCase }}SourceDir, "policies", "config.yaml")
 
-	TryCreateDist(distDir)
-	if !skipBinary() {
-		TryBuildBinary({{ $app.AppName | LowerCamelCase }}SourceDir, distDir, configFilePath)
-	}
+	TryBuildPackage(
+		{{ $app.AppName | LowerCamelCase }}SourceDir,
+		distDir,
+		configFilePath,
+		policiesDir,
+	)
 }
 
 func TryRun{{ $app.AppName | UpperCamelCase }}AsService(
 	networkName string,
-	testData string) (cleanUpFn func()) {
+	testData string,
+	policiesDir string) (cleanUpFn func()) {
 	ctx := context.Background()
 	distDir := "./dist"
 	var err error
 
 	distDir, err = filepath.Abs(distDir)
 	Expect(err).To(BeNil())
+
+	cerbos := TryRunCerbos(
+		ctx,
+		distDir,
+		policiesDir,
+	)
 
 	// configures dependencies
 	postgresCont, err := postgres.Run(ctx,
@@ -259,5 +277,6 @@ func TryRun{{ $app.AppName | UpperCamelCase }}AsService(
 	return func() {
 		testcontainers.CleanupContainer(GinkgoTB(), {{ $app.AppName | LowerCamelCase }}Cont)
 		testcontainers.CleanupContainer(GinkgoTB(), postgresCont)
+		testcontainers.CleanupContainer(GinkgoTB(), cerbos)
 	}
 }

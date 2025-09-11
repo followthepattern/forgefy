@@ -54,6 +54,7 @@ func testing{{ $app.AppName | UpperCamelCase }}() {
             {{ $app.Backend | LowerCamelCase }}CleanUpFn = TryRun{{ $app.Backend | UpperCamelCase }}AsService(
 			    testNet.Name,
 			    filepath.Join({{ $app.Backend | LowerCamelCase }}SourceDir, "tests", "integration", "testdata", "database.sql"),
+				filepath.Join({{ $app.Backend | LowerCamelCase }}SourceDir, "policies"),
 			)
 		})
 
