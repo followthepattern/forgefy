@@ -45,7 +45,7 @@ func NewAuthenticationService(cont container.Container) AuthenticationService {
 	}
 }
 
-func (service AuthenticationService) Login(ctx context.Context, email types.String, password types.String) (*LoginResponse, error) {
+func (service AuthenticationService) Login(ctx context.Context, email types.String, password types.String) (*models.LoginResponse, error) {
 	authUser, err := service.authDatabase.GetAuthUserByEmail(email)
 	if err != nil {
 		service.logger.Error("failed to login", log.WithError(err), log.WithCorrelationID(ctx))
@@ -68,13 +68,13 @@ func (service AuthenticationService) Login(ctx context.Context, email types.Stri
 		return nil, err
 	}
 
-	return &LoginResponse{
+	return &models.LoginResponse{
 		ExpiresAt: expiresAt,
 		JWT:       tokenString,
 	}, nil
 }
 
-func (service AuthenticationService) Register(ctx context.Context, register RegisterRequestParams) (*RegisterResponse, error) {
+func (service AuthenticationService) Register(ctx context.Context, register models.RegisterRequestParams) (*models.RegisterResponse, error) {
 	_, err := models.GetUserContext(ctx)
 	if err != nil {
 		service.logger.Error("failed to receive user context", log.WithError(err), log.WithCorrelationID(ctx))
@@ -97,7 +97,7 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 		return nil, err
 	}
 
-	creationUser := UserPassword{
+	creationUser := models.UserPassword{
 		UserModel: models.UserModel{
 			Id:        types.StringFrom(uuid.NewString()),
 			Email:     register.Email,
@@ -105,7 +105,7 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 			LastName:  register.LastName,
 			Active:    types.FALSE,
 		},
-		Password: Password{
+		Password: models.Password{
 			PasswordHash: string(passwordHash),
 		},
 	}
@@ -123,7 +123,7 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 		service.logger.Error("failed to send activation email", log.WithError(emailErr), log.WithCorrelationID(ctx))
 	}()
 
-	return &RegisterResponse{
+	return &models.RegisterResponse{
 		Email:     creationUser.Email,
 		FirstName: creationUser.FirstName,
 		LastName:  creationUser.LastName,
@@ -148,12 +148,12 @@ func GenerateTokenStringFromUser(model models.UserModel, privateKey crypto.Priva
 	return tokenString, nil
 }
 
-func GetActivationMailTemplate(cfg config.Config, userID types.String, email types.String) mail.MailModel {
+func GetActivationMailTemplate(cfg config.Config, userID types.String, email types.String) models.Mail {
 	activationLink := fmt.Sprintf("%s/users/activate/%s", cfg.Organization.Url, userID)
 
 	from := fmt.Sprintf("%s <%s>", cfg.Organization.Name, cfg.Organization.Email)
 
-	m := mail.MailModel{
+	m := models.Mail{
 		From:    from,
 		To:      []string{email.Data},
 		Subject: "Activate your email address",
@@ -167,7 +167,7 @@ func (service AuthenticationService) ActivateUser(ctx context.Context, userID st
 	return service.authDatabase.ActivateUser(userID)
 }
 
-func (service AuthenticationService) Profile(ctx context.Context) (*UserPassword, error) {
+func (service AuthenticationService) Profile(ctx context.Context) (*models.UserPassword, error) {
 	ctxu, err := models.GetUserContext(ctx)
 	if err != nil {
 		return nil, err

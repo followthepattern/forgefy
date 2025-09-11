@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/{{ $app | PackageName }}/types"
+	"github.com/{{ $app | PackageName }}/models"
 	"github.com/graph-gophers/graphql-go"
 )
 
@@ -14,7 +15,7 @@ type loginResponse struct {
 	ExpiresAt graphql.Time `json:"expires_at,omitempty"`
 }
 
-func getFromLoginResponseModel(m LoginResponse) *loginResponse {
+func getFromLoginResponseModel(m models.LoginResponse) *loginResponse {
 	expiresAt := graphql.Time{
 		Time: m.ExpiresAt,
 	}
@@ -38,7 +39,7 @@ func (r AuthGraphQL) Login(ctx context.Context, args struct {
 	Email    types.String
 	Password types.String
 }) (*loginResponse, error) {
-	loginRequest := LoginRequestParams{
+	loginRequest := models.LoginRequestParams{
 		Email:    args.Email,
 		Password: args.Password,
 	}
@@ -56,8 +57,8 @@ func (r AuthGraphQL) Register(ctx context.Context, args struct {
 	FirstName types.String
 	LastName  types.String
 	Password  types.String
-}) (*RegisterResponse, error) {
-	registerRequest := RegisterRequestParams{
+}) (*models.RegisterResponse, error) {
+	registerRequest := models.RegisterRequestParams{
 		Email:     args.Email,
 		FirstName: args.FirstName,
 		LastName:  args.LastName,
@@ -72,6 +73,6 @@ func (r AuthGraphQL) Register(ctx context.Context, args struct {
 	return registerResponse, nil
 }
 
-func (graphQL AuthGraphQL) Profile(ctx context.Context) (*UserPassword, error) {
+func (graphQL AuthGraphQL) Profile(ctx context.Context) (*models.UserPassword, error) {
 	return graphQL.ctrl.Profile(ctx)
 }

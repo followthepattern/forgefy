@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/{{ $app | PackageName }}/api/httpresponses"
+	"github.com/{{ $app | PackageName }}/models"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -32,7 +33,7 @@ func (rest AuthRest) ActivateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rest AuthRest) Login(w http.ResponseWriter, r *http.Request) {
-	var value LoginRequestParams
+	var value models.LoginRequestParams
 	err := json.NewDecoder(r.Body).Decode(&value)
 	if err != nil {
 		httpresponses.BadRequest(w, httpresponses.FailedToDecodeRequestBody)
