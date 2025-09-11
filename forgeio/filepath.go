@@ -6,7 +6,6 @@ import (
 
 const (
 	TMPL_SUFFIX           = ".tmpl"
-	DAGGER_FILE_TOKEN     = "($dagger$)"
 	MONITORING_FILE_TOKEN = "($monitoring$)"
 	VSCODE_FILE_TOKEN     = "($vscode$)"
 	APP_FILE_TOKEN        = "[(application)]"
@@ -15,10 +14,6 @@ const (
 
 func IsForgeTemplate(filepath string) bool {
 	return strings.HasSuffix(filepath, TMPL_SUFFIX)
-}
-
-func ExcludeTemplate(filepath string, excludeDagger bool) bool {
-	return excludeDagger && strings.Contains(filepath, DAGGER_FILE_TOKEN)
 }
 
 func ExcludeMonitoring(filepath string, excludeMonitoring bool) bool {

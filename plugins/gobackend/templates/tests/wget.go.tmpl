@@ -1,0 +1,36 @@
+{{ $app := .App -}}
+
+package tests
+
+import (
+	"context"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/wait"
+)
+
+func TryRunWGet(
+	ctx context.Context,
+	url string,
+	opts ...testcontainers.ContainerCustomizer) {
+	req := testcontainers.GenericContainerRequest{
+		ContainerRequest: testcontainers.ContainerRequest{
+			Image:      {{ $app.AppName | UpperCamelCase }}GoImageReference,
+			Name:       "wget",
+			Cmd:        []string{"wget", "-qO-", url},
+			WaitingFor: wait.ForLog("0.0.0"),
+		},
+		Started: true,
+	}
+
+	for _, opt := range opts {
+		err := opt.Customize(&req)
+		Expect(err).To(BeNil())
+	}
+
+	container, err := testcontainers.GenericContainer(ctx, req)
+	defer testcontainers.CleanupContainer(GinkgoTB(), container)
+	Expect(err).To(BeNil(), "healthcheck should return with valid version number")
+}
