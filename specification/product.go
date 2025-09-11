@@ -10,13 +10,26 @@ import (
 )
 
 type Product struct {
-	ForgeVersion string    `yaml:"forge_version"`
-	Name         string    `yaml:"product_name"`
-	Email        string    `yaml:"email"`
-	Apps         []App     `yaml:"apps"`
-	Features     []Feature `yaml:"features"`
-	Monitoring   bool      `yaml:"monitoring"`
-	VSCode       bool      `yaml:"vscode"`
+	ForgeVersion  string        `yaml:"forge_version"`
+	Name          string        `yaml:"product_name"`
+	Email         string        `yaml:"email"`
+	Apps          []App         `yaml:"apps"`
+	Features      []Feature     `yaml:"features"`
+	ExcludeDagger bool          `yaml:"exclude_dagger"`
+	Monitoring    bool          `yaml:"monitoring"`
+	VSCode        bool          `yaml:"vscode"`
+	PluginsConfig PluginsConfig `yaml:"plugins"`
+}
+
+type PluginsConfig []map[string]any
+
+func (pc PluginsConfig) GetConfig(pluginName string) map[string]any {
+	for _, config := range pc {
+		if _, ok := config[pluginName]; ok {
+			return config
+		}
+	}
+	return nil
 }
 
 func (fs Product) Validate() error {

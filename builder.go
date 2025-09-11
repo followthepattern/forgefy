@@ -126,12 +126,21 @@ func (b Builder) buildApps(pm productmap.ProductMap, appSpecification specificat
 
 func (b Builder) setAppDefaults(app specification.App) specification.App {
 	admin := defaults.AdminUser()
-	app.Defaults.Users = []models.User{admin}
+	workflowUser := defaults.WorkflowUser()
+	app.Defaults.Users = []models.User{admin, workflowUser}
+
 	roles := defaults.Roles(admin, app.FeaturesArray())
-	app.Defaults.Roles = roles
-	app.Defaults.UserRoles = defaults.UserRole(admin, roles)
+	workflowRoles := defaults.Roles(workflowUser, app.FeaturesArray())
+	app.Defaults.Roles = append(roles, workflowRoles...)
+	app.Defaults.UserRoles = append(defaults.UserRole(admin, roles), defaults.UserRole(workflowUser, workflowRoles)...)
 
 	app.CountOfRandomValues = 30
+
+	for i := range app.Features {
+		if app.Features[i].FeatureType == "" {
+			app.Features[i].FeatureType = specification.CRUD
+		}
+	}
 
 	return app
 }
