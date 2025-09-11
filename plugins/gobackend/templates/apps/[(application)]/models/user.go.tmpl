@@ -3,7 +3,6 @@
 package models
 
 import (
-	"github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -35,6 +34,6 @@ func (m UserModel) UpdateValidate() error {
 	)
 }
 
-type UserListRequestParams = models.ListRequestParams[models.ListFilter]
+type UserListRequestParams = ListRequestParams[ListFilter]
 
-type UserListResponse = models.ListResponse[UserModel]
+type UserListResponse = ListResponse[UserModel]
