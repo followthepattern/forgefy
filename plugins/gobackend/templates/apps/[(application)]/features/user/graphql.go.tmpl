@@ -6,8 +6,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/{{ $app | PackageName }}/features/user/models"
-	basemodels "github.com/{{ $app | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/types"
 )
 
@@ -28,14 +27,14 @@ func (graphQL UserGraphQL) Single(ctx context.Context, args struct{ Id string })
 }
 
 func (graphQL UserGraphQL) List(ctx context.Context, args struct {
-	Pagination *basemodels.Pagination
-	Filter     *basemodels.ListFilter
-	OrderBy    *[]basemodels.OrderBy
-}) (*basemodels.ListResponse[models.UserModel], error) {
+	Pagination *models.Pagination
+	Filter     *models.ListFilter
+	OrderBy    *[]models.OrderBy
+}) (*models.ListResponse[models.UserModel], error) {
 	request := models.UserListRequestParams{}
 
 	if args.Pagination != nil {
-		request.Pagination = basemodels.Pagination{
+		request.Pagination = models.Pagination{
 			PageSize: args.Pagination.PageSize,
 			Page:     args.Pagination.Page,
 		}
@@ -59,12 +58,12 @@ func (graphQL UserGraphQL) List(ctx context.Context, args struct {
 
 func (graphQL UserGraphQL) Create(ctx context.Context, args struct {
 	Model models.UserModel
-}) (*basemodels.ResponseStatus, error) {
+}) (*models.ResponseStatus, error) {
 	err := graphQL.ctrl.Create(ctx, args.Model)
 	if err != nil {
 		return nil, err
 	}
-	return &basemodels.ResponseStatus{
+	return &models.ResponseStatus{
 		Code: http.StatusCreated,
 	}, nil
 }
@@ -72,25 +71,25 @@ func (graphQL UserGraphQL) Create(ctx context.Context, args struct {
 func (graphQL UserGraphQL) Update(ctx context.Context, args struct {
 	Id    types.String
 	Model models.UserModel
-}) (*basemodels.ResponseStatus, error) {
+}) (*models.ResponseStatus, error) {
 	args.Model.Id = args.Id
 	err := graphQL.ctrl.Update(ctx, args.Model)
 	if err != nil {
 		return nil, err
 	}
-	return &basemodels.ResponseStatus{
+	return &models.ResponseStatus{
 		Code: http.StatusOK,
 	}, nil
 }
 
 func (graphQL UserGraphQL) Delete(ctx context.Context, args struct {
 	Ids []string
-}) (*basemodels.ResponseStatus, error) {
+}) (*models.ResponseStatus, error) {
 	err := graphQL.ctrl.Delete(ctx, args.Ids)
 	if err != nil {
 		return nil, err
 	}
-	return &basemodels.ResponseStatus{
+	return &models.ResponseStatus{
 		Code: http.StatusOK,
 	}, nil
 }

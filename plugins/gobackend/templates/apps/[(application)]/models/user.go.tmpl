@@ -3,7 +3,7 @@
 package models
 
 import (
-	basemodels "github.com/{{ $app | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -14,7 +14,7 @@ type UserModel struct {
 	FirstName types.String `db:"first_name" goqu:"omitempty"`
 	LastName  types.String `db:"last_name" goqu:"omitempty"`
 	Active    types.Bool   `db:"active" goqu:"skipupdate,omitempty"`
-	basemodels.Userlog
+	Userlog
 }
 
 func (model UserModel) IsDefault() bool {
@@ -35,6 +35,6 @@ func (m UserModel) UpdateValidate() error {
 	)
 }
 
-type UserListRequestParams = basemodels.ListRequestParams[basemodels.ListFilter]
+type UserListRequestParams = models.ListRequestParams[models.ListFilter]
 
-type UserListResponse = basemodels.ListResponse[UserModel]
+type UserListResponse = models.ListResponse[UserModel]

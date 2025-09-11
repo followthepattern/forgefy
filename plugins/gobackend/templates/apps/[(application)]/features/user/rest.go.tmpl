@@ -7,8 +7,7 @@ import (
 	"net/http"
 
 	"github.com/{{ $app | PackageName }}/api/httpresponses"
-	"github.com/{{ $app | PackageName }}/features/user/models"
-	basemodels "github.com/{{ $app | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/types"
 
 	"github.com/go-chi/chi/v5"
@@ -40,7 +39,7 @@ func (service UserRest) Get(w http.ResponseWriter, r *http.Request) {
 	search := chi.URLParam(r, "search")
 
 	filter := models.UserListRequestParams{
-		Filter: basemodels.ListFilter{
+		Filter: models.ListFilter{
 			Search: types.StringFrom(search),
 		},
 	}

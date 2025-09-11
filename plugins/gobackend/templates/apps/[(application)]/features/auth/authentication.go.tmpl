@@ -13,7 +13,6 @@ import (
 	"github.com/{{ $app | PackageName }}/config"
 	"github.com/{{ $app | PackageName }}/container"
 	"github.com/{{ $app | PackageName }}/features/mail"
-	usermodels "github.com/{{ $app | PackageName }}/features/user/models"
 	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/types"
@@ -99,7 +98,7 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 	}
 
 	creationUser := UserPassword{
-		UserModel: usermodels.UserModel{
+		UserModel: models.UserModel{
 			Id:        types.StringFrom(uuid.NewString()),
 			Email:     register.Email,
 			FirstName: register.FirstName,
@@ -131,7 +130,7 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 	}, nil
 }
 
-func GenerateTokenStringFromUser(model usermodels.UserModel, privateKey crypto.PrivateKey) (string, error) {
+func GenerateTokenStringFromUser(model models.UserModel, privateKey crypto.PrivateKey) (string, error) {
 	expiresAt := time.Now().Add(time.Hour * 24)
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("EdDSA"), jwt.MapClaims{
 		"id":        model.Id,

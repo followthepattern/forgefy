@@ -8,8 +8,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/{{ $app | PackageName }}/features/{{ $feature | PackageName }}/models"
-	basemodels "github.com/{{ $app | PackageName }}/models"
+	"github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/types"
 )
 
@@ -30,14 +29,14 @@ func (graphQL {{ $feature | GoType }}GraphQL) Single(ctx context.Context, args s
 }
 
 func (graphQL {{ $feature | GoType }}GraphQL) List(ctx context.Context, args struct {
-	Pagination *basemodels.Pagination
-	Filter     *basemodels.ListFilter
-	OrderBy    *[]basemodels.OrderBy
-}) (*basemodels.ListResponse[models.{{ $feature | GoType }}Model], error) {
+	Pagination *models.Pagination
+	Filter     *models.ListFilter
+	OrderBy    *[]models.OrderBy
+}) (*models.ListResponse[models.{{ $feature | GoType }}Model], error) {
 	request := models.{{ $feature | GoType }}ListRequestParams{}
 
 	if args.Pagination != nil {
-		request.Pagination = basemodels.Pagination{
+		request.Pagination = models.Pagination{
 			PageSize: args.Pagination.PageSize,
 			Page:     args.Pagination.Page,
 		}
@@ -61,12 +60,12 @@ func (graphQL {{ $feature | GoType }}GraphQL) List(ctx context.Context, args str
 
 func (graphQL {{ $feature | GoType }}GraphQL) Create(ctx context.Context, args struct {
 	Model models.{{ $feature | GoType }}Model
-}) (*basemodels.ResponseStatus, error) {
+}) (*models.ResponseStatus, error) {
 	err := graphQL.ctrl.Create(ctx, args.Model)
 	if err != nil {
 		return nil, err
 	}
-	return &basemodels.ResponseStatus{
+	return &models.ResponseStatus{
 		Code: http.StatusCreated,
 	}, nil
 }
@@ -74,25 +73,25 @@ func (graphQL {{ $feature | GoType }}GraphQL) Create(ctx context.Context, args s
 func (graphQL {{ $feature | GoType }}GraphQL) Update(ctx context.Context, args struct {
 	Id    types.String
 	Model models.{{ $feature | GoType }}Model
-}) (*basemodels.ResponseStatus, error) {
+}) (*models.ResponseStatus, error) {
 	args.Model.{{ $idField.FieldNameCamelCaseUpper }} = args.Id
 	err := graphQL.ctrl.Update(ctx, args.Model)
 	if err != nil {
 		return nil, err
 	}
-	return &basemodels.ResponseStatus{
+	return &models.ResponseStatus{
 		Code: http.StatusOK,
 	}, nil
 }
 
 func (graphQL {{ $feature | GoType }}GraphQL) Delete(ctx context.Context, args struct {
 	Ids []string
-}) (*basemodels.ResponseStatus, error) {
+}) (*models.ResponseStatus, error) {
 	err := graphQL.ctrl.Delete(ctx, args.Ids)
 	if err != nil {
 		return nil, err
 	}
-	return &basemodels.ResponseStatus{
+	return &models.ResponseStatus{
 		Code: http.StatusOK,
 	}, nil
 }
