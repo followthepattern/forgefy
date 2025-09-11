@@ -25,15 +25,6 @@ type AccessControl struct {
 	cerbos cerbos.Client[*cerbos.GRPCClient, cerbos.PrincipalCtx]
 }
 
-func NewClient(cfg config.Cerbos) (cerbos.Client[*cerbos.GRPCClient, cerbos.PrincipalCtx], error) {
-	client, err := cerbos.New(cfg.Address, cerbos.WithPlaintext())
-	if err != nil {
-		return nil, err
-	}
-
-	return client, nil
-}
-
 func New(cfg config.Cerbos) (AccessControl, error) {
 	client, err := cerbos.New(cfg.Address, cerbos.WithPlaintext())
 	if err != nil {
