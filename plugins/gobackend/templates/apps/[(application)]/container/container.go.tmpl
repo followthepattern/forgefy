@@ -43,10 +43,15 @@ type Container struct {
 	logger        *slog.Logger
 }
 
-func NewC() *Container {
-	return &Container{
+func New(logger *slog.Logger, cfg config.Config) *Container {
+	c := &Container{
 		registrations: make(map[reflect.Type]*registration),
 	}
+
+	RegisterSingleton[*slog.Logger](c, func() *slog.Logger { return logger })
+	RegisterSingleton[config.Config](c, func() config.Config { return cfg })
+
+	return c
 }
 
 func RegisterSingleton[T any](c *Container, constructor any) {
@@ -179,11 +184,12 @@ func (c *Container) invokeConstructor(ctor reflect.Value, st *resolveState) (ref
 }
 
 func (c *Container) GetLogger(component string) *slog.Logger {
-	return c.logger.With(log.WithComponent(component))
+	logger := MustResolve[*slog.Logger](c)
+	return logger.With(log.WithComponent(component))
 }
 
 func (c *Container) GetConfig() config.Config {
-	return c.cfg
+	return MustResolve[config.Config](c)
 }
 
 type resolveState struct {
@@ -197,4 +203,3 @@ func newResolveState() *resolveState {
 func typeOf[T any]() reflect.Type {
 	return reflect.TypeOf((*T)(nil)).Elem()
 }
-
