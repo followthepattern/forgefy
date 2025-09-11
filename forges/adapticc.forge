@@ -4,11 +4,11 @@ product_name: "Adapticc"
 monitoring: true
 vscode: true
 apps:
-  - name: backend1
+  - name: backend
     type: go-backend
-  - name: frontend1
+  - name: frontend
     type: react-frontend
-    backend: backend1
+    backend: backend
 features:
   - name: product
     fields:

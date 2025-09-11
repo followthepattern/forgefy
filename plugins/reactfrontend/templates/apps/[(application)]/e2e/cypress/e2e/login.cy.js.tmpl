@@ -1,9 +1,7 @@
-{{ $app := . -}}
-
 describe('Login', () => {
     it('Visits the home page and tries to log in', () => {
       // Open the website
-      cy.visit('http://{{ $app.AppName | NetworkName }}:3000');
+      cy.visit('http://frontend:3000');
   
       // Fill out the form
       cy.get('input[name=email]').should('be.visible').type('admin@admin.com');
