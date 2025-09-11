@@ -21,26 +21,31 @@ const (
 )
 
 var (
-	ErrNotRegistered      = errors.New("type not registered")
-	ErrInvalidConstructor = errors.New("constructor must be a function")
-	ErrBadReturnTypes     = errors.New("constructor must return (T) or (T, error)")
-	ErrCycleDetected      = errors.New("dependency cycle detected")
+	ErrNotRegistered       = errors.New("type not registered")
+	ErrInvalidConstructor  = errors.New("constructor must be a function")
+	ErrBadReturnTypes      = errors.New("constructor must return (T) or (T, error)")
+	ErrCycleDetected       = errors.New("dependency cycle detected")
+	ErrServiceStartMissing = errors.New("service missing Start() error method")
 )
 
 type registration struct {
 	lifetime    Lifetime
 	constructor reflect.Value // func(...) (T[, error])
 	resultType  reflect.Type  // the T that is produced/bound (may be an interface)
-	once        sync.Once
-	instance    reflect.Value
-	initErr     error
+	isService   bool
+
+	once     sync.Once
+	instance reflect.Value
+	initErr  error
 }
 
 type Container struct {
 	mu            sync.RWMutex
 	registrations map[reflect.Type]*registration
-	cfg           config.Config
-	logger        *slog.Logger
+}
+
+type Service interface {
+	Start() error
 }
 
 func New(logger *slog.Logger, cfg config.Config) *Container {
@@ -60,7 +65,7 @@ func RegisterSingleton[T any](c *Container, constructor any) {
 
 func Register[T any](c *Container, life Lifetime, constructor any) {
 	t := typeOf[T]()
-	c.registerForType(t, life, constructor)
+	c.registerForType(t, life, constructor, false)
 }
 
 func RegisterAs[TInterface any](c *Container, life Lifetime, constructor any) {
@@ -68,7 +73,20 @@ func RegisterAs[TInterface any](c *Container, life Lifetime, constructor any) {
 	if iface.Kind() != reflect.Interface {
 		panic(fmt.Errorf("RegisterAs target must be an interface, got %v", iface))
 	}
-	c.registerForType(iface, life, constructor)
+	c.registerForType(iface, life, constructor, false)
+}
+
+func RegisterService[T Service](c *Container, life Lifetime, constructor any) {
+	t := typeOf[T]()
+	c.registerForType(t, life, constructor, true)
+}
+
+func RegisterServiceAs[TInterface Service](c *Container, life Lifetime, constructor any) {
+	iface := typeOf[TInterface]()
+	if iface.Kind() != reflect.Interface {
+		panic(fmt.Errorf("RegisterAs target must be an interface, got %v", iface))
+	}
+	c.registerForType(iface, life, constructor, true)
 }
 
 func Resolve[T any](c *Container) (T, error) {
@@ -98,8 +116,8 @@ func MustResolve[T any](c *Container) T {
 	return v
 }
 
-func (c *Container) registerForType(target reflect.Type, life Lifetime, constructor any) {
-	cv := reflect.ValueOf(constructor)
+func (c *Container) registerForType(target reflect.Type, life Lifetime, ctor any, isService bool) {
+	cv := reflect.ValueOf(ctor)
 	if cv.Kind() != reflect.Func {
 		panic(ErrInvalidConstructor)
 	}
@@ -112,10 +130,10 @@ func (c *Container) registerForType(target reflect.Type, life Lifetime, construc
 		panic(ErrBadReturnTypes)
 	}
 	if !outT.AssignableTo(target) {
-		if !(outT.Kind() == reflect.Pointer && outT.Elem().AssignableTo(target)) && !outT.Implements(target) {
-			if !(target.Kind() == reflect.Interface && (outT.Implements(target) || (outT.Kind() == reflect.Pointer && outT.Implements(target)))) {
-				panic(fmt.Errorf("constructor returns %v which is not assignable to %v", outT, target))
-			}
+		if !(outT.Kind() == reflect.Pointer && outT.Elem().AssignableTo(target)) &&
+			!(target.Kind() == reflect.Interface && (outT.Implements(target) ||
+				(outT.Kind() == reflect.Pointer && outT.Implements(target)))) {
+			panic(fmt.Errorf("constructor returns %v which is not assignable to %v", outT, target))
 		}
 	}
 
@@ -125,6 +143,7 @@ func (c *Container) registerForType(target reflect.Type, life Lifetime, construc
 		lifetime:    life,
 		constructor: cv,
 		resultType:  target,
+		isService:   isService,
 	}
 }
 
@@ -139,11 +158,26 @@ func (c *Container) resolveType(target reflect.Type, st *resolveState) (reflect.
 	switch reg.lifetime {
 	case Singleton:
 		reg.once.Do(func() {
-			reg.instance, reg.initErr = c.invokeConstructor(reg.constructor, st)
+			inst, err := c.invokeConstructor(reg.constructor, st)
+			if err == nil && reg.isService {
+				err = callStart(inst)
+			}
+			reg.instance, reg.initErr = inst, err
 		})
 		return reg.instance, reg.initErr
+
 	case Transient:
-		return c.invokeConstructor(reg.constructor, st)
+		inst, err := c.invokeConstructor(reg.constructor, st)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		if reg.isService {
+			if err := callStart(inst); err != nil {
+				return reflect.Value{}, err
+			}
+		}
+		return inst, nil
+
 	default:
 		return reflect.Value{}, fmt.Errorf("unknown lifetime for %v", target)
 	}
@@ -181,6 +215,62 @@ func (c *Container) invokeConstructor(ctor reflect.Value, st *resolveState) (ref
 		return reflect.Value{}, out[1].Interface().(error)
 	}
 	return out[0], nil
+}
+
+func (c *Container) BootServices() error {
+	c.mu.RLock()
+	targets := make([]reflect.Type, 0, len(c.registrations))
+	for t, reg := range c.registrations {
+		if reg.isService {
+			targets = append(targets, t)
+		}
+	}
+	c.mu.RUnlock()
+
+	var errs []error
+	st := newResolveState()
+	for _, t := range targets {
+		if _, err := c.resolveType(t, st); err != nil {
+			errs = append(errs, fmt.Errorf("boot %v: %w", t, err))
+		}
+	}
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
+	return nil
+}
+
+func callStart(v reflect.Value) error {
+	// If v is zero or invalid
+	if !v.IsValid() {
+		return fmt.Errorf("cannot start invalid value")
+	}
+	// When v is an interface, use its underlying value for method lookup
+	if v.Kind() == reflect.Interface {
+		v = v.Elem()
+	}
+	// MethodByName works for pointer receivers if v is a pointer
+	m := v.MethodByName("Start")
+	if !m.IsValid() {
+		// Try pointer if we currently have a value receiver
+		if v.CanAddr() {
+			if pm := v.Addr().MethodByName("Start"); pm.IsValid() {
+				m = pm
+			}
+		}
+	}
+	if !m.IsValid() {
+		return ErrServiceStartMissing
+	}
+	mt := m.Type()
+	if mt.NumIn() != 0 || mt.NumOut() != 1 || mt.Out(0) != reflect.TypeOf((*error)(nil)).Elem() {
+		return fmt.Errorf("Start() must have signature func() error")
+	}
+	res := m.Call(nil)
+	if !res[0].IsNil() {
+		return res[0].Interface().(error)
+	}
+	return nil
 }
 
 func (c *Container) GetLogger(component string) *slog.Logger {
