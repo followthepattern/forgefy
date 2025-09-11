@@ -5,7 +5,6 @@
 package models
 
 import (
-	basemodels "github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -14,7 +13,7 @@ type {{ $feature | GoType }}Model struct {
 	{{- range $field := .Fields }}
 	{{ $field.FieldNameCamelCaseUpper }} {{ $field | GoType }} `db:"{{ $field | DBName }}" goqu:"omitempty"`
 	{{- end }}
-	basemodels.Userlog
+	Userlog
 }
 
 func (m {{ $feature | GoType }}Model) IsDefault() bool {
@@ -31,6 +30,6 @@ func (m {{ $feature | GoType }}Model) UpdateValidate() error {
 	)
 }
 
-type {{ $feature | GoType }}ListRequestParams = basemodels.ListRequestParams[basemodels.ListFilter]
+type {{ $feature | GoType }}ListRequestParams = ListRequestParams[ListFilter]
 
-type {{ $feature | GoType }}ListResponse = basemodels.ListResponse[{{ $feature | GoType }}Model]
+type {{ $feature | GoType }}ListResponse = ListResponse[{{ $feature | GoType }}Model]
