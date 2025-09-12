@@ -21,7 +21,6 @@ const (
 )
 
 type AccessControl struct {
-	kind   string
 	cerbos cerbos.Client[*cerbos.GRPCClient, cerbos.PrincipalCtx]
 }
 
@@ -34,15 +33,6 @@ func New(cfg config.Cerbos) (AccessControl, error) {
 	return AccessControl{
 		cerbos: client,
 	}, nil
-}
-
-func (ac AccessControl) WithKind(kind string) AccessControl {
-	ac.kind = kind
-	return ac
-}
-
-func (ac AccessControl) Authorize(ctx context.Context, principalID string, action string, resourceID string, roles ...string) error {
-	return ac.AuthorizeWithResource(ctx, ac.kind, principalID, action, resourceID, roles...)
 }
 
 func (ac AccessControl) AuthorizeWithResource(ctx context.Context, resource string, principalID string, action string, resourceID string, roles ...string) error {
