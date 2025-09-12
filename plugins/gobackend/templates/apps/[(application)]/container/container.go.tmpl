@@ -3,82 +3,293 @@
 package container
 
 import (
-	"database/sql"
+	"errors"
+	"fmt"
 	"log/slog"
+	"reflect"
+	"sync"
 
-	"github.com/{{ $app | PackageName }}/accesscontrol"
 	"github.com/{{ $app | PackageName }}/config"
-	"github.com/{{ $app | PackageName }}/features/mail"
 	"github.com/{{ $app | PackageName }}/log"
 )
 
-type ContainerOption interface {
-	Apply(c *Container)
-}
+type Lifetime int
 
-type ContainerOptionFn func(c *Container)
+const (
+	Transient Lifetime = iota
+	Singleton
+)
 
-func (f ContainerOptionFn) Apply(c *Container) {
-	f(c)
-}
+var (
+	ErrNotRegistered       = errors.New("type not registered")
+	ErrInvalidConstructor  = errors.New("constructor must be a function")
+	ErrBadReturnTypes      = errors.New("constructor must return (T) or (T, error)")
+	ErrCycleDetected       = errors.New("dependency cycle detected")
+	ErrServiceStartMissing = errors.New("service missing Start() error method")
+)
 
-func WithLogger(logger *slog.Logger) ContainerOption {
-	return ContainerOptionFn(func(c *Container) {
-		c.logger = logger
-	})
-}
+type registration struct {
+	lifetime    Lifetime
+	constructor reflect.Value // func(...) (T[, error])
+	resultType  reflect.Type  // the T that is produced/bound (may be an interface)
+	isService   bool
 
-func WithEMail(emailService mail.Mail) ContainerOption {
-	return ContainerOptionFn(func(c *Container) {
-		c.email = emailService
-	})
+	once     sync.Once
+	instance reflect.Value
+	initErr  error
 }
 
 type Container struct {
-	ac      accesscontrol.AccessControl
-	email   mail.Mail
-	db      *sql.DB
-	cfg     config.Config
-	jwtKeys config.JwtKeyPair
-	logger  *slog.Logger
+	mu            sync.RWMutex
+	registrations map[reflect.Type]*registration
 }
 
-func New(ac accesscontrol.AccessControl, db *sql.DB, cfg config.Config, jwtKeys config.JwtKeyPair, opts ...ContainerOption) Container {
-	c := Container{
-		ac:      ac,
-		db:      db,
-		cfg:     cfg,
-		logger:  log.DefaultLogger,
-		jwtKeys: jwtKeys,
+type Service interface {
+	Start() error
+}
+
+func New(logger *slog.Logger, cfg config.Config) *Container {
+	c := &Container{
+		registrations: make(map[reflect.Type]*registration),
 	}
 
-	for _, opt := range opts {
-		opt.Apply(&c)
-	}
+	RegisterSingleton[*slog.Logger](c, func() *slog.Logger { return logger })
+	RegisterSingleton[config.Config](c, func() config.Config { return cfg })
 
 	return c
 }
 
-func (c Container) GetAccessControl() accesscontrol.AccessControl {
-	return c.ac
+func RegisterSingleton[T any](c *Container, constructor any) {
+	Register[T](c, Singleton, constructor)
 }
 
-func (c Container) GetDB() *sql.DB {
-	return c.db
+func Register[T any](c *Container, life Lifetime, constructor any) {
+	t := typeOf[T]()
+	c.registerForType(t, life, constructor, false)
 }
 
-func (c Container) GetConfig() config.Config {
-	return c.cfg
+func RegisterAs[TInterface any](c *Container, life Lifetime, constructor any) {
+	iface := typeOf[TInterface]()
+	if iface.Kind() != reflect.Interface {
+		panic(fmt.Errorf("RegisterAs target must be an interface, got %v", iface))
+	}
+	c.registerForType(iface, life, constructor, false)
 }
 
-func (c Container) GetLogger() *slog.Logger {
-	return c.logger
+func RegisterService[T Service](c *Container, life Lifetime, constructor any) {
+	t := typeOf[T]()
+	c.registerForType(t, life, constructor, true)
 }
 
-func (c Container) GetEmail() mail.Mail {
-	return c.email
+func RegisterServiceAs[TInterface Service](c *Container, life Lifetime, constructor any) {
+	iface := typeOf[TInterface]()
+	if iface.Kind() != reflect.Interface {
+		panic(fmt.Errorf("RegisterAs target must be an interface, got %v", iface))
+	}
+	c.registerForType(iface, life, constructor, true)
 }
 
-func (c Container) GetJWTKeys() config.JwtKeyPair {
-	return c.jwtKeys
+func Resolve[T any](c *Container) (T, error) {
+	var zero T
+	t := typeOf[T]()
+	v, err := c.resolveType(t, newResolveState())
+	if err != nil {
+		return zero, err
+	}
+	if !v.Type().AssignableTo(t) {
+		if v.CanConvert(t) {
+			v = v.Convert(t)
+		} else if t.Kind() == reflect.Interface && v.Type().Implements(t) {
+			// ok
+		} else {
+			return zero, fmt.Errorf("resolved type %v is not assignable to %v", v.Type(), t)
+		}
+	}
+	return v.Interface().(T), nil
+}
+
+func MustResolve[T any](c *Container) T {
+	v, err := Resolve[T](c)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (c *Container) registerForType(target reflect.Type, life Lifetime, ctor any, isService bool) {
+	cv := reflect.ValueOf(ctor)
+	if cv.Kind() != reflect.Func {
+		panic(ErrInvalidConstructor)
+	}
+	ct := cv.Type()
+	if ct.NumOut() < 1 || ct.NumOut() > 2 {
+		panic(ErrBadReturnTypes)
+	}
+	outT := ct.Out(0)
+	if ct.NumOut() == 2 && ct.Out(1) != reflect.TypeOf((*error)(nil)).Elem() {
+		panic(ErrBadReturnTypes)
+	}
+	if !outT.AssignableTo(target) {
+		if !(outT.Kind() == reflect.Pointer && outT.Elem().AssignableTo(target)) &&
+			!(target.Kind() == reflect.Interface && (outT.Implements(target) ||
+				(outT.Kind() == reflect.Pointer && outT.Implements(target)))) {
+			panic(fmt.Errorf("constructor returns %v which is not assignable to %v", outT, target))
+		}
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.registrations[target] = &registration{
+		lifetime:    life,
+		constructor: cv,
+		resultType:  target,
+		isService:   isService,
+	}
+}
+
+func (c *Container) resolveType(target reflect.Type, st *resolveState) (reflect.Value, error) {
+	c.mu.RLock()
+	reg, ok := c.registrations[target]
+	c.mu.RUnlock()
+	if !ok {
+		return reflect.Value{}, fmt.Errorf("%w: %v", ErrNotRegistered, target)
+	}
+
+	switch reg.lifetime {
+	case Singleton:
+		reg.once.Do(func() {
+			inst, err := c.invokeConstructor(reg.constructor, st)
+			if err == nil && reg.isService {
+				err = callStart(inst)
+			}
+			reg.instance, reg.initErr = inst, err
+		})
+		return reg.instance, reg.initErr
+
+	case Transient:
+		inst, err := c.invokeConstructor(reg.constructor, st)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		if reg.isService {
+			if err := callStart(inst); err != nil {
+				return reflect.Value{}, err
+			}
+		}
+		return inst, nil
+
+	default:
+		return reflect.Value{}, fmt.Errorf("unknown lifetime for %v", target)
+	}
+}
+
+func (c *Container) invokeConstructor(ctor reflect.Value, st *resolveState) (reflect.Value, error) {
+	ct := ctor.Type()
+	argc := ct.NumIn()
+	args := make([]reflect.Value, argc)
+
+	ctorKey := ctor.Pointer()
+	if st.inProgress[ctorKey] {
+		return reflect.Value{}, ErrCycleDetected
+	}
+	st.inProgress[ctorKey] = true
+	defer func() { delete(st.inProgress, ctorKey) }()
+
+	for i := range argc {
+		pt := ct.In(i)
+		if pt == reflect.TypeOf((*Container)(nil)) {
+			args[i] = reflect.ValueOf(c)
+			continue
+		}
+		dep, err := c.resolveType(pt, st)
+		if err != nil {
+			return reflect.Value{}, fmt.Errorf("resolving %v for %v: %w", pt, ctor.Type(), err)
+		}
+		args[i] = dep
+	}
+	out := ctor.Call(args)
+	if len(out) == 1 {
+		return out[0], nil
+	}
+	if !out[1].IsNil() {
+		return reflect.Value{}, out[1].Interface().(error)
+	}
+	return out[0], nil
+}
+
+func (c *Container) BootServices() error {
+	c.mu.RLock()
+	targets := make([]reflect.Type, 0, len(c.registrations))
+	for t, reg := range c.registrations {
+		if reg.isService {
+			targets = append(targets, t)
+		}
+	}
+	c.mu.RUnlock()
+
+	var errs []error
+	st := newResolveState()
+	for _, t := range targets {
+		if _, err := c.resolveType(t, st); err != nil {
+			errs = append(errs, fmt.Errorf("boot %v: %w", t, err))
+		}
+	}
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
+	return nil
+}
+
+func callStart(v reflect.Value) error {
+	// If v is zero or invalid
+	if !v.IsValid() {
+		return fmt.Errorf("cannot start invalid value")
+	}
+	// When v is an interface, use its underlying value for method lookup
+	if v.Kind() == reflect.Interface {
+		v = v.Elem()
+	}
+	// MethodByName works for pointer receivers if v is a pointer
+	m := v.MethodByName("Start")
+	if !m.IsValid() {
+		// Try pointer if we currently have a value receiver
+		if v.CanAddr() {
+			if pm := v.Addr().MethodByName("Start"); pm.IsValid() {
+				m = pm
+			}
+		}
+	}
+	if !m.IsValid() {
+		return ErrServiceStartMissing
+	}
+	mt := m.Type()
+	if mt.NumIn() != 0 || mt.NumOut() != 1 || mt.Out(0) != reflect.TypeOf((*error)(nil)).Elem() {
+		return fmt.Errorf("Start() must have signature func() error")
+	}
+	res := m.Call(nil)
+	if !res[0].IsNil() {
+		return res[0].Interface().(error)
+	}
+	return nil
+}
+
+func (c *Container) GetLogger(component string) *slog.Logger {
+	logger := MustResolve[*slog.Logger](c)
+	return logger.With(log.WithComponent(component))
+}
+
+func (c *Container) GetConfig() config.Config {
+	return MustResolve[config.Config](c)
+}
+
+type resolveState struct {
+	inProgress map[uintptr]bool
+}
+
+func newResolveState() *resolveState {
+	return &resolveState{inProgress: make(map[uintptr]bool)}
+}
+
+func typeOf[T any]() reflect.Type {
+	return reflect.TypeOf((*T)(nil)).Elem()
 }

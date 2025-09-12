@@ -1,13 +1,8 @@
-{{ $app := .App -}}
-
 package storage
 
 import (
-	"log/slog"
 	"mime/multipart"
 	"os"
-
-	"github.com/{{ $app | PackageName }}/log"
 )
 
 const (
@@ -20,48 +15,7 @@ var (
 	FileSizeExceedsMaxUploadSize         = "uploaded file is too big: %s. Please use an image less than 2MB in size"
 )
 
-type Config struct {
-	uploadDirectory string
-	logger          *slog.Logger
-}
-
 type Storage interface {
 	Upload(directoryPath string, file multipart.File, fileHeader multipart.FileHeader) (string, error)
 	Download(filePath string) (*os.File, error)
-}
-
-type StorageOpt interface {
-	setStorageOpt(cfg *Config)
-}
-
-type storageOptFunc func(cfg *Config)
-
-func (fn storageOptFunc) setStorageOpt(cfg *Config) {
-	fn(cfg)
-}
-
-func WithUploadDirectory(path string) StorageOpt {
-	return storageOptFunc(func(cfg *Config) {
-		cfg.uploadDirectory = path
-	})
-}
-
-func WithLogger(logger *slog.Logger) StorageOpt {
-	return storageOptFunc(func(cfg *Config) {
-		cfg.logger = logger
-	})
-}
-
-func NewStorage(opts ...StorageOpt) Storage {
-	cfg := &Config{}
-
-	for _, opt := range opts {
-		opt.setStorageOpt(cfg)
-	}
-
-	return &LocalStorage{
-		cfg: *cfg,
-		logger: cfg.logger.With(
-			log.WithComponent("local storage")),
-	}
 }

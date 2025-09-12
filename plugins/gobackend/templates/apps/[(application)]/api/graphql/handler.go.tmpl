@@ -6,15 +6,16 @@ import (
 	"net/http"
 
 	"github.com/{{ $app | PackageName }}/api/graphql/schema"
-	"github.com/{{ $app | PackageName }}/controllers"
 
 	"github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
 )
 
-func NewHandler(controllers controllers.Controllers) http.Handler {
-	resolver := NewResolver(controllers)
+type GraphQLHandler interface {
+	http.Handler
+}
 
+func NewHandler(resolver Resolver) GraphQLHandler {
 	opts := []graphql.SchemaOpt{graphql.UseFieldResolvers()}
 
 	schema := graphql.MustParseSchema(schema.Schema, &resolver, opts...)

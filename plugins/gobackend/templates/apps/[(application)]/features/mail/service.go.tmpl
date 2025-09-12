@@ -7,6 +7,7 @@ import (
 	"net/smtp"
 
 	"github.com/{{ $app | PackageName }}/config"
+	"github.com/{{ $app | PackageName }}/models"
 )
 
 type Mail struct {
@@ -15,15 +16,15 @@ type Mail struct {
 	email  Email
 }
 
-func NewMail(cfg config.Config, emailClient Email, logger *slog.Logger) Mail {
+func NewMail(cfg config.Config, logger *slog.Logger) Mail {
 	return Mail{
 		logger: logger,
 		cfg:    cfg,
-		email:  emailClient,
+		email:  NewClient(),
 	}
 }
 
-func (service Mail) SendMail(mail MailModel) error {
+func (service Mail) SendMail(mail models.Mail) error {
 	mailCfg := service.cfg.Mail
 
 	service.email.SetFrom(mail.From)

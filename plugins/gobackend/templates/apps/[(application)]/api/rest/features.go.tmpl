@@ -1,31 +1,41 @@
 {{ $app := .App -}}
+{{ $features := .Features -}}
 
 package rest
 
 import (
 	"net/http"
 
-	"github.com/{{ $app | PackageName }}/controllers"
 	"github.com/{{ $app | PackageName }}/features/storage"
 {{- $AppNameToPackageName := $app | PackageName }}
-{{- range $feature := .Features }}
+{{- range $feature := $features }}
 	"github.com/{{ $AppNameToPackageName }}/features/{{ $feature | PackageName }}"
 {{- end }}
 	"github.com/go-chi/chi/v5"
 )
 
-func New(ctrls controllers.Controllers) http.Handler {
+type FeatureHandler interface {
+	http.Handler
+}
+
+func New(
+	storageController storage.StorageController,
+{{- range $feature := $features }}
+	{{ $feature.FeatureName | LowerCamelCase }}Controller {{ $feature | PackageName }}.{{ $feature.FeatureName | UpperCamelCase }}Controller,
+{{- end }}
+) FeatureHandler {
 	r := chi.NewMux()
 
-	storage := storage.NewStorageRest(ctrls.Storage())
+	storage := storage.NewStorageRest(storageController)
 	r.Route("/storage", storage)
-	{{ range $feature := .Features }}
-	{{ .FeatureNameCamelCase }} := {{ $feature | PackageName }}.New{{ $feature | GoType }}Rest(ctrls.{{ $feature | GoType}}())
+
+	{{ range $feature := $features -}}
+	{{ $feature.FeatureName | LowerCamelCase }} := {{ $feature | PackageName }}.New{{ $feature | GoType }}Rest({{ $feature.FeatureName | LowerCamelCase }}Controller)
 	r.Route("/{{ $feature | AsURL }}s", func(r chi.Router) {
-		r.Get("/", {{ .FeatureNameCamelCase }}.Get)
-		r.Get("/id", {{ .FeatureNameCamelCase }}.GetByID)
-		r.Post("/", {{ .FeatureNameCamelCase }}.Create)
-		r.Post("/id", {{ .FeatureNameCamelCase }}.Update)
+		r.Get("/", {{ $feature.FeatureName | LowerCamelCase }}.Get)
+		r.Get("/id", {{ $feature.FeatureName | LowerCamelCase }}.GetByID)
+		r.Post("/", {{ $feature.FeatureName | LowerCamelCase }}.Create)
+		r.Post("/id", {{ $feature.FeatureName | LowerCamelCase }}.Update)
 	})
 	{{ end }}
 	return r

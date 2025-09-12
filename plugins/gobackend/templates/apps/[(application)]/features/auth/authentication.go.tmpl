@@ -11,9 +11,7 @@ import (
 	"time"
 
 	"github.com/{{ $app | PackageName }}/config"
-	"github.com/{{ $app | PackageName }}/container"
 	"github.com/{{ $app | PackageName }}/features/mail"
-	usermodels "github.com/{{ $app | PackageName }}/features/user/models"
 	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/types"
@@ -34,19 +32,23 @@ type AuthenticationService struct {
 	logger       *slog.Logger
 }
 
-func NewAuthenticationService(cont container.Container) AuthenticationService {
-	authDatabase := NewAuthDatabase(cont.GetDB())
+func NewAuthenticationService(
+	authDatabase AuthDatabase,
+	cfg config.Config,
+	mail mail.Mail,
+	logger *slog.Logger,
+) AuthenticationService {
 
 	return AuthenticationService{
-		cfg:          cont.GetConfig(),
+		cfg:          cfg,
 		authDatabase: authDatabase,
-		mail:         cont.GetEmail(),
-		jwtKeys:      cont.GetJWTKeys(),
-		logger:       cont.GetLogger().With(log.WithComponent("auth service")),
+		mail:         mail,
+		jwtKeys:      cfg.Server.JwtKeyPair,
+		logger:       logger.With(log.WithComponent("authentication_service")),
 	}
 }
 
-func (service AuthenticationService) Login(ctx context.Context, email types.String, password types.String) (*LoginResponse, error) {
+func (service AuthenticationService) Login(ctx context.Context, email types.String, password types.String) (*models.LoginResponse, error) {
 	authUser, err := service.authDatabase.GetAuthUserByEmail(email)
 	if err != nil {
 		service.logger.Error("failed to login", log.WithError(err), log.WithCorrelationID(ctx))
@@ -69,13 +71,13 @@ func (service AuthenticationService) Login(ctx context.Context, email types.Stri
 		return nil, err
 	}
 
-	return &LoginResponse{
+	return &models.LoginResponse{
 		ExpiresAt: expiresAt,
 		JWT:       tokenString,
 	}, nil
 }
 
-func (service AuthenticationService) Register(ctx context.Context, register RegisterRequestParams) (*RegisterResponse, error) {
+func (service AuthenticationService) Register(ctx context.Context, register models.RegisterRequestParams) (*models.RegisterResponse, error) {
 	_, err := models.GetUserContext(ctx)
 	if err != nil {
 		service.logger.Error("failed to receive user context", log.WithError(err), log.WithCorrelationID(ctx))
@@ -98,15 +100,15 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 		return nil, err
 	}
 
-	creationUser := UserPassword{
-		UserModel: usermodels.UserModel{
+	creationUser := models.UserPassword{
+		UserModel: models.UserModel{
 			Id:        types.StringFrom(uuid.NewString()),
 			Email:     register.Email,
 			FirstName: register.FirstName,
 			LastName:  register.LastName,
 			Active:    types.FALSE,
 		},
-		Password: Password{
+		Password: models.Password{
 			PasswordHash: string(passwordHash),
 		},
 	}
@@ -124,14 +126,14 @@ func (service AuthenticationService) Register(ctx context.Context, register Regi
 		service.logger.Error("failed to send activation email", log.WithError(emailErr), log.WithCorrelationID(ctx))
 	}()
 
-	return &RegisterResponse{
+	return &models.RegisterResponse{
 		Email:     creationUser.Email,
 		FirstName: creationUser.FirstName,
 		LastName:  creationUser.LastName,
 	}, nil
 }
 
-func GenerateTokenStringFromUser(model usermodels.UserModel, privateKey crypto.PrivateKey) (string, error) {
+func GenerateTokenStringFromUser(model models.UserModel, privateKey crypto.PrivateKey) (string, error) {
 	expiresAt := time.Now().Add(time.Hour * 24)
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("EdDSA"), jwt.MapClaims{
 		"id":        model.Id,
@@ -149,12 +151,12 @@ func GenerateTokenStringFromUser(model usermodels.UserModel, privateKey crypto.P
 	return tokenString, nil
 }
 
-func GetActivationMailTemplate(cfg config.Config, userID types.String, email types.String) mail.MailModel {
+func GetActivationMailTemplate(cfg config.Config, userID types.String, email types.String) models.Mail {
 	activationLink := fmt.Sprintf("%s/users/activate/%s", cfg.Organization.Url, userID)
 
 	from := fmt.Sprintf("%s <%s>", cfg.Organization.Name, cfg.Organization.Email)
 
-	m := mail.MailModel{
+	m := models.Mail{
 		From:    from,
 		To:      []string{email.Data},
 		Subject: "Activate your email address",
@@ -168,7 +170,7 @@ func (service AuthenticationService) ActivateUser(ctx context.Context, userID st
 	return service.authDatabase.ActivateUser(userID)
 }
 
-func (service AuthenticationService) Profile(ctx context.Context) (*UserPassword, error) {
+func (service AuthenticationService) Profile(ctx context.Context) (*models.UserPassword, error) {
 	ctxu, err := models.GetUserContext(ctx)
 	if err != nil {
 		return nil, err

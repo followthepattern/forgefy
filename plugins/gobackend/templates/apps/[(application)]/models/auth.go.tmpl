@@ -1,11 +1,10 @@
 {{ $app := .App -}}
 
-package auth
+package models
 
 import (
 	"time"
 
-	"github.com/{{ $app | PackageName }}/features/user/models"
 	"github.com/{{ $app | PackageName }}/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -54,6 +53,6 @@ type Password struct {
 }
 
 type UserPassword struct {
-	models.UserModel
+	UserModel
 	Password
 }

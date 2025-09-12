@@ -1,4 +1,5 @@
 {{ $app := .App -}}
+{{ $features := $app.Features -}}
 
 package main
 
@@ -13,10 +14,17 @@ import (
 
 	"github.com/{{ $app | PackageName }}/accesscontrol"
 	"github.com/{{ $app | PackageName }}/api"
+	"github.com/{{ $app | PackageName }}/api/rest"
+	"github.com/{{ $app | PackageName }}/api/graphql"
 	"github.com/{{ $app | PackageName }}/config"
 	"github.com/{{ $app | PackageName }}/container"
-	"github.com/{{ $app | PackageName }}/controllers"
+	"github.com/{{ $app | PackageName }}/features/auth"
 	"github.com/{{ $app | PackageName }}/features/mail"
+	"github.com/{{ $app | PackageName }}/features/storage"
+	"github.com/{{ $app | PackageName }}/features/user"
+{{- range $feature := $features }}
+	"github.com/{{ $app | PackageName }}/features/{{ $feature | PackageName }}"
+{{- end }}
 	"github.com/{{ $app | PackageName }}/hostserver"
 	"github.com/{{ $app | PackageName }}/log"
 
@@ -24,6 +32,8 @@ import (
 )
 
 func main() {
+	ctx := context.Background()
+
 	cfg, err := config.Parse()
 	if err != nil {
 		log.DefaultLogger.Error("failed to parse config", log.WithError(err))
@@ -45,61 +55,97 @@ func main() {
 		slog.String("cerbos address", cfg.Cerbos.Address),
 	)
 
-	jwt, err := config.GetKeys(logger, cfg.Server)
+	cfg.Server.JwtKeyPair, err = config.GetKeys(logger, cfg.Server)
 	if err != nil {
 		logger.Error("failed to get keys", log.WithError(err))
 		os.Exit(1)
 	}
 
-	db, err := createDBConn(cfg)
+	c := container.New(
+		logger,
+		cfg,
+	)
+
+	err = registerDependencies(c)
 	if err != nil {
-		logger.Error("failed to create db connection", log.WithError(err))
+		logger.Error("failed to register dependencies", log.WithError(err))
 		os.Exit(1)
 	}
 
-	defer func() {
+	router, err := api.NewHttpApi(c)
+	if err != nil {
+		logger.Error("failed to create http api", log.WithError(err))
+		os.Exit(1)
+	}
+
+	server := hostserver.NewServer(router, logger)
+	ctx, cancel := context.WithCancel(ctx)
+
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, os.Interrupt)
+	go func() {
+		osCall := <-sig
+		logger.Info("received os call", slog.String("os call", osCall.String()))
+		cancel()
+
+		db := container.MustResolve[*sql.DB](c)
 		if err := db.Close(); err != nil {
 			logger.Error("failed to close db connection", log.WithError(err))
 		}
 	}()
 
-	ctx := context.Background()
-
-	cerbosClient, err := accesscontrol.New(cfg.Cerbos)
-	if err != nil {
-		logger.Error("failed to create cerbos client", log.WithError(err))
-		os.Exit(1)
-	}
-
-	mail := mail.NewMail(cfg, mail.NewClient(), logger.With(log.WithComponent("mail")))
-
-	cont := container.New(
-		cerbosClient,
-		db,
-		cfg,
-		jwt,
-		container.WithLogger(logger),
-		container.WithEMail(mail),
-	)
-
-	ctrls := controllers.New(cont)
-
-	router := api.NewHttpApi(cfg, jwt, ctrls, logger.With(log.WithComponent("api")))
-
-	server := hostserver.NewServer(router, logger)
-	ctx, cancel := context.WithCancel(ctx)
-
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	go func() {
-		osCall := <-c
-		logger.Info("received os call", slog.String("os call", osCall.String()))
-		cancel()
-	}()
-
 	if err := server.Serve(ctx, cfg.Server.Host, cfg.Server.Port); err != nil {
 		logger.Error("failed to serve server", log.WithError(err))
 	}
+}
+
+func registerDependencies(c *container.Container) (err error) {
+	db, err := createDBConn(c.GetConfig())
+	if err != nil {
+		return err
+	}
+
+	container.RegisterSingleton[*sql.DB](c, func() *sql.DB { return db })
+	container.RegisterSingleton[accesscontrol.AccessControl](c, accesscontrol.New)
+	container.RegisterSingleton[mail.Mail](c, mail.NewMail)
+
+	// register storage
+	container.RegisterAs[storage.Storage](c, container.Singleton, storage.NewLocalStorage)
+	container.RegisterSingleton[storage.StorageService](c, storage.NewStorageService)
+	container.RegisterSingleton[storage.StorageController](c, storage.NewStorageController)
+
+	// register auth
+	container.RegisterSingleton[auth.AuthDatabase](c, auth.NewAuthDatabase)
+	container.RegisterSingleton[auth.AuthenticationService](c, auth.NewAuthenticationService)
+	container.RegisterSingleton[auth.AuthorizationService](c, auth.NewAuthorizationService)
+	container.RegisterSingleton[auth.AuthController](c, auth.NewAuthController)
+	container.RegisterSingleton[auth.AuthGraphQL](c, auth.NewAuthGraphQL)
+	container.RegisterSingleton[auth.AuthRest](c, auth.NewAuthRest)
+
+	// register user
+	container.RegisterSingleton[user.UserDatabase](c, user.NewUserDatabase)
+	container.RegisterSingleton[user.UserService](c, user.NewUserService)
+	container.RegisterSingleton[user.UserController](c, user.NewUserController)
+	container.RegisterSingleton[user.UserGraphQL](c, user.NewUserGraphQL)
+	container.RegisterSingleton[user.UserRest](c, user.NewUserRest)
+
+{{- range $feature := $features }}
+	{{ $package := $feature.FeatureName | LowerCamelCase }}
+	{{ $typeName := $feature.FeatureName | UpperCamelCase -}}
+	// register {{ $feature.FeatureName | LowerCamelCase }}
+	container.RegisterSingleton[{{ $package }}.{{ $typeName }}Database](c, {{ $package }}.New{{ $typeName }}Database)
+	container.RegisterSingleton[{{ $package }}.{{ $typeName }}Service](c, {{ $package }}.New{{ $typeName }}Service)
+	container.RegisterSingleton[{{ $package }}.{{ $typeName }}Controller](c, {{ $package }}.New{{ $typeName }}Controller)
+	container.RegisterSingleton[{{ $package }}.{{ $typeName }}GraphQL](c, {{ $package }}.New{{ $typeName }}GraphQL)
+	container.RegisterSingleton[{{ $package }}.{{ $typeName }}Rest](c, {{ $package }}.New{{ $typeName }}Rest)
+{{- end }}
+	// register api
+	container.RegisterSingleton[graphql.Resolver](c, graphql.NewResolver)
+	container.RegisterAs[graphql.GraphQLHandler](c, container.Singleton, graphql.NewHandler)
+	container.RegisterAs[rest.FeatureHandler](c, container.Singleton, rest.New)
+	container.RegisterAs[rest.AuthHandler](c, container.Singleton, rest.NewAuth)
+
+	return c.BootServices()
 }
 
 func createDBConn(cfg config.Config) (*sql.DB, error) {
