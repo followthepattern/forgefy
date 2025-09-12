@@ -33,15 +33,19 @@ type AuthenticationService struct {
 	logger       *slog.Logger
 }
 
-func NewAuthenticationService(cont container.Container) AuthenticationService {
-	authDatabase := NewAuthDatabase(cont.GetDB())
+func NewAuthenticationService(
+	authDatabase AuthDatabase,
+	cfg config.Config,
+	mail mail.Mail,
+	logger *slog.Logger,
+) AuthenticationService {
 
 	return AuthenticationService{
-		cfg:          cont.GetConfig(),
+		cfg:          cfg,
 		authDatabase: authDatabase,
-		mail:         cont.GetEmail(),
-		jwtKeys:      cont.GetJWTKeys(),
-		logger:       cont.GetLogger().With(log.WithComponent("auth service")),
+		mail:         mail,
+		jwtKeys:      cfg.Server.JwtKeyPair,
+		logger:       logger.With(log.WithComponent("authentication_service")),
 	}
 }
 

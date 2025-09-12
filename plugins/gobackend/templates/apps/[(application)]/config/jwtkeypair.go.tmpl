@@ -11,8 +11,8 @@ import (
 )
 
 type JwtKeyPair struct {
-	Private crypto.PrivateKey
-	Public  crypto.PublicKey
+	Private crypto.PrivateKey `mapstructure:"-"`
+	Public  crypto.PublicKey  `mapstructure:"-"`
 }
 
 func GetKeys(logger *slog.Logger, cfg Server) (JwtKeyPair, error) {

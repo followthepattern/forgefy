@@ -12,6 +12,7 @@ type Server struct {
 	Ed25519PublicKey      string `mapstructure:"ed25519_public_key"`
 	LogLevel              int    `mapstructure:"log_level"`
 	GraphqlSchemaFilepath string `mapstructure:"graphql_schema_filepath"`
+	JwtKeyPair            JwtKeyPair `mapstructure:"-"`
 }
 
 func (cfg Server) Validate() error {
