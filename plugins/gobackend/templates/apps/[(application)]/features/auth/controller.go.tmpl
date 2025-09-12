@@ -7,7 +7,6 @@ import (
 	"log/slog"
 
 	"github.com/{{ $app | PackageName }}/config"
-	"github.com/{{ $app | PackageName }}/container"
 	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/types"
 	"github.com/{{ $app | PackageName }}/models"
@@ -20,13 +19,15 @@ type AuthController struct {
 	authService AuthenticationService
 }
 
-func NewAuthController(cont container.Container) AuthController {
-	authService := NewAuthenticationService(cont)
-
+func NewAuthController(
+	authService AuthenticationService,
+	cfg config.Config,
+	logger *slog.Logger,
+) AuthController {
 	return AuthController{
 		authService: authService,
-		cfg:         cont.GetConfig(),
-		logger:      cont.GetLogger().With(log.WithComponent("auth controller")),
+		cfg:         cfg,
+		logger:      logger.With(log.WithComponent("auth controller")),
 	}
 }
 

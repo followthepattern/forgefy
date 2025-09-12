@@ -101,6 +101,7 @@ func registerDependencies(c *container.Container, logger *slog.Logger) (err erro
 	container.RegisterSingleton[auth.AuthDatabase](c, auth.NewAuthDatabase)
 	container.RegisterSingleton[auth.AuthenticationService](c, auth.NewAuthenticationService)
 	container.RegisterSingleton[auth.AuthorizationService](c, auth.NewAuthorizationService)
+	container.RegisterSingleton[auth.AuthController](c, auth.NewAuthController)
 	container.RegisterSingleton[user.UserDatabase](c, user.NewUserDatabase)
 
 	return c.BootServices()
