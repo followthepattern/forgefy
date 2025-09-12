@@ -16,11 +16,11 @@ type Mail struct {
 	email  Email
 }
 
-func NewMail(cfg config.Config, emailClient Email, logger *slog.Logger) Mail {
+func NewMail(cfg config.Config, logger *slog.Logger) Mail {
 	return Mail{
 		logger: logger,
 		cfg:    cfg,
-		email:  emailClient,
+		email:  NewClient(),
 	}
 }
 

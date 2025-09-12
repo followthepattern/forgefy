@@ -11,7 +11,7 @@ import (
 	"path"
 
 	"github.com/{{ $app | PackageName }}/accesscontrol"
-	"github.com/{{ $app | PackageName }}/container"
+	"github.com/{{ $app | PackageName }}/config"
 	"github.com/{{ $app | PackageName }}/features/auth"
 	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/models"
@@ -19,23 +19,22 @@ import (
 	"github.com/google/uuid"
 )
 
-type StorageServiceConfig struct {
-	container.Container
-	Storage              Storage
-	AuthorizationService auth.AuthorizationService
-}
-
 type StorageService struct {
-	logger               *slog.Logger
-	authorizationService auth.AuthorizationService
 	storage              Storage
+	authorizationService auth.AuthorizationService
+	logger               *slog.Logger
 }
 
-func NewStorageService(cfg StorageServiceConfig) StorageService {
+func NewStorageService(
+	storage Storage,
+	authorizationService auth.AuthorizationService,
+	cfg config.Config,
+	logger *slog.Logger,
+) StorageService {
 	return StorageService{
-		logger:               cfg.GetLogger().With(log.WithComponent("storage service")),
-		authorizationService: cfg.AuthorizationService,
-		storage:              cfg.Storage,
+		logger:               logger.With(log.WithComponent("storage_service")),
+		authorizationService: authorizationService,
+		storage:              storage,
 	}
 }
 

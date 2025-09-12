@@ -3,7 +3,6 @@
 package graphql
 
 import (
-	"github.com/{{ $app | PackageName }}/controllers"
 	"github.com/{{ $app | PackageName }}/features/auth"
 	"github.com/{{ $app | PackageName }}/features/user"
 	{{ $AppNameToPackageName := $app | PackageName }}
@@ -17,19 +16,18 @@ type Resolver struct {
 	userGraphQL user.UserGraphQL
 
 {{- range $feature := .Features }}
-	{{ .FeatureNameCamelCase }}GraphQL	{{ $feature | PackageName }}.{{ $feature | GoType }}GraphQL
+	{{ $feature.FeatureName | LowerCamelCase }}GraphQL	{{ $feature | PackageName }}.{{ $feature | GoType }}GraphQL
 {{- end }}
 }
 
-func NewResolver(controllers controllers.Controllers) Resolver {
-	authGraphQL := auth.NewAuthGraphQL(controllers.Auth())
-	userGraphQL := user.NewUserGraphQL(controllers.User())
-	
+func NewResolver(
+	authGraphQL	auth.AuthGraphQL,
+	userGraphQL user.UserGraphQL,
+
 {{- range $feature := .Features }}
-	{{ $feature.FeatureNameCamelCase }}GraphQL := {{ $feature | PackageName }}.New{{ $feature | GoType }}GraphQL(controllers.{{ $feature | GoType }}())
+	{{ .FeatureNameCamelCase }}GraphQL	{{ $feature | PackageName }}.{{ $feature | GoType }}GraphQL,
 {{- end }}
-
-
+) Resolver {
 	resolver := Resolver{
 		authGraphQL:	authGraphQL,
 		userGraphQL:    userGraphQL,

@@ -3,7 +3,6 @@
 package api
 
 import (
-	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -11,24 +10,31 @@ import (
 	"github.com/{{ $app | PackageName }}/api/graphql"
 	"github.com/{{ $app | PackageName }}/api/middlewares"
 	"github.com/{{ $app | PackageName }}/api/rest"
-	"github.com/{{ $app | PackageName }}/config"
-	"github.com/{{ $app | PackageName }}/controllers"
+	"github.com/{{ $app | PackageName }}/container"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 )
 
-func NewHttpApi(cfg config.Config,
-	jwtKeys config.JwtKeyPair,
-	ctrls controllers.Controllers,
-	logger *slog.Logger,
-) *chi.Mux {
+func NewHttpApi(c *container.Container) (*chi.Mux, error) {
 	r := chi.NewRouter()
+	cfg := c.GetConfig()
 
-	graphqlHandler := graphql.NewHandler(ctrls)
-	restHandler := rest.New(ctrls)
-	authHandler := rest.NewAuth(ctrls)
+	graphqlHandler, err := container.Resolve[graphql.GraphQLHandler](c)
+	if err != nil {
+		return nil, err
+	}
+
+	featureHandler, err := container.Resolve[rest.FeatureHandler](c)
+	if err != nil {
+		return nil, err
+	}
+
+	authHandler, err := container.Resolve[rest.AuthHandler](c)
+	if err != nil {
+		return nil, err
+	}
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"*"},
@@ -39,8 +45,8 @@ func NewHttpApi(cfg config.Config,
 		MaxAge:           300,
 	}))
 
-	middlewareLogger := middlewares.NewMiddlewareLogger(logger)
-	authMiddleware := middlewares.NewJWT(logger, jwtKeys)
+	middlewareLogger := middlewares.NewMiddlewareLogger(c.GetLogger("api_logger"))
+	authMiddleware := middlewares.NewJWT(c.GetLogger("jwt_logger"), cfg.Server.JwtKeyPair)
 
 	r.Use(middlewares.CorrelationID)
 	r.Use(middleware.RealIP)
@@ -54,12 +60,12 @@ func NewHttpApi(cfg config.Config,
 		}
 
 		r.With(authMiddleware.Authenticate).Post("/graphql", graphqlHandler.ServeHTTP)
-		r.With(authMiddleware.Authenticate).Mount("/api", restHandler)
+		r.With(authMiddleware.Authenticate).Mount("/api", featureHandler)
 	})
 
 	r.Mount("/auth", authHandler)
 
-	return r
+	return r, nil
 }
 
 func spaHandler(staticPath, indexFile string) http.HandlerFunc {

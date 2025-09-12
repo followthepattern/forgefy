@@ -8,8 +8,6 @@ import (
 	"log/slog"
 
 	"github.com/{{ $app | PackageName }}/config"
-	"github.com/{{ $app | PackageName }}/container"
-	"github.com/{{ $app | PackageName }}/features/auth"
 	"github.com/{{ $app | PackageName }}/models"
 	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/types"
@@ -23,14 +21,15 @@ type {{ $feature | GoType }}Controller struct {
 	cfg     config.Config
 }
 
-func New{{ $feature | GoType }}Controller(cont container.Container) {{ $feature | GoType }}Controller {
-	authorizationService := auth.NewAuthorizationService(cont, "{{ $feature.FeatureNameCamelCase }}")
-	{{ $feature.FeatureName | LowerCamelCase }}Service := New{{ $feature | GoType }}Service(cont, authorizationService)
-
+func New{{ $feature | GoType }}Controller(
+	service {{ $feature | GoType }}Service,
+	cfg     config.Config,
+	logger  *slog.Logger,
+) {{ $feature | GoType }}Controller {
 	return {{ $feature | GoType }}Controller{
-		{{ $feature.FeatureName | LowerCamelCase }}: {{ $feature.FeatureName | LowerCamelCase }}Service,
-		logger:  cont.GetLogger().With(log.WithComponent("{{ $feature.FeatureName | LowerCamelCase }} controller")),
-		cfg:     cont.GetConfig(),
+		{{ $feature.FeatureName | LowerCamelCase }}: service,
+		logger: logger.With(log.WithComponent("{{ $feature.FeatureName | LowerCamelCase }}_controller")),
+		cfg:    cfg,
 	}
 }
 

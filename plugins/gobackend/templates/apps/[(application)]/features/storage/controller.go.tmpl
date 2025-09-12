@@ -9,10 +9,9 @@ import (
 	"os"
 
 	"github.com/{{ $app | PackageName }}/config"
-	"github.com/{{ $app | PackageName }}/container"
-	"github.com/{{ $app | PackageName }}/features/auth"
 	"github.com/{{ $app | PackageName }}/log"
 	"github.com/{{ $app | PackageName }}/types"
+
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
@@ -22,22 +21,15 @@ type StorageController struct {
 	cfg            config.Config
 }
 
-func NewStorageController(cont container.Container) StorageController {
-	storage := NewStorage(
-		WithUploadDirectory(DEFAULT_DIRECTORY),
-		WithLogger(cont.GetLogger()),
-	)
-
-	storageService := NewStorageService(StorageServiceConfig{
-		Container:            cont,
-		Storage:              storage,
-		AuthorizationService: auth.NewAuthorizationService(cont, ""),
-	})
-
+func NewStorageController(
+	storageService StorageService,
+	cfg config.Config,
+	logger *slog.Logger,
+) StorageController {
 	return StorageController{
-		logger:         cont.GetLogger().With(log.WithComponent("storage controller")),
-		cfg:            cont.GetConfig(),
+		logger:         logger.With(log.WithComponent("storage controller")),
 		storageService: storageService,
+		cfg:            cfg,
 	}
 }
 
