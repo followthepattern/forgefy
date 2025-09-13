@@ -18,7 +18,7 @@ func Roles(admin models.User, features []string) (roles []models.Role) {
 			},
 			Code: models.Field{
 				Name:     "Code",
-				Value:    fmt.Sprintf("%s:editor", naming.LowerFirst(feature)),
+				Value:    fmt.Sprintf("%s:editor", naming.ToLowerSnakeCase(feature)),
 				Nullable: false,
 			},
 			Name: models.Field{

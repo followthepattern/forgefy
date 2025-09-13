@@ -45,12 +45,12 @@ services:
       - fluent-bit
 {{- end }}
 
-  {{ .App.AppNameCamelCase }}_backend:
+  {{ .App.AppNameCamelCase }}_app:
     image: golang:1.24.2
-    hostname: {{ .App.AppNameCamelCase }}_backend
-    container_name: {{ .App.AppNameCamelCase }}_backend
+    hostname: {{ .App.AppNameCamelCase }}_app
+    container_name: {{ .App.AppNameCamelCase }}_app
     command: bash -c "go get ./... && go run ./cmd/{{ .App.AppNameCamelCase }}"
-    working_dir: /backend
+    working_dir: /app
 
     depends_on:
 {{- if $app.Monitoring }}
@@ -63,7 +63,7 @@ services:
       - {{ .App.AppPort }}:8080
 
     volumes:
-      - ./:/backend:rw
+      - ./:/app:rw
       - shared-volume:/sock
 {{ if $app.Monitoring }}
     logging:

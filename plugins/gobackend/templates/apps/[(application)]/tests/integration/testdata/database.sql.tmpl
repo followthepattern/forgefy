@@ -64,7 +64,7 @@ CREATE SCHEMA app;
 ALTER SCHEMA app OWNER TO {{ $appName }}user;
 
 {{ range $feature := .Features }}
-CREATE TABLE app.{{ $feature.FeatureName }} (
+CREATE TABLE app.{{ $feature.FeatureName | LowerSnakeCase }} (
 {{- range $index, $field := .Fields }}
     {{ $field | DBName }} {{ $field | DBType }}{{- if $field.Nullable }} {{ $field | DBNullable }}{{end}},
 {{- end }}
@@ -74,7 +74,7 @@ CREATE TABLE app.{{ $feature.FeatureName }} (
     updated_at timestamp
 );
 
-ALTER TABLE app.{{ $feature.FeatureName }} OWNER TO {{ $appName }}user;
+ALTER TABLE app.{{ $feature.FeatureName | LowerSnakeCase }} OWNER TO {{ $appName }}user;
 {{end}}
 
 {{- range .Defaults.Users }}
@@ -93,7 +93,7 @@ INSERT INTO auth.user_role VALUES ({{ .UserID | ValueDB }}, {{ .RoleID | ValueDB
     {{- $featureName := .FeatureName }}
     {{- range $feature | Records }}
         {{- $fields := .Fields }}
-INSERT INTO app.{{ $featureName }} VALUES ({{- range $index, $field := $fields }}{{ if $index }},{{end}}{{ $field | ValueDB }}{{- end }});
+INSERT INTO app.{{ $featureName | LowerSnakeCase }} VALUES ({{- range $index, $field := $fields }}{{ if $index }},{{end}}{{ $field | ValueDB }}{{- end }});
         
     {{- end }}
 {{- end }}

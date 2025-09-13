@@ -35,10 +35,6 @@ func (f Feature) FeatureHumanReadableName() string {
 	return naming.CapitalizeFirst(f.FeatureName)
 }
 
-func (f Feature) FeatureNameDir() string {
-	return strings.ToLower(naming.ToSnakeCase(f.FeatureName))
-}
-
 func (f Feature) Validate() error {
 	for _, data := range f.DefinedRecords {
 		line := strings.Split(data, ",")

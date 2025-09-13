@@ -1,14 +1,15 @@
+{{ $feature := . -}}
 
 apiVersion: api.cerbos.dev/v1
 resourcePolicy:
   version: "default"
-  resource: "{{ .FeatureNameCamelCase }}"
+  resource: "{{ $feature.FeatureName | LowerSnakeCase }}"
   rules:
     - actions:
         - read
       effect: EFFECT_ALLOW
       roles:
-        - {{ .FeatureNameCamelCase }}:viewer
+        - {{ $feature.FeatureName | LowerSnakeCase }}:viewer
 
     - actions:
         - create
@@ -17,4 +18,4 @@ resourcePolicy:
         - delete
       effect: EFFECT_ALLOW
       roles:
-        - {{ .FeatureNameCamelCase }}:editor
+        - {{ $feature.FeatureName | LowerSnakeCase }}:editor

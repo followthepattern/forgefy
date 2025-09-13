@@ -130,7 +130,7 @@ func registerDependencies(c *container.Container) (err error) {
 	container.RegisterSingleton[user.UserRest](c, user.NewUserRest)
 
 {{- range $feature := $features }}
-	{{ $package := $feature.FeatureName | LowerCamelCase }}
+	{{ $package := $feature | PackageName }}
 	{{ $typeName := $feature.FeatureName | UpperCamelCase -}}
 	// register {{ $feature.FeatureName | LowerCamelCase }}
 	container.RegisterSingleton[{{ $package }}.{{ $typeName }}Database](c, {{ $package }}.New{{ $typeName }}Database)

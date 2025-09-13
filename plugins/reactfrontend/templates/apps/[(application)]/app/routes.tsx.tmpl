@@ -15,11 +15,11 @@ import UserSingle from "./(account)/user/(single)/[id]/page"
 import UserEdit from "./(account)/user/(single)/[id]/edit/page"
 import UserNew from "./(account)/user/(single)/new/page"
 {{ range $feature := .Features }}
-import {{ $feature.FeatureName | UpperCamelCase }}List from "./(account)/{{ .FeatureNameDir }}/page"
-import {{ $feature.FeatureName | UpperCamelCase }}Single from "./(account)/{{ .FeatureNameDir }}/(single)/[id]/page"
-import {{ $feature.FeatureName | UpperCamelCase }}Edit from "./(account)/{{ .FeatureNameDir }}/(single)/[id]/edit/page"
-import {{ $feature.FeatureName | UpperCamelCase }}New from "./(account)/{{ .FeatureNameDir }}/(single)/new/page"
-import {{ $feature.FeatureName | UpperCamelCase }}SingleLayout from "./(account)/{{ .FeatureNameDir }}/(single)/layout"
+import {{ $feature.FeatureName | UpperCamelCase }}List from "./(account)/{{ $feature.FeatureName | LowerCamelCase }}/page"
+import {{ $feature.FeatureName | UpperCamelCase }}Single from "./(account)/{{ $feature.FeatureName | LowerCamelCase }}/(single)/[id]/page"
+import {{ $feature.FeatureName | UpperCamelCase }}Edit from "./(account)/{{ $feature.FeatureName | LowerCamelCase }}/(single)/[id]/edit/page"
+import {{ $feature.FeatureName | UpperCamelCase }}New from "./(account)/{{ $feature.FeatureName | LowerCamelCase }}/(single)/new/page"
+import {{ $feature.FeatureName | UpperCamelCase }}SingleLayout from "./(account)/{{ $feature.FeatureName | LowerCamelCase }}/(single)/layout"
 {{ end }}
 export const Routes: RouteObject[] = [
     {

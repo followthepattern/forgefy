@@ -33,14 +33,14 @@ func New{{ $feature | GoType }}Service(
 		authorizationService: authorizationService,
 		{{ $feature.FeatureName | LowerCamelCase }}Repository: repository,
 		logger:	logger.With(log.WithComponent("{{ $feature.FeatureName | LowerCamelCase }}_service")),
-		name: "{{ $feature.FeatureName | LowerCamelCase }}",
+		name: "{{ $feature.FeatureName | LowerSnakeCase }}",
 	}
 
 	return service
 }
 
 func (service {{ $feature | GoType }}Service) GetByID(ctx context.Context, id string) (*models.{{ $feature | GoType }}Model, error) {
-	err := service.authorizationService.AuthorizeWithResource(ctx, service.name, accesscontrol.READ, id)
+	err := service.authorizationService.AuthorizeWithResource(ctx, service.name, id, accesscontrol.READ)
 	if err != nil {
 		service.logger.Error("Error authorizing user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
@@ -55,7 +55,7 @@ func (service {{ $feature | GoType }}Service) GetByID(ctx context.Context, id st
 }
 
 func (service {{ $feature | GoType }}Service) Get(ctx context.Context, request models.{{ $feature | GoType }}ListRequestParams) (*models.{{ $feature | GoType }}ListResponse, error) {
-	err := service.authorizationService.AuthorizeWithResource(ctx, service.name, accesscontrol.READ, accesscontrol.ALLRESOURCE)
+	err := service.authorizationService.AuthorizeWithResource(ctx, service.name, accesscontrol.ALLRESOURCE, accesscontrol.READ)
 	if err != nil {
 		service.logger.Error("Error authorizing user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return nil, err
@@ -72,7 +72,7 @@ func (service {{ $feature | GoType }}Service) Get(ctx context.Context, request m
 }
 
 func (service {{ $feature | GoType }}Service) Create(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
-	userID, err := service.authorizationService.AuthorizedUser(ctx, service.name, accesscontrol.CREATE, accesscontrol.NEW)
+	userID, err := service.authorizationService.AuthorizedUser(ctx, service.name, accesscontrol.NEW, accesscontrol.CREATE)
 	if err != nil {
 		service.logger.Error("Error authorizing user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
@@ -90,7 +90,7 @@ func (service {{ $feature | GoType }}Service) Create(ctx context.Context, value 
 }
 
 func (service {{ $feature | GoType }}Service) Update(ctx context.Context, value models.{{ $feature | GoType }}Model) error {
-	userID, err := service.authorizationService.AuthorizedUser(ctx, service.name, accesscontrol.UPDATE, value.{{ $idField.FieldNameCamelCaseUpper }}.Data)
+	userID, err := service.authorizationService.AuthorizedUser(ctx, service.name, value.{{ $idField.FieldNameCamelCaseUpper }}.Data, accesscontrol.UPDATE)
 	if err != nil {
 		service.logger.Error("Error authorizing user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
@@ -107,7 +107,7 @@ func (service {{ $feature | GoType }}Service) Update(ctx context.Context, value 
 }
 
 func (service {{ $feature | GoType }}Service) Delete(ctx context.Context, ids []string) error {
-	err := service.authorizationService.AuthorizeWithResource(ctx, service.name, accesscontrol.DELETE, accesscontrol.ALLRESOURCE)
+	err := service.authorizationService.AuthorizeWithResource(ctx, service.name, accesscontrol.ALLRESOURCE, accesscontrol.DELETE)
 	if err != nil {
 		service.logger.Error("Error authorizing user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))
 		return err
