@@ -5,6 +5,7 @@ import { Id } from "react-toastify";
 
 import SingleLayout from "@/app/(account)/components/singleView/layout";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
+import TertiaryButton from "@/app/components/buttons/tertiaryButton";
 import CancelModal from "@/app/components/modals/cancelModal";
 import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
 import Label from "@/app/(account)/components/labels/label";
@@ -173,7 +174,7 @@ export default function UserEdit() {
                         </CancelModal>
                     </div>
                     <ConfirmModal onConfirm={onDelete} title="Delete User" body={`Are you sure you want to delete ${data?.id}?`}>
-                        Delete
+                        <TertiaryButton>Delete</TertiaryButton>
                     </ConfirmModal>
                 </SingleLayout.Footer>
             </form>

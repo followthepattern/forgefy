@@ -41,11 +41,11 @@ const orderByLabels: SortLabel[] = [
 ];
 
 function viewLink(value: {{ $feature.FeatureName | UpperCamelCase }}): string {
-  return `/{{ $feature.FeatureName | LowerCamelCase }}/${value.id}`
+  return `/{{ $feature | URL }}/${value.id}`
 }
 
 function editLink(value: {{ $feature.FeatureName | UpperCamelCase }}): string {
-  return `/{{ $feature.FeatureName | LowerCamelCase }}/${value.id}/edit`
+  return `/{{ $feature | URL }}/${value.id}/edit`
 }
 
 export default function {{ $feature.FeatureName | UpperCamelCase }}List() {
