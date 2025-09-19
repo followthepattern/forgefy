@@ -1,0 +1,51 @@
+
+version: 0
+product_name: "Strive"
+monitoring: true
+vscode: true
+apps:
+  - name: strv
+    type: go-backend
+  - name: frontend
+    type: react-frontend
+    backend: strv
+    brand_color_rgb: "4, 47, 46"
+features:
+  - name: tracking
+    fields:
+      - name: Id
+        type: id
+      - name: Name
+        type: string
+      - name: Type
+        type: string
+      - name: Price
+        type: number
+      - name: Active
+        type: boolean
+      - name: Published
+        type: date
+      - name: Publish Time
+        type: time
+      - name: Description
+        type: text
+      - name: Photo
+        type: file
+  - name: calories
+    fields:
+      - name: Id
+        type: id
+      - name: Name
+        type: string
+        nullable: false
+      - name: Description
+        type: string
+        nullable: false
+  - name: body weight
+    fields:
+      - name: Id
+        type: id
+      - name: Type
+        type: string
+      - name: Extension
+        type: string
