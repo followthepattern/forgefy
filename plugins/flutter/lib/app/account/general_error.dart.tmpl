@@ -1,0 +1,18 @@
+import 'package:adapticc/lib/extensions.dart';
+import 'package:adapticc/styles/colors.dart';
+import 'package:flutter/material.dart';
+
+class GeneralError extends StatelessWidget {
+  const GeneralError({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      context.strings.somethingWentWrong,
+      style: TextStyle(
+        color: error,
+        fontSize: 24,
+      ),
+    );
+  }
+}

@@ -1,0 +1,26 @@
+import 'package:adapticc/app/routes.dart';
+import 'package:adapticc/l10n/generated/app_localizations.dart';
+import 'package:adapticc/styles/theme.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+class App extends StatelessWidget {
+  const App({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return RouterProvider(
+      child: Builder(
+        builder: (context) {
+          return MaterialApp.router(
+            routerConfig: context.read<GoRouter>(),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            theme: theme,
+          );
+        },
+      ),
+    );
+  }
+}

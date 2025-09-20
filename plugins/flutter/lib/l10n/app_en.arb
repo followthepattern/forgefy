@@ -1,0 +1,16 @@
+{
+  "edit": "Edit",
+  "emailAddress": "Email address",
+  "loginTitle": "Sign in to your account!",
+  "newResource": "New",
+  "sort": "Sort",
+  "sorted": "Sorted",
+  "password": "Password",
+  "search": "Search",
+  "signIn": "Sign in",
+  "signOut": "Sign out",
+  "somethingWentWrong": "Something went wrong",
+  "user": "User",
+  "view": "View",
+  "wrongEmailOrPassword": "Wrong email or password"
+}

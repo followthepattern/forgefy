@@ -1,0 +1,33 @@
+import 'package:adapticc/app/account/components/list_view/section_header/section_header.dart';
+import 'package:adapticc/app/account/lib/query_properties.dart';
+import 'package:flutter/material.dart';
+
+class ResourceListView extends StatelessWidget {
+  const ResourceListView({
+    super.key,
+    required this.resourceName,
+    required this.resourceUrl,
+    required this.orderByLabels,
+    required this.child,
+  });
+
+  final String resourceName;
+  final String resourceUrl;
+  final List<SortLabel> orderByLabels;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionHeader(
+          resourceName: resourceName,
+          resourceUrl: resourceUrl,
+          orderByLabels: orderByLabels,
+        ),
+        Expanded(child: child),
+      ],
+    );
+  }
+}

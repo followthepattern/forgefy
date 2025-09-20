@@ -1,0 +1,56 @@
+import 'package:adapticc/lib/config.dart';
+import 'package:flutter/material.dart';
+import 'package:graphql/client.dart';
+import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
+
+class GraphQLClientProvider extends SingleChildStatelessWidget {
+  const GraphQLClientProvider({
+    super.key,
+    super.child,
+    this.token,
+    this.onTokenError,
+  });
+
+  final String? token;
+  final VoidCallback? onTokenError;
+
+  GraphQLClient _createClient() {
+    final httpLink = HttpLink(apiGraphqlUrl);
+
+    final errorLink = ErrorLink(
+      onException: (request, forward, exception) {
+        if (exception is HttpLinkParserException &&
+            exception.response.statusCode == 400 &&
+            exception.response.body == '"invalid user token"') {
+          onTokenError?.call();
+          throw Exception('Invalid user token');
+        }
+        return forward(request);
+      },
+    );
+
+    late final Link link;
+
+    if (token != null) {
+      link = AuthLink(
+        getToken: () => 'Bearer $token',
+      ).concat(errorLink.concat(httpLink));
+    } else {
+      link = httpLink;
+    }
+
+    return GraphQLClient(
+      link: link,
+      cache: GraphQLCache(),
+    );
+  }
+
+  @override
+  Widget buildWithChild(BuildContext context, Widget? child) {
+    return Provider(
+      create: (context) => _createClient(),
+      child: child,
+    );
+  }
+}

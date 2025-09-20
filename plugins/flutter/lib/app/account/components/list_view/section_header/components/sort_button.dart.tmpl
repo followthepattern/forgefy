@@ -1,0 +1,89 @@
+import 'dart:math';
+
+import 'package:adapticc/app/account/lib/query_properties.dart';
+import 'package:adapticc/lib/extensions.dart';
+import 'package:adapticc/styles/colors.dart';
+import 'package:flutter/material.dart';
+
+final _buttonStyle = ElevatedButton.styleFrom(
+  backgroundColor: white,
+  foregroundColor: black,
+  textStyle: TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  ),
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(8),
+  ),
+);
+
+class SortButton extends StatelessWidget {
+  const SortButton({
+    super.key,
+    required this.orderByLabels,
+    this.selectedSortLabel,
+    required this.onChanged,
+  });
+
+  final List<SortLabel> orderByLabels;
+  final SortLabel? selectedSortLabel;
+  final ValueChanged<SortLabel> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWidth = constraints.maxWidth;
+        return MenuAnchor(
+          style: MenuStyle(
+            backgroundColor: WidgetStateProperty.all(white),
+            shape: WidgetStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          menuChildren: [
+            ...orderByLabels.map(
+              (label) => ConstrainedBox(
+                constraints: BoxConstraints(minWidth: maxWidth),
+                child: MenuItemButton(
+                  onPressed: () => onChanged(label),
+                  trailingIcon: selectedSortLabel?.name == label.name
+                      ? Icon(Icons.check)
+                      : null,
+                  child: Text(label.label),
+                ),
+              ),
+            ),
+          ],
+          builder: (context, controller, child) => ElevatedButton(
+            style: _buttonStyle,
+            onPressed: () {
+              if (controller.isOpen) {
+                controller.close();
+              } else {
+                controller.open();
+              }
+            },
+            child: Row(
+              spacing: 4,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  selectedSortLabel == null
+                      ? context.strings.sort
+                      : context.strings.sorted,
+                ),
+                Transform.rotate(
+                  angle: pi / 2,
+                  child: Icon(Icons.chevron_right),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

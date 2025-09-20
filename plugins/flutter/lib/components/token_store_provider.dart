@@ -1,0 +1,19 @@
+import 'package:adapticc/lib/token_store.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
+
+class TokenStoreProvider extends SingleChildStatelessWidget {
+  const TokenStoreProvider({
+    super.key,
+    super.child,
+  });
+
+  @override
+  Widget buildWithChild(BuildContext context, Widget? child) {
+    return ChangeNotifierProvider<TokenStore>(
+      create: (context) => TokenStore(),
+      child: child,
+    );
+  }
+}

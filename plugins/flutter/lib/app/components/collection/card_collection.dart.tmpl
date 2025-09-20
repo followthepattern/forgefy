@@ -1,0 +1,187 @@
+import 'package:adapticc/app/components/collection/pagination.dart';
+import 'package:adapticc/app/components/inputs/checkbox_input.dart';
+import 'package:adapticc/lib/extensions.dart';
+import 'package:flutter/material.dart';
+
+class ColumnLabel<T> {
+  ColumnLabel({
+    required this.name,
+    required this.getValue,
+  });
+
+  final String name;
+  final String Function(T item) getValue;
+}
+
+class CardCollection<T> extends StatefulWidget {
+  const CardCollection({
+    super.key,
+    required this.columns,
+    required this.items,
+    required this.totalCount,
+    required this.currentPage,
+    this.pageSize = 20,
+    this.onPageChange,
+    this.onView,
+    this.onEdit,
+  });
+
+  final List<ColumnLabel<T>> columns;
+  final List<T> items;
+  final int totalCount;
+  final int currentPage;
+  final int pageSize;
+  final Function(int page)? onPageChange;
+  final Function(T item)? onView;
+  final Function(T item)? onEdit;
+
+  @override
+  State<CardCollection<T>> createState() => _CardCollectionState<T>();
+}
+
+class _CardCollectionState<T> extends State<CardCollection<T>> {
+  final Set<T> _selectedItems = {};
+
+  void _toggleItem(T item) {
+    setState(() {
+      if (_selectedItems.contains(item)) {
+        _selectedItems.remove(item);
+      } else {
+        _selectedItems.add(item);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.topRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: CheckboxInput(
+              value: _selectedItems.length == widget.items.length,
+              onChanged: (value) {
+                setState(() {
+                  if (_selectedItems.length != widget.items.length) {
+                    _selectedItems.addAll(widget.items);
+                  } else {
+                    _selectedItems.clear();
+                  }
+                });
+              },
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: widget.items.length,
+            itemBuilder: (context, index) {
+              return _CardCollectionItem(
+                item: widget.items[index],
+                columns: widget.columns,
+                isSelected: _selectedItems.contains(widget.items[index]),
+                onToggle: () => _toggleItem(widget.items[index]),
+                onView: () => widget.onView?.call(widget.items[index]),
+                onEdit: () => widget.onEdit?.call(widget.items[index]),
+              );
+            },
+          ),
+        ),
+        Pagination(
+          totalCount: widget.totalCount,
+          currentPage: widget.currentPage,
+          pageSize: widget.pageSize,
+          onPageChange: widget.onPageChange,
+        ),
+      ],
+    );
+  }
+}
+
+class _CardCollectionItem<T> extends StatelessWidget {
+  const _CardCollectionItem({
+    super.key,
+    required this.item,
+    required this.columns,
+    required this.isSelected,
+    required this.onToggle,
+    this.onView,
+    this.onEdit,
+  });
+
+  final T item;
+  final List<ColumnLabel<T>> columns;
+  final bool isSelected;
+  final VoidCallback onToggle;
+  final VoidCallback? onView;
+  final VoidCallback? onEdit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.all(8.0),
+      child: InkWell(
+        onTap: () {
+          onToggle();
+        },
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ...columns.map(
+                    (column) => Row(
+                      children: [
+                        Text(
+                          '${column.name}: ',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Expanded(
+                          child: Text(
+                            column.getValue(
+                              item,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          onView?.call();
+                        },
+                        child: Text(context.strings.view),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          onEdit?.call();
+                        },
+                        child: Text(context.strings.edit),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: CheckboxInput(
+                value: isSelected,
+                onChanged: (value) {
+                  onToggle();
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

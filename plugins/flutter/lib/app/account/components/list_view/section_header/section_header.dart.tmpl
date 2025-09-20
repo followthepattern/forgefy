@@ -1,0 +1,79 @@
+import 'package:adapticc/app/account/components/list_view/section_header/components/new_resource_link.dart';
+import 'package:adapticc/app/account/components/list_view/section_header/components/search_input.dart';
+import 'package:adapticc/app/account/components/list_view/section_header/components/sort_button.dart';
+import 'package:adapticc/app/account/lib/query_properties.dart';
+import 'package:adapticc/styles/colors.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+class SectionHeader extends StatelessWidget {
+  const SectionHeader({
+    super.key,
+    required this.resourceName,
+    required this.resourceUrl,
+    required this.orderByLabels,
+  });
+
+  final String resourceName;
+  final String resourceUrl;
+  final List<SortLabel> orderByLabels;
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedSortLabel = context.select<QueryProperties, SortLabel?>(
+      (queryProps) => queryProps.orderBy,
+    );
+
+    return Column(
+      spacing: 8,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _Header(resourceName: resourceName),
+        SearchInput(
+          onChanged: (value) {
+            context.read<QueryProperties>().filter = value;
+          },
+        ),
+        Row(
+          spacing: 8,
+          children: [
+            Expanded(
+              child: NewResourceLink(),
+            ),
+            Expanded(
+              child: SortButton(
+                orderByLabels: orderByLabels,
+                selectedSortLabel: selectedSortLabel,
+                onChanged: (label) {
+                  context.read<QueryProperties>().orderBy =
+                      label == selectedSortLabel ? null : label;
+                },
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header({
+    required this.resourceName,
+  });
+
+  final String resourceName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      resourceName,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: grayPrimary,
+      ),
+    );
+  }
+}

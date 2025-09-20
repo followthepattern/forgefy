@@ -1,0 +1,15 @@
+import 'package:adapticc/components/http_client_provider.dart';
+import 'package:flutter/material.dart' hide HttpClientProvider;
+
+class AuthLayout extends StatelessWidget {
+  const AuthLayout({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return HttpClientProvider(
+      child: child,
+    );
+  }
+}

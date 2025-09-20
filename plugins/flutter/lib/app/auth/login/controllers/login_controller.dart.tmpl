@@ -1,0 +1,45 @@
+import 'package:adapticc/http/http_client.dart';
+import 'package:adapticc/lib/config.dart';
+import 'package:adapticc/lib/token_store.dart';
+
+const _loginUrl = '$backendUrl/auth/login';
+
+class LoginController {
+  LoginController({
+    required this.client,
+    required this.tokenStore,
+  });
+
+  final HttpClient client;
+  final TokenStore tokenStore;
+
+  Future<void> login(String email, String password) async {
+    try {
+      final result = await client.post(
+        url: _loginUrl,
+        body: {
+          'email': email,
+          'password': password,
+        },
+      );
+
+      final String? jwt = result['jwt'];
+      if (jwt == null) {
+        throw WrongEmailOrPasswordException();
+      }
+
+      await tokenStore.setToken(jwt);
+    } on HttpClientException catch (e) {
+      if (e.message == WrongEmailOrPasswordException.identifier) {
+        throw WrongEmailOrPasswordException();
+      }
+      rethrow;
+    }
+  }
+}
+
+class WrongEmailOrPasswordException implements Exception {
+  static const String identifier = '"WRONG_EMAIL_OR_PASSWORD"';
+
+  WrongEmailOrPasswordException();
+}

@@ -1,0 +1,49 @@
+import 'package:adapticc/app/components/inputs/checkbox_input.dart';
+import 'package:adapticc/lib/extensions.dart';
+import 'package:flutter/material.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+
+class CardCollectionSkeleton extends StatelessWidget {
+  const CardCollectionSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Skeletonizer(
+      child: ListView.builder(
+        itemCount: 2,
+        itemBuilder: (context, index) {
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Card item $index'),
+                      CheckboxInput(value: false, onChanged: (value) {}),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: null,
+                        child: Text(context.strings.view),
+                      ),
+                      TextButton(
+                        onPressed: null,
+                        child: Text(context.strings.edit),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

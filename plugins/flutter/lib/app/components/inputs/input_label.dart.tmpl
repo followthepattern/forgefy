@@ -1,0 +1,18 @@
+import 'package:flutter/material.dart';
+
+class InputLabel extends StatelessWidget {
+  const InputLabel({
+    super.key,
+    required this.label,
+  });
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label,
+      style: Theme.of(context).textTheme.labelMedium,
+    );
+  }
+}
