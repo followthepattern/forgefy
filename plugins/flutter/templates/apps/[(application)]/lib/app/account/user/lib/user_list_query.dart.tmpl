@@ -1,7 +1,7 @@
-import 'package:adapticc/app/account/user/graphql/query.dart';
-import 'package:adapticc/app/account/user/model.dart';
-import 'package:adapticc/graphql/list_query.dart';
-import 'package:adapticc/graphql/list_response.dart';
+import 'package:{{ .App.AppName | LowerSnakeCase }}/app/account/user/graphql/query.dart';
+import 'package:{{ .App.AppName | LowerSnakeCase }}/app/account/user/model.dart';
+import 'package:{{ .App.AppName | LowerSnakeCase }}/graphql/list_query.dart';
+import 'package:{{ .App.AppName | LowerSnakeCase }}/graphql/list_response.dart';
 
 class UserListQuery extends ListQuery<User> {
   UserListQuery({
