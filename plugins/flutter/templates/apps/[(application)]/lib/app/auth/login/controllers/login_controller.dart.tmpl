@@ -1,6 +1,6 @@
-import 'package:{{ .App.AppName | LowerSnakeCase }}/http/http_client.dart';
-import 'package:{{ .App.AppName | LowerSnakeCase }}/lib/config.dart';
-import 'package:{{ .App.AppName | LowerSnakeCase }}/lib/token_store.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/http/http_client.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/lib/config.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/lib/token_store.dart';
 
 const _loginUrl = '$backendUrl/auth/login';
 
