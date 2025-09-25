@@ -1,0 +1,26 @@
+const getUsers = r'''
+query GetUsers(
+	$pageSize: Uint
+	$page: Uint
+	$search: String
+	$orderBy: [OrderBy!]
+) {
+	users {
+		list(
+			pagination: { pageSize: $pageSize, page: $page }
+			filter: { search: $search }
+			orderBy: $orderBy
+		) {
+			count
+			data {
+				id
+				email
+				firstName
+				lastName
+			}
+			page
+			pageSize
+		}
+	}
+}
+''';

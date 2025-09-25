@@ -1,0 +1,35 @@
+import 'package:{{ .AppName | LowerSnakeCase }}/app/components/inputs/input_label.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+
+class InputTextField extends StatelessWidget {
+  const InputTextField({
+    super.key,
+    required this.label,
+    required this.name,
+    this.obscureText = false,
+    this.validator,
+  });
+
+  final String label;
+  final String name;
+  final bool obscureText;
+  final FormFieldValidator<String>? validator;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      spacing: 8,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InputLabel(label: label),
+        FormBuilderTextField(
+          name: name,
+          obscureText: obscureText,
+          validator: validator,
+        ),
+      ],
+    );
+  }
+}

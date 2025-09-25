@@ -1,0 +1,76 @@
+import 'package:{{ .AppName | LowerSnakeCase }}/styles/colors.dart';
+import 'package:flutter/material.dart';
+
+final theme = ThemeData(
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: brand,
+    brightness: Brightness.light,
+  ),
+  scaffoldBackgroundColor: brand,
+  textTheme: TextTheme(
+    headlineMedium: TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.w700,
+    ),
+    labelMedium: TextStyle(
+      fontWeight: FontWeight.w500,
+      color: grayPrimary,
+      fontSize: 14,
+    ),
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    floatingLabelBehavior: FloatingLabelBehavior.never,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(6),
+    ),
+  ),
+  checkboxTheme: CheckboxThemeData(
+    fillColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.selected)) {
+        return Color(0xFF2563eb);
+      }
+      return white;
+    }),
+    side: BorderSide(
+      color: Color(0xFF6b7280),
+    ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(6),
+    ),
+  ),
+  segmentedButtonTheme: SegmentedButtonThemeData(
+    style: ButtonStyle(
+      backgroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return brand;
+        }
+        return white;
+      }),
+      foregroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return white;
+        }
+        return black;
+      }),
+      side: WidgetStateProperty.all(
+        BorderSide(
+          color: gray,
+          width: 1,
+        ),
+      ),
+      shape: WidgetStateProperty.all(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    ),
+  ),
+);
+
+final primaryButtonStyle = ElevatedButton.styleFrom(
+  backgroundColor: brand,
+  foregroundColor: Colors.white,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(8),
+  ),
+);

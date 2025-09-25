@@ -1,0 +1,95 @@
+import 'package:{{ .AppName | LowerSnakeCase }}/app/auth/login/controllers/login_controller.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/components/buttons/primary_button.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/components/inputs/input_text_field.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/http/http_client.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/lib/extensions.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/lib/token_store.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:provider/provider.dart';
+
+class _Fields {
+  static const email = 'email';
+  static const password = 'password';
+}
+
+class LoginForm extends StatefulWidget {
+  const LoginForm({super.key});
+
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormBuilderState>();
+
+  Future<void> _onSubmit() async {
+    final isValid = _formKey.currentState?.saveAndValidate();
+    if (isValid == false || _formKey.currentState == null) {
+      return;
+    }
+    final value = _formKey.currentState!.value;
+    if (value[_Fields.email] == null || value[_Fields.password] == null) {
+      return;
+    }
+    final email = value[_Fields.email] as String;
+    final password = value[_Fields.password] as String;
+
+    final loginController = LoginController(
+      client: context.read<HttpClient>(),
+      tokenStore: context.read<TokenStore>(),
+    );
+
+    try {
+      await loginController.login(email, password);
+    } on WrongEmailOrPasswordException {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.strings.wrongEmailOrPassword),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.strings.somethingWentWrong)),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FormBuilder(
+      key: _formKey,
+      child: Column(
+        spacing: 24,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          InputTextField(
+            label: context.strings.emailAddress,
+            name: _Fields.email,
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(),
+              FormBuilderValidators.email(),
+            ]),
+          ),
+          InputTextField(
+            label: context.strings.password,
+            name: _Fields.password,
+            obscureText: true,
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(),
+            ]),
+          ),
+          PrimaryButton(
+            onPressed: _onSubmit,
+            child: Text(context.strings.signIn),
+          ),
+        ],
+      ),
+    );
+  }
+}
