@@ -25,7 +25,7 @@ func NewAuthorizationService(authDatabase AuthDatabase, ac accesscontrol.AccessC
 	}
 }
 
-func (service AuthorizationService) AuthorizedUser(ctx context.Context, kind string, action string, resourceID string) (string, error) {
+func (service AuthorizationService) AuthorizedUser(ctx context.Context, kind string, resourceID string, action string) (string, error) {
 	ctxu, err := models.GetUserContext(ctx)
 	if err != nil {
 		service.logger.Error("failed to get authorized user", log.WithError(err), log.WithCorrelationID(ctx), log.WithUserContext(ctx))

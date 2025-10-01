@@ -1,10 +1,11 @@
 {{ $product := . -}}
+{{ $apps := .Apps -}}
 
 version: '3'
 
-{{ if .Apps -}}
+{{ if $apps | NoneMobile -}}
 include:
-{{- range .Apps }}
+{{- range $app := $apps | NoneMobile }}
   - apps/{{ .AppNameDir }}/docker-compose.yml
 {{- end }}
 {{ end }}
