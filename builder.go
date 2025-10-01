@@ -70,6 +70,7 @@ func (builder Builder) addParsingFunctions(pm productmap.ProductMap) productmap.
 		"slist":           parsing.SList,
 		"IsID":            parsing.CreateIsID(types.Registered),
 		"NoneID":          parsing.CreateNoneID(types.Registered),
+		"NoneMobile":      parsing.NoneMobile,
 		"TableViewFilter": parsing.CreateTableViewFilter(types.Registered),
 		"IsUndefined":     parsing.CreateIsUndefined(types.Registered),
 		"IsBoolean":       parsing.CreateIsBoolean(types.Registered),

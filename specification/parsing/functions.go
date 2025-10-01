@@ -2,6 +2,7 @@ package parsing
 
 import (
 	"slices"
+	"strings"
 
 	"github.com/followthepattern/forgefy/specification"
 	"github.com/followthepattern/forgefy/specification/models"
@@ -35,6 +36,16 @@ func TypeCRUD(features []specification.Feature) []specification.Feature {
 
 	result := slices.DeleteFunc(copiedFields, func(e specification.Feature) bool {
 		return e.FeatureType == specification.CRUD
+	})
+
+	return result
+}
+
+func NoneMobile(apps []specification.App) []specification.App {
+	copiedFields := slices.Clone(apps)
+
+	result := slices.DeleteFunc(copiedFields, func(a specification.App) bool {
+		return strings.Contains(string(a.AppType), "mobile")
 	})
 
 	return result
