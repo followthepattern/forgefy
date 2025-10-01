@@ -1,0 +1,26 @@
+import 'package:{{ .AppName | LowerSnakeCase }}/app/account/user/graphql/query.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/account/user/model.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/graphql/list_query.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/graphql/list_response.dart';
+
+class UserListQuery extends ListQuery<User> {
+  UserListQuery({
+    required super.graphQLClient,
+    required super.queryProperties,
+  });
+
+  @override
+  String get query => getUsers;
+
+  @override
+  ListResponse<User> parseResult(Map<String, dynamic> data) {
+    return ListResponse(
+      count: data['users']['list']['count'],
+      pageSize: data['users']['list']['pageSize'],
+      page: data['users']['list']['page'],
+      data: data['users']['list']['data']
+          .map<User>((e) => User.fromJson(e))
+          .toList(),
+    );
+  }
+}

@@ -1,0 +1,91 @@
+import 'package:flutter/material.dart';
+
+const int pageSizeDefault = 10;
+const int pageDefault = 1;
+
+class QueryProperties extends ChangeNotifier {
+  QueryProperties({
+    int currentPage = pageDefault,
+    int pageSize = pageSizeDefault,
+    String? filter,
+    SortLabel? orderBy,
+  }) : _currentPage = currentPage,
+       _pageSize = pageSize,
+       _filter = filter,
+       _orderBy = orderBy;
+
+  int _currentPage;
+  final int _pageSize;
+  String? _filter;
+  SortLabel? _orderBy;
+
+  int get currentPage => _currentPage;
+  int get pageSize => _pageSize;
+  String? get filter => _filter;
+  SortLabel? get orderBy => _orderBy;
+
+  set currentPage(int page) {
+    _currentPage = page;
+    notifyListeners();
+  }
+
+  set filter(String? filter) {
+    _filter = filter;
+    notifyListeners();
+  }
+
+  set orderBy(SortLabel? orderBy) {
+    _orderBy = orderBy;
+    notifyListeners();
+  }
+}
+
+class SortLabel extends OrderBy {
+  const SortLabel({
+    required super.name,
+    required this.label,
+    super.desc = false,
+  });
+
+  final String label;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == runtimeType &&
+        other is SortLabel &&
+        name == other.name &&
+        desc == other.desc &&
+        label == other.label;
+  }
+
+  @override
+  int get hashCode => name.hashCode ^ desc.hashCode ^ label.hashCode;
+}
+
+class OrderBy {
+  const OrderBy({
+    required this.name,
+    this.desc = false,
+  });
+
+  final String name;
+  final bool desc;
+
+  @override
+  bool operator ==(Object other) {
+    return other.runtimeType == runtimeType &&
+        other is OrderBy &&
+        name == other.name &&
+        desc == other.desc;
+  }
+
+  @override
+  int get hashCode => name.hashCode ^ desc.hashCode;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'desc': desc,
+    };
+  }
+}

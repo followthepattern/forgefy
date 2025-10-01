@@ -1,0 +1,61 @@
+import 'package:{{ .AppName | LowerSnakeCase }}/app/account/account_layout.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/account/layouts/list_layout.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/account/user/user_list_page.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/auth/auth_layout.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/auth/login/login_page.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/lib/token_store.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
+
+GoRouter _router({Listenable? refreshListenable}) {
+  return GoRouter(
+    refreshListenable: refreshListenable,
+    redirect: (context, state) async {
+      final token = await context.read<TokenStore>().getToken();
+      if (token == null) {
+        return LoginPage.path;
+      }
+      if (state.uri.path == LoginPage.path || state.uri.path == '/') {
+        return UserListPage.path;
+      }
+      return null;
+    },
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (context, state) => AuthLayout(
+          child: const LoginPage(),
+        ),
+      ),
+      GoRoute(
+        path: LoginPage.path,
+        builder: (context, state) => AuthLayout(
+          child: const LoginPage(),
+        ),
+      ),
+      GoRoute(
+        path: UserListPage.path,
+        builder: (context, state) => AccountLayout(
+          child: const ListLayout(
+            child: UserListPage(),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+class RouterProvider extends SingleChildStatelessWidget {
+  const RouterProvider({super.key, super.child});
+
+  @override
+  Widget buildWithChild(BuildContext context, Widget? child) {
+    return Provider(
+      create: (context) =>
+          _router(refreshListenable: context.read<TokenStore>()),
+      child: child,
+    );
+  }
+}

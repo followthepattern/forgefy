@@ -9,6 +9,9 @@ apps:
   - name: frontend
     type: react-frontend
     backend: backend
+  - name: mobile
+    type: flutter-mobile
+    backend: backend
 features:
   - name: product
     fields:

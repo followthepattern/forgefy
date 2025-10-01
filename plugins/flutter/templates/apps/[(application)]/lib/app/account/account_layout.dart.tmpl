@@ -1,0 +1,35 @@
+import 'package:{{ .AppName | LowerSnakeCase }}/components/graphql_client_provider.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/lib/token_store.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+class AccountLayout extends StatelessWidget {
+  const AccountLayout({super.key, required this.child});
+
+  final Widget child;
+
+  void _onTokenError(BuildContext context) {
+    context.read<TokenStore>().deleteToken();
+
+    context.go('/');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: context.read<TokenStore>().getToken(),
+      builder: (context, asyncSnapshot) {
+        if (asyncSnapshot.hasData) {
+          return GraphQLClientProvider(
+            token: asyncSnapshot.data,
+            onTokenError: () => _onTokenError(context),
+            child: child,
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
+  }
+}

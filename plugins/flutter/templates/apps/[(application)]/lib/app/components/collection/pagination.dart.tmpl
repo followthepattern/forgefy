@@ -1,0 +1,127 @@
+import 'dart:math';
+
+import 'package:{{ .AppName | LowerSnakeCase }}/styles/colors.dart';
+import 'package:flutter/material.dart';
+
+final _arrowButtonStyle = ElevatedButton.styleFrom(
+  backgroundColor: white,
+  foregroundColor: black,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(8),
+    side: BorderSide(
+      color: gray,
+    ),
+  ),
+);
+
+class Pagination extends StatelessWidget {
+  const Pagination({
+    super.key,
+    required this.totalCount,
+    required this.currentPage,
+    required this.pageSize,
+    this.onPageChange,
+  });
+
+  final int totalCount;
+  final int currentPage;
+  final int pageSize;
+  final Function(int page)? onPageChange;
+
+  int get _numberOfTotalPages => (totalCount / pageSize).ceil();
+
+  List<int> get _paginationSymbols {
+    const pageNumberLimit = 5;
+    List<int> pagination = [];
+    const limitPerSide = pageNumberLimit ~/ 2;
+
+    final pageFrom = max(
+      min(
+        currentPage - limitPerSide,
+        _numberOfTotalPages - pageNumberLimit + 1,
+      ),
+      1,
+    );
+    final pageTo = min(pageFrom + pageNumberLimit - 1, _numberOfTotalPages);
+
+    for (var page = pageFrom; page <= pageTo; page++) {
+      pagination.add(page);
+    }
+
+    return pagination;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_numberOfTotalPages < 1) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      children: [
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 300),
+          opacity: currentPage > 1 ? 1 : 0,
+          child: AbsorbPointer(
+            absorbing: currentPage == 1,
+            child: IconButton(
+              style: _arrowButtonStyle,
+              onPressed: () => onPageChange?.call(currentPage - 1),
+              icon: Icon(Icons.arrow_back),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Center(
+            child: _PageSymbols(
+              paginationSymbols: _paginationSymbols,
+              currentPage: currentPage,
+              onPageChange: onPageChange,
+            ),
+          ),
+        ),
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 300),
+          opacity: currentPage < _numberOfTotalPages ? 1 : 0,
+          child: AbsorbPointer(
+            absorbing: currentPage == _numberOfTotalPages,
+            child: IconButton(
+              style: _arrowButtonStyle,
+              onPressed: () => onPageChange?.call(currentPage + 1),
+              icon: Icon(Icons.arrow_forward),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PageSymbols extends StatelessWidget {
+  const _PageSymbols({
+    required this.paginationSymbols,
+    required this.currentPage,
+    this.onPageChange,
+  });
+
+  final List<int> paginationSymbols;
+  final int currentPage;
+  final Function(int page)? onPageChange;
+
+  @override
+  Widget build(BuildContext context) {
+    return SegmentedButton<int>(
+      showSelectedIcon: false,
+      segments: paginationSymbols
+          .map(
+            (symbol) =>
+                ButtonSegment(value: symbol, label: Text(symbol.toString())),
+          )
+          .toList(),
+      selected: {currentPage},
+      onSelectionChanged: (value) {
+        onPageChange?.call(value.first);
+      },
+    );
+  }
+}

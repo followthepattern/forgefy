@@ -1,0 +1,23 @@
+import 'package:{{ .AppName | LowerSnakeCase }}/http/http_client.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
+
+class HttpClientProvider extends SingleChildStatelessWidget {
+  const HttpClientProvider({
+    super.key,
+    super.child,
+  });
+
+  HttpClient _createClient() {
+    return HttpClient();
+  }
+
+  @override
+  Widget buildWithChild(BuildContext context, Widget? child) {
+    return Provider(
+      create: (context) => _createClient(),
+      child: child,
+    );
+  }
+}

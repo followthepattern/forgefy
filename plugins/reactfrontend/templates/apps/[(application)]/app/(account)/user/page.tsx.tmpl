@@ -1,4 +1,5 @@
 import React, { useContext, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Id } from 'react-toastify';
 
 import Collection from '@/app/components/collection/collection';
@@ -16,39 +17,6 @@ import useListUser from './hooks/listUser';
 import { User } from './model';
 import useDeleteUser from './hooks/deleteUser';
 
-const columns = [
-  {
-    id: "email",
-    name: "Email",
-  },
-  {
-    id: "firstName",
-    name: "First Name",
-  }, {
-    id: "lastName",
-    name: "Last Name",
-  }]
-
-const orderByLabels: SortLabel[] = [{
-  name: "id",
-  label: "Id",
-  desc: false,
-},
-{
-  name: "email",
-  label: "Email",
-  desc: false,
-},
-{
-  name: "first_name",
-  label: "First Name",
-  desc: false,
-}, {
-  name: "last_name",
-  label: "Last Name",
-  desc: false,
-}];
-
 function viewLink(value: User): string {
   return `/user/${value.id}`
 }
@@ -58,6 +26,31 @@ function editLink(value: User): string {
 }
 
 export default function UserList() {
+  const { t } = useTranslation();
+  
+  const orderByLabels: SortLabel[] = [
+    {
+      name: "id",
+      label: t('common.id'),
+      desc: false,
+    },
+    {
+      name: "email",
+      label: t('user.email'),
+      desc: false,
+    },
+    {
+      name: "first_name",
+      label: t('user.firstName'),
+      desc: false,
+    },
+    {
+      name: "last_name",
+      label: t('user.lastName'),
+      desc: false,
+    }
+  ];
+
   return (
     <ListView
       resourceName={RESOURCE_NAME}
@@ -70,7 +63,22 @@ export default function UserList() {
 }
 
 function UserListComponent() {
+  const { t } = useTranslation();
   const queryProps = useContext(QueryContext);
+
+  const columns = [
+    {
+      id: "email",
+      name: t('user.email'),
+    },
+    {
+      id: "firstName",
+      name: t('user.firstName'),
+    }, {
+      id: "lastName",
+      name: t('user.lastName'),
+    }
+  ];
 
   const [executeQuery, { data, error, loading, itemNotFound, called }] = useListUser();
 
@@ -124,7 +132,7 @@ function UserListComponent() {
   }
 
   if (itemNotFound) {
-    return <div>Item not found</div>
+    return <div>{t('common.itemNotFound')}</div>
   }
 
   const items = data.data ?? [];

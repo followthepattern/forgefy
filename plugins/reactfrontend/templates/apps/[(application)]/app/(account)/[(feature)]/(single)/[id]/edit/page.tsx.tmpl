@@ -6,6 +6,7 @@ import { Id } from "react-toastify";
 
 import SingleLayout from "@/app/(account)/components/singleView/layout";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
+import TertiaryButton from "@/app/components/buttons/tertiaryButton";
 import CancelModal from "@/app/components/modals/cancelModal";
 import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
 import { saveToast, deleteToast, upsertToastError, upsertToastSuccess } from "@/app/(account)/components/toastContainer/toasts";
@@ -274,7 +275,7 @@ export default function {{ $feature.FeatureName | UpperCamelCase }}Edit() {
                         </CancelModal>
                     </div>
                     <ConfirmModal onConfirm={onDelete} title="Delete {{ .FeatureHumanReadableName }}" body={`Are you sure you want to delete ${data?.id}?`}>
-                        Delete
+                        <TertiaryButton>Delete</TertiaryButton>
                     </ConfirmModal>
                 </SingleLayout.Footer>
             </form>

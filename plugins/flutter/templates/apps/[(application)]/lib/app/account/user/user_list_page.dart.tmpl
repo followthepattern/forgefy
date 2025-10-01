@@ -1,0 +1,98 @@
+import 'package:{{ .AppName | LowerSnakeCase }}/app/account/components/list_view/resource_list_view.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/account/components/skeletons/card_collection_skeleton.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/account/general_error.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/account/lib/query_properties.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/account/user/lib/user_list_query.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/account/user/model.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/app/components/collection/card_collection.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/styles/colors.dart';
+import 'package:flutter/material.dart';
+import 'package:graphql/client.dart';
+import 'package:provider/provider.dart';
+
+final _columns = [
+  ColumnLabel<User>(name: 'Email', getValue: (user) => user.email ?? ''),
+  ColumnLabel<User>(
+    name: 'First Name',
+    getValue: (user) => user.firstName ?? '',
+  ),
+  ColumnLabel<User>(
+    name: 'Last Name',
+    getValue: (user) => user.lastName ?? '',
+  ),
+];
+
+final _orderByLabels = [
+  SortLabel(name: 'id', label: 'Id', desc: false),
+  SortLabel(name: 'email', label: 'Email', desc: false),
+  SortLabel(name: 'first_name', label: 'First Name', desc: false),
+  SortLabel(name: 'last_name', label: 'Last Name', desc: false),
+];
+
+class UserListPage extends StatelessWidget {
+  static const path = '/user';
+
+  const UserListPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      lazy: false,
+      create: (context) => UserListQuery(
+        graphQLClient: context.read<GraphQLClient>(),
+        queryProperties: context.read<QueryProperties>(),
+      )..init(),
+      child: Scaffold(
+        backgroundColor: white,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _UserList(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UserList extends StatelessWidget {
+  const _UserList();
+
+  @override
+  Widget build(BuildContext context) {
+    final items = context.watch<UserListQuery>().data;
+    final totalCount = context.watch<UserListQuery>().count;
+    final isLoading = context.watch<UserListQuery>().isLoading;
+    final hasError = context.watch<UserListQuery>().hasError;
+
+    final currentPage = context.select<QueryProperties, int>(
+      (queryProps) => queryProps.currentPage,
+    );
+    final pageSize = context.select<QueryProperties, int>(
+      (queryProps) => queryProps.pageSize,
+    );
+
+    if (hasError) {
+      return Center(
+        child: const GeneralError(),
+      );
+    }
+
+    final content = isLoading
+        ? CardCollectionSkeleton()
+        : CardCollection(
+            columns: _columns,
+            items: items,
+            totalCount: totalCount,
+            currentPage: currentPage,
+            pageSize: pageSize,
+          );
+
+    return ResourceListView(
+      resourceName: 'Users',
+      resourceUrl: 'user',
+      orderByLabels: _orderByLabels,
+      child: content,
+    );
+  }
+}

@@ -1,0 +1,23 @@
+import 'package:{{ .AppName | LowerSnakeCase }}/lib/extensions.dart';
+import 'package:{{ .AppName | LowerSnakeCase }}/styles/theme.dart';
+import 'package:flutter/material.dart';
+
+class NewResourceLink extends StatelessWidget {
+  const NewResourceLink({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: () {},
+      style: primaryButtonStyle.copyWith(
+        textStyle: WidgetStateProperty.all(
+          TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      label: Text(context.strings.newResource),
+      icon: Icon(Icons.add),
+    );
+  }
+}

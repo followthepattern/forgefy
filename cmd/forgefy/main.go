@@ -10,6 +10,7 @@ import (
 
 	"github.com/followthepattern/forgefy"
 	"github.com/followthepattern/forgefy/forgeio"
+	"github.com/followthepattern/forgefy/plugins/flutter"
 	"github.com/followthepattern/forgefy/plugins/gobackend"
 	"github.com/followthepattern/forgefy/plugins/monorepo"
 	"github.com/followthepattern/forgefy/plugins/reactfrontend"
@@ -76,7 +77,7 @@ func main() {
 
 	f := forgefy.New()
 
-	f.InstallPlugins(monorepo.MonoRepo{}, gobackend.Plugin{}, reactfrontend.Plugin{})
+	f.InstallPlugins(monorepo.MonoRepo{}, gobackend.Plugin{}, reactfrontend.Plugin{}, flutter.Plugin{})
 
 	fw := forgeio.NewFileWriter(outputDir)
 
