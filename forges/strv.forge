@@ -13,7 +13,7 @@ apps:
 features:
   - name: athlete_profile
     fields:
-      - user_id: 
+      - name: user_id
         type: id
       - name: age
         type: number
@@ -22,9 +22,19 @@ features:
       - name: body_weight
   - name: coach_profile
     fields:
-      - user_id:
+      - name: user_id
         type: id
       - name: bio
         type: text
       - name: website_url
-        type: text 
+        type: text
+  - name: organizations
+    fields:
+      - name: id
+        type: id
+      - name: name
+        type: text
+      - name: kind
+        type: string
+      - name: owner_user_id
+        type: id
