@@ -11,41 +11,20 @@ apps:
     backend: strv
     brand_color_rgb: "4, 47, 46"
 features:
-  - name: tracking
+  - name: athlete_profile
     fields:
-      - name: Id
+      - user_id: 
         type: id
-      - name: Name
-        type: string
-      - name: Type
-        type: string
-      - name: Price
+      - name: age
         type: number
-      - name: Active
-        type: boolean
-      - name: Published
-        type: date
-      - name: Publish Time
-        type: time
-      - name: Description
+      - name: height
+        type: number
+      - name: body_weight
+  - name: coach_profile
+    fields:
+      - user_id:
+        type: id
+      - name: bio
         type: text
-      - name: Photo
-        type: file
-  - name: calories
-    fields:
-      - name: Id
-        type: id
-      - name: Name
-        type: string
-        nullable: false
-      - name: Description
-        type: string
-        nullable: false
-  - name: body weight
-    fields:
-      - name: Id
-        type: id
-      - name: Type
-        type: string
-      - name: Extension
-        type: string
+      - name: website_url
+        type: text 
