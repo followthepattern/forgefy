@@ -38,3 +38,13 @@ features:
         type: string
       - name: owner_user_id
         type: id
+  - name: organization_members
+    fields:
+      - name: org_id
+        type: id
+      - name: user_id
+        type: id
+      - name: role
+        type: string
+      - name: status
+        type: string
