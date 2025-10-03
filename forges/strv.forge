@@ -28,7 +28,7 @@ features:
         type: text
       - name: website_url
         type: text
-  - name: organizations
+  - name: organization
     fields:
       - name: id
         type: id
@@ -38,7 +38,7 @@ features:
         type: string
       - name: owner_user_id
         type: id
-  - name: organization_members
+  - name: organization_member
     fields:
       - name: org_id
         type: id
