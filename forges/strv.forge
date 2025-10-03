@@ -48,3 +48,107 @@ features:
         type: string
       - name: status
         type: string
+  - name: bodybuilding_plan_template
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: name
+        type: string
+      - name: category
+        type: string
+      - name: version
+        type: number
+      - name: status
+        type: string
+      - name: metadata
+        type: text
+      - name: content
+        type: text
+  - name: bodybuilding_plan_program
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: template_id
+        type: id
+      - name: name
+        type: text
+      - name: weeks
+        type: number
+      - name: personalization
+        type: text
+  - name: bodybuilding_plan_block
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: program_id
+        type: id
+      - name: block_index
+        type: number
+      - name: length_days
+        type: number
+      - name: start_offset_days
+        type: number
+  - name: bodybuilding_plan_session
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: block_id
+        type: id
+      - name: session_index
+        type: number
+      - name: days_offset
+        type: number
+      - name: name
+        type: string
+      - name: notes
+        type: text
+  - name: bodybuilding_plan_exercise
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: session_id
+        type: id
+      - name: order_index
+        type: number
+      - name: exercise_key
+        type: string
+      - name: target_sets
+        type: number
+      - name: target_reps
+        type: string
+      - name: target_load
+        type: number
+      - name: target_rpe
+        type: number
+      - name: rest_sec
+        type: number
+      - name: notes
+        type: text
+  - name: plan_assignment
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: program_id
+        type: id
+      - name: athlete_user_id
+        type: id
+      - name: coach_user_id
+        type: id
+      - name: start_date
+        type: date
+      - name: status
+        type: string
+      - name: tz
+        type: string
