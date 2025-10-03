@@ -152,3 +152,29 @@ features:
         type: string
       - name: tz
         type: string
+  - name: assignment_schedule_rules
+    fields:
+      - name: id
+        type: id
+      - name: assignment_id
+        type: id
+      - name: session_id
+        type: id
+      - name: rule
+        type: text
+  - name: assignment_session_exceptions
+    fields:
+      - name: id
+        type: id
+      - name: assignment_id
+        type: id
+      - name: session_id
+        type: id
+      - name: original_date
+        type: date
+      - name: status
+        type: text
+      - name: new_date
+        type: date
+      - name: note
+        type: text
