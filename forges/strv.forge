@@ -178,3 +178,45 @@ features:
         type: date
       - name: note
         type: text
+  - name: workout_entries
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: assignment_id
+        type: id
+      - name: program_id
+        type: id
+      - name: session_id
+        type: id
+      - name: scheduled_date
+        type: date
+      - name: performed_at
+        type: date
+      - name: rpe_session
+        type: number
+      - name: notes
+        type: text
+  - name: set_entries
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: workout_entry_id
+        type: id
+      - name: exercise_id
+        type: id
+      - name: set_index
+        type: number
+      - name: load_kg
+        type: number
+      - name: reps
+        type: number
+      - name: rpe
+        type: number
+      - name: rest_sec
+        type: number
+      - name: completed
+        type: boolean
