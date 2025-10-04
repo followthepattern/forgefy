@@ -4,11 +4,11 @@ product_name: "Strive"
 monitoring: true
 vscode: true
 apps:
-  - name: strv
+  - name: backend
     type: go-backend
   - name: frontend
     type: react-frontend
-    backend: strv
+    backend: backend
     brand_color_rgb: "4, 47, 46"
 features:
   - name: athlete_profile
