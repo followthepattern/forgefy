@@ -20,6 +20,7 @@ features:
       - name: height
         type: number
       - name: body_weight
+        type: number
   - name: coach_profile
     fields:
       - name: user_id
