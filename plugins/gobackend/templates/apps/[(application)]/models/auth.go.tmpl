@@ -27,10 +27,10 @@ type LoginResponse struct {
 }
 
 type RegisterRequestParams struct {
-	Email     types.String `json:"email"`
-	FirstName types.String `json:"first_name"`
-	LastName  types.String `json:"last_name"`
-	Password  types.String `json:"password"`
+	Email     types.String
+	FirstName types.String
+	LastName  types.String
+	Password  types.String
 }
 
 func (r RegisterRequestParams) Validate() error {
@@ -44,8 +44,8 @@ func (r RegisterRequestParams) Validate() error {
 
 type RegisterResponse struct {
 	Email     types.String `json:"email"`
-	FirstName types.String `json:"first_name"`
-	LastName  types.String `json:"last_name"`
+	FirstName types.String `json:"firstName"`
+	LastName  types.String `json:"lastName"`
 }
 
 type Password struct {

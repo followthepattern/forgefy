@@ -78,12 +78,6 @@ func (service AuthenticationService) Login(ctx context.Context, email types.Stri
 }
 
 func (service AuthenticationService) Register(ctx context.Context, register models.RegisterRequestParams) (*models.RegisterResponse, error) {
-	_, err := models.GetUserContext(ctx)
-	if err != nil {
-		service.logger.Error("failed to receive user context", log.WithError(err), log.WithCorrelationID(ctx))
-		return nil, err
-	}
-
 	valid, err := service.authDatabase.VerifyEmail(register.Email)
 	if err != nil {
 		service.logger.Error("failed to verify email", log.WithError(err), log.WithCorrelationID(ctx))
