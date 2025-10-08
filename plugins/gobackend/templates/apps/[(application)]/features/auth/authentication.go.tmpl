@@ -146,7 +146,7 @@ func GenerateTokenStringFromUser(model models.UserModel, privateKey crypto.Priva
 }
 
 func GetActivationMailTemplate(cfg config.Config, userID types.String, email types.String) models.Mail {
-	activationLink := fmt.Sprintf("%s/users/activate/%s", cfg.Organization.Url, userID)
+	activationLink := fmt.Sprintf("%s/auth/activate/%s", cfg.Organization.Url, userID)
 
 	from := fmt.Sprintf("%s <%s>", cfg.Organization.Name, cfg.Organization.Email)
 

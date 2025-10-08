@@ -34,7 +34,7 @@ func (service Mail) SendMail(mail models.Mail) error {
 	service.email.SetHTML(mail.HTML)
 
 	err := service.email.
-		Send(service.cfg.Organization.Name,
+		Send(service.cfg.Mail.Addr,
 			smtp.PlainAuth("",
 				mailCfg.Username,
 				mailCfg.Password,
