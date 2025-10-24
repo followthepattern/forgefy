@@ -29,6 +29,7 @@ func main() {
 	var file string
 	var outputDir string
 	var exclude string
+	var include string
 	var cleanUp bool
 
 	var root = &cobra.Command{
@@ -51,7 +52,8 @@ func main() {
 
 	root.Flags().StringVarP(&file, "file", "f", "", "filepath to the forge file")
 	root.Flags().StringVarP(&outputDir, "output", "o", "", "output directory path")
-	root.Flags().StringVarP(&exclude, "exclude", "i", "", "specify regex to exclude certain files from forging")
+	root.Flags().StringVarP(&exclude, "exclude", "e", "", "specify regex to exclude certain files from forging")
+	root.Flags().StringVarP(&include, "include", "i", "", "specify regex to include certain files from forging")
 	root.Flags().BoolVarP(&cleanUp, "cleanup", "c", false, "set to true if you want to delete the previous forge")
 
 	if err := root.Execute(); err != nil {

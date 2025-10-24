@@ -65,7 +65,7 @@ func (f Forgefy) Forge(yaml string, fw forgeio.Writer, opts ...ForgeConfigOption
 	}
 
 	if len(forgeConfig.includeFiles) != 0 {
-		product.Exclude(forgeConfig.includeFiles)
+		product.Include(forgeConfig.includeFiles)
 	}
 
 	if len(forgeConfig.excludeFiles) != 0 {
