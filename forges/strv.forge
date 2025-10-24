@@ -1,0 +1,223 @@
+
+version: 0
+product_name: "Strive"
+monitoring: true
+vscode: true
+apps:
+  - name: backend
+    type: go-backend
+  - name: frontend
+    type: react-frontend
+    backend: backend
+    brand_color_rgb: "4, 47, 46"
+features:
+  - name: athlete_profile
+    fields:
+      - name: user_id
+        type: id
+      - name: age
+        type: number
+      - name: height
+        type: number
+      - name: body_weight
+        type: number
+  - name: coach_profile
+    fields:
+      - name: user_id
+        type: id
+      - name: bio
+        type: text
+      - name: website_url
+        type: text
+  - name: organization
+    fields:
+      - name: id
+        type: id
+      - name: name
+        type: text
+      - name: kind
+        type: string
+      - name: owner_user_id
+        type: id
+  - name: organization_member
+    fields:
+      - name: org_id
+        type: id
+      - name: user_id
+        type: id
+      - name: role
+        type: string
+      - name: status
+        type: string
+  - name: bodybuilding_plan_template
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: name
+        type: string
+      - name: category
+        type: string
+      - name: version
+        type: number
+      - name: status
+        type: string
+      - name: metadata
+        type: text
+      - name: content
+        type: text
+  - name: bodybuilding_plan_program
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: template_id
+        type: id
+      - name: name
+        type: text
+      - name: weeks
+        type: number
+      - name: personalization
+        type: text
+  - name: bodybuilding_plan_block
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: program_id
+        type: id
+      - name: block_index
+        type: number
+      - name: length_days
+        type: number
+      - name: start_offset_days
+        type: number
+  - name: bodybuilding_plan_session
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: block_id
+        type: id
+      - name: session_index
+        type: number
+      - name: days_offset
+        type: number
+      - name: name
+        type: string
+      - name: notes
+        type: text
+  - name: bodybuilding_plan_exercise
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: session_id
+        type: id
+      - name: order_index
+        type: number
+      - name: exercise_key
+        type: string
+      - name: target_sets
+        type: number
+      - name: target_reps
+        type: string
+      - name: target_load
+        type: number
+      - name: target_rpe
+        type: number
+      - name: rest_sec
+        type: number
+      - name: notes
+        type: text
+  - name: plan_assignment
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: program_id
+        type: id
+      - name: athlete_user_id
+        type: id
+      - name: coach_user_id
+        type: id
+      - name: start_date
+        type: date
+      - name: status
+        type: string
+      - name: tz
+        type: string
+  - name: assignment_schedule_rules
+    fields:
+      - name: id
+        type: id
+      - name: assignment_id
+        type: id
+      - name: session_id
+        type: id
+      - name: rule
+        type: text
+  - name: assignment_session_exceptions
+    fields:
+      - name: id
+        type: id
+      - name: assignment_id
+        type: id
+      - name: session_id
+        type: id
+      - name: original_date
+        type: date
+      - name: status
+        type: text
+      - name: new_date
+        type: date
+      - name: note
+        type: text
+  - name: workout_entries
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: assignment_id
+        type: id
+      - name: program_id
+        type: id
+      - name: session_id
+        type: id
+      - name: scheduled_date
+        type: date
+      - name: performed_at
+        type: date
+      - name: rpe_session
+        type: number
+      - name: notes
+        type: text
+  - name: set_entries
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: workout_entry_id
+        type: id
+      - name: exercise_id
+        type: id
+      - name: set_index
+        type: number
+      - name: load_kg
+        type: number
+      - name: reps
+        type: number
+      - name: rpe
+        type: number
+      - name: rest_sec
+        type: number
+      - name: completed
+        type: boolean
