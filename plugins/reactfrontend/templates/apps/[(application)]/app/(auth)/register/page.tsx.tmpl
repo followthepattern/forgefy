@@ -1,7 +1,8 @@
-import { gql, useMutation } from "@apollo/client";
-import { register as r } from "../graphql/register";
-import { SubmitHandler, UseFormRegister, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { ErrorParser } from "@/lib/errorParser";
+import { usePost } from "@/http/usePost";
+import { BACKEND_URL } from "@/lib/config";
+import { RegisterResponse } from "./model";
 
 type FormValues = {
     email: string;
@@ -17,8 +18,10 @@ interface ContainerProperties {
 
 function Container(props: ContainerProperties) {
     return (
-        <div className="flex flex-col justify-center min-h-full px-6 py-8 md:py-12 lg:px-8">
-            {props.children}
+        <div className="flex flex-col justify-center max-w-xl min-h-full p-2 sm:mx-auto">
+            <div className="p-4 bg-white rounded-lg">
+                {props.children}
+            </div>
         </div>
     )
 }
@@ -44,33 +47,34 @@ export default function Register() {
         handleSubmit
     } = useForm<FormValues>();
 
-    const [executeRegister, { data, called, loading, error }] = useMutation(gql(r), { errorPolicy: "all" });
+    const { post, data, error, loading } = usePost<RegisterResponse>();
+
+    const url = `${BACKEND_URL}/auth/register`;
 
     const onSubmit: SubmitHandler<FormValues> = (formValues) => {
-        executeRegister({
-            variables: {
-                email: formValues.email,
-                firstName: formValues.firstName,
-                lastName: formValues.lastName,
-                password: formValues.password,
-            },
-        });
+        post(
+            url, {
+                body: formValues,
+            }
+        );
     };
 
-    if (called && loading) {
+    if (loading) {
         return <p>Loading...</p>
     }
 
+    console.info("data", data)
 
-    if (called && data?.authentication?.register) {
+    if (data?.firstName && data?.lastName) {
         return (
             <Container>
                 <Title>
-                    Registration Completed!
+                    Welcome, {data.firstName} {data.lastName}!
                 </Title>
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                     <h1 className="mt-10 text-xl text-center text-gray-primary">
-                        Check your emails
+                        Your account has been created successfully.
+                        Check your email for verifying your account.
                     </h1>
                 </div>
             </Container>
@@ -170,12 +174,12 @@ export default function Register() {
                     <div>
                         <button
                             type="submit"
-                            className="w-full px-3 py-3 text-sm font-semibold text-white bg-brand rounded-md shadow-sm mx:auto hover:bg-brand-hover focus:bg-brand-active"
+                            className="w-full px-3 py-3 text-sm font-semibold text-white rounded-md shadow-sm bg-brand mx:auto hover:bg-brand-hover focus:bg-brand-active"
                         >
                             Sign Up
                         </button>
                         {error && <p className="mt-2 text-sm font-bold text-error">
-                            {ErrorParser(error.message)}
+                            {ErrorParser(error)}
                         </p>}
                         {errors && <p className="mt-2 text-sm font-bold text-error">
                             {errors.password ? "Passwords do not match" : ""}

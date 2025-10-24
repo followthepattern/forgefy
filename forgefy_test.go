@@ -9,9 +9,11 @@ import (
 )
 
 var _ = Describe("Forgefy", func() {
-	var (
+	var dummyWriter forgeio.DummyWriter
+
+	BeforeEach(func() {
 		dummyWriter = forgeio.NewDummyWriter()
-	)
+	})
 
 	Context("No plugin Forge", func() {
 		var (
@@ -31,6 +33,38 @@ product_name: "test product"
 			Expect(productName).Should(Equal("test product"))
 
 			Expect(dummyWriter).Should(forgeio.ContainFiles("docker-compose.yml"))
+		})
+	})
+
+	Context("No plugin Forge with Include", func() {
+		var (
+			yaml = `
+version: 0
+product_name: "test product"
+`
+		)
+
+		It("forges only included files", func() {
+			f := forgefy.New()
+
+			f.InstallPlugins(monorepo.MonoRepo{})
+
+			includeFiles := map[string]struct{}{
+				"tests/go.mod": {},
+			}
+
+			productName, err := f.Forge(
+				yaml,
+				&dummyWriter,
+				forgefy.WithIncludedFiles(includeFiles),
+			)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(productName).To(Equal("test product"))
+
+			Expect(dummyWriter).To(forgeio.ContainFiles("tests/go.mod"))
+
+			Expect(dummyWriter).NotTo(forgeio.ContainFiles("docker-compose.yml"))
+
 		})
 	})
 })

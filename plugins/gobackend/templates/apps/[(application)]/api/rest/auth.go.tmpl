@@ -19,6 +19,7 @@ func NewAuth(auth auth.AuthRest) AuthHandler {
 	r.Route("/", func(r chi.Router) {
 		r.Get("/activate/{userID}", auth.ActivateUser)
 		r.Post("/login", auth.Login)
+		r.Post("/register", auth.Register)
 	})
 
 	return r

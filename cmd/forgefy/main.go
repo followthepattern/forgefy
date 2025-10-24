@@ -29,6 +29,7 @@ func main() {
 	var file string
 	var outputDir string
 	var exclude string
+	var include string
 	var cleanUp bool
 
 	var root = &cobra.Command{
@@ -51,7 +52,8 @@ func main() {
 
 	root.Flags().StringVarP(&file, "file", "f", "", "filepath to the forge file")
 	root.Flags().StringVarP(&outputDir, "output", "o", "", "output directory path")
-	root.Flags().StringVarP(&exclude, "exclude", "i", "", "specify regex to exclude certain files from forging")
+	root.Flags().StringVarP(&exclude, "exclude", "e", "", "specify regex to exclude certain files from forging")
+	root.Flags().StringVarP(&include, "include", "i", "", "specify regex to include certain files from forging")
 	root.Flags().BoolVarP(&cleanUp, "cleanup", "c", false, "set to true if you want to delete the previous forge")
 
 	if err := root.Execute(); err != nil {
@@ -60,6 +62,7 @@ func main() {
 	}
 
 	excludedFiles := createExcludeMap(exclude)
+	includedFiles := createIncludeMap("")
 
 	if _, err := os.Stat(outputDir); !os.IsNotExist(err) && cleanUp {
 		err := remove(outputDir, excludedFiles)
@@ -86,7 +89,8 @@ func main() {
 	productName, err := f.Forge(
 		string(forgeFile),
 		fw,
-		forgefy.WithExcludedFiles(excludedFiles))
+		forgefy.WithExcludedFiles(excludedFiles),
+		forgefy.WithIncludedFiles(includedFiles))
 
 	if err != nil {
 		slog.Error("during forging error occured", slog.String("error", err.Error()))
@@ -106,6 +110,17 @@ func createExcludeMap(exclude string) map[string]struct{} {
 	}
 
 	return excludedFiles
+}
+
+func createIncludeMap(include string) map[string]struct{} {
+	patterns := strings.Split(include, ",")
+
+	includedFiles := make(map[string]struct{})
+	for _, pattern := range patterns {
+		includedFiles[pattern] = struct{}{}
+	}
+
+	return includedFiles
 }
 
 func remove(projectPath string, excludedFiles map[string]struct{}) error {
