@@ -19,6 +19,7 @@ func New() Forgefy {
 }
 
 type ForgeConfging struct {
+	includeFiles map[string]struct{}
 	excludeFiles map[string]struct{}
 }
 
@@ -35,6 +36,12 @@ func (fn ForgeConfigOptionFn) apply(f *ForgeConfging) {
 func WithExcludedFiles(excludedFiles map[string]struct{}) ForgeConfigOption {
 	return ForgeConfigOptionFn(func(f *ForgeConfging) {
 		f.excludeFiles = excludedFiles
+	})
+}
+
+func WithIncludedFiles(includedFiles map[string]struct{}) ForgeConfigOption {
+	return ForgeConfigOptionFn(func(f *ForgeConfging) {
+		f.includeFiles = includedFiles
 	})
 }
 
@@ -55,6 +62,10 @@ func (f Forgefy) Forge(yaml string, fw forgeio.Writer, opts ...ForgeConfigOption
 	product, err := builder.Build()
 	if err != nil {
 		return productSpecification.Name, err
+	}
+
+	if len(forgeConfig.includeFiles) != 0 {
+		product.Exclude(forgeConfig.includeFiles)
 	}
 
 	if len(forgeConfig.excludeFiles) != 0 {

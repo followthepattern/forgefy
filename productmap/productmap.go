@@ -58,6 +58,13 @@ func (pm *ProductMap) Walk(fn WalkFn) error {
 	return nil
 }
 
+func (pm *ProductMap) Include(includeFiles map[string]struct{}) {
+	maps.DeleteFunc(pm.files, func(key string, _ File) bool {
+		_, ok := includeFiles[key]
+		return !ok
+	})
+}
+
 func (pm *ProductMap) Exclude(excludedFiles map[string]struct{}) {
 	maps.DeleteFunc(pm.files, func(key string, _ File) bool {
 		_, ok := excludedFiles[key]
