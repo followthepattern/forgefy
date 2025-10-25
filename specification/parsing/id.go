@@ -32,7 +32,7 @@ func CreateNoneID(t types.TypeRegistry) func([]models.Field) []models.Field {
 		copiedFields := slices.Clone(f)
 
 		return slices.DeleteFunc(copiedFields, func(e models.Field) bool {
-			return t.GetType(e.Type) == types.ID
+			return t.GetType(e.Type) == types.ID && e.Name == "id"
 		})
 	}
 }
