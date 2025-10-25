@@ -3,6 +3,7 @@ package productmap
 import (
 	"fmt"
 	"maps"
+	"strings"
 	"text/template"
 )
 
@@ -60,8 +61,14 @@ func (pm *ProductMap) Walk(fn WalkFn) error {
 
 func (pm *ProductMap) Include(includeFiles map[string]struct{}) {
 	maps.DeleteFunc(pm.files, func(key string, _ File) bool {
-		_, ok := includeFiles[key]
-		return !ok
+		for includeKey := range includeFiles {
+			if strings.HasPrefix(key, includeKey) {
+				return false
+			}
+
+		}
+
+		return true
 	})
 }
 

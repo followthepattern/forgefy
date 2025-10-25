@@ -62,7 +62,7 @@ func main() {
 	}
 
 	excludedFiles := createExcludeMap(exclude)
-	includedFiles := createIncludeMap("")
+	includedFiles := createIncludeMap(include)
 
 	if _, err := os.Stat(outputDir); !os.IsNotExist(err) && cleanUp {
 		err := remove(outputDir, excludedFiles)
@@ -86,11 +86,16 @@ func main() {
 
 	forgeStart := time.Now()
 
+	opts := []forgefy.ForgeConfigOption{forgefy.WithExcludedFiles(excludedFiles)}
+
+	if len(includedFiles) > 0 {
+		opts = append(opts, forgefy.WithIncludedFiles(includedFiles))
+	}
+
 	productName, err := f.Forge(
 		string(forgeFile),
 		fw,
-		forgefy.WithExcludedFiles(excludedFiles),
-		forgefy.WithIncludedFiles(includedFiles))
+		opts...)
 
 	if err != nil {
 		slog.Error("during forging error occured", slog.String("error", err.Error()))
@@ -102,6 +107,9 @@ func main() {
 }
 
 func createExcludeMap(exclude string) map[string]struct{} {
+	if len(exclude) == 0 {
+		return map[string]struct{}{}
+	}
 	exceptions := strings.Split(exclude, ",")
 
 	excludedFiles := make(map[string]struct{})
@@ -113,6 +121,10 @@ func createExcludeMap(exclude string) map[string]struct{} {
 }
 
 func createIncludeMap(include string) map[string]struct{} {
+	if len(include) == 0 {
+		return map[string]struct{}{}
+	}
+
 	patterns := strings.Split(include, ",")
 
 	includedFiles := make(map[string]struct{})
