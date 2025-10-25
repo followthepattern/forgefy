@@ -179,7 +179,7 @@ features:
         type: date
       - name: note
         type: text
-  - name: workout_entries
+  - name: exercise_entry
     fields:
       - name: id
         type: id
@@ -191,6 +191,10 @@ features:
         type: id
       - name: session_id
         type: id
+      - name: session_entry_id
+        type: id
+      - name: exercise_name
+        type: string
       - name: scheduled_date
         type: date
       - name: performed_at
@@ -221,3 +225,23 @@ features:
         type: number
       - name: completed
         type: boolean
+  - name: session_entry
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: assignment_id
+        type: id
+      - name: program_id
+        type: id
+      - name: plan_session_id
+        type: id
+      - name: session_name
+        type: string
+      - name: started_at
+        type: datetime
+      - name: rpe_session
+        type: number
+      - name: notes
+        type: text
