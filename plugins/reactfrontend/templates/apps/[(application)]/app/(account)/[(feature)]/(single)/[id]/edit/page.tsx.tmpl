@@ -1,48 +1,23 @@
 {{ $feature := . -}}
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
 import { Id } from "react-toastify";
 
 import SingleLayout from "@/app/(account)/components/singleView/layout";
 import PrimaryButton from "@/app/components/buttons/primaryButton";
 import TertiaryButton from "@/app/components/buttons/tertiaryButton";
 import CancelModal from "@/app/components/modals/cancelModal";
-import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
 import { saveToast, deleteToast, upsertToastError, upsertToastSuccess } from "@/app/(account)/components/toastContainer/toasts";
 import LoadingSingleItem from "@/app/(account)/components/singleView/loadingSingleItem";
 import ItemNotFound from "@/app/(account)/components/singleView/itemNotFound";
 import Error from "@/app/(account)/error";
-import Label from "@/app/(account)/components/labels/label";
-import InputField from "@/app/components/inputs/inputField";
-
-{{- if $feature | HasBoolean -}}
-import Checkbox from "@/app/components/inputs/checkboxField";
-{{ end -}}
-{{if $feature | HasNumber -}}
-import NumberField from "@/app/components/inputs/numberField";
-{{ end -}}
-{{if $feature | HasText -}}
-import TextareaField from "@/app/components/inputs/textareaField";
-{{ end -}}
-{{if $feature | HasTime -}}
-import TimeField from "@/app/components/inputs/timeField";
-{{ end -}}
-{{if $feature | HasDate -}}
-import DateField from "@/app/components/inputs/dateField";
-{{ end -}}
-{{if $feature | HasFile -}}
-import FileField from "@/app/components/inputs/fileField";
-{{ end }}
 import ConfirmModal from "@/app/(account)/components/modals/confirmModal";
 
 import useSingle{{ $feature.FeatureName | UpperCamelCase }} from "../../../hooks/single{{ $feature.FeatureName | UpperCamelCase }}";
 import useUpdate{{ $feature.FeatureName | UpperCamelCase }} from "../../../hooks/update{{ $feature.FeatureName | UpperCamelCase }}";
 import useDelete{{ $feature.FeatureName | UpperCamelCase }} from "../../../hooks/delete{{ $feature.FeatureName | UpperCamelCase }}";
+import {{ $feature.FeatureName | UpperCamelCase }}EditForm from "../components/{{ $feature.FeatureName | LowerCamelCase }}Form";
 
-{{if $feature | HasFile -}}
-import { RESOURCE_NAME } from "../../../const";
-{{ end -}}
 import { RESOURCE_URL } from "../../../const";
 import { {{ $feature.FeatureName | UpperCamelCase }} } from "../../../model";
 

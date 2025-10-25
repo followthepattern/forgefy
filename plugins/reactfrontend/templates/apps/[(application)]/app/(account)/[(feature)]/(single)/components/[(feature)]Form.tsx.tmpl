@@ -1,0 +1,175 @@
+{{ $feature := . -}}
+import React from "react";
+import { useForm } from "react-hook-form";
+
+import GridFields from "@/app/(account)/components/singleView/gridFields/gridFields";
+import Label from "@/app/(account)/components/labels/label";
+import InputField from "@/app/components/inputs/inputField";
+
+{{- if $feature | HasBoolean -}}
+import Checkbox from "@/app/components/inputs/checkboxField";
+{{ end -}}
+{{if $feature | HasNumber -}}
+import NumberField from "@/app/components/inputs/numberField";
+{{ end -}}
+{{if $feature | HasText -}}
+import TextareaField from "@/app/components/inputs/textareaField";
+{{ end -}}
+{{if $feature | HasTime -}}
+import TimeField from "@/app/components/inputs/timeField";
+{{ end -}}
+{{if $feature | HasDate -}}
+import DateField from "@/app/components/inputs/dateField";
+{{ end -}}
+{{if $feature | HasFile -}}
+import FileField from "@/app/components/inputs/fileField";
+import { RESOURCE_NAME } from "../../../const";
+{{ end }}
+
+import { {{ $feature.FeatureName | UpperCamelCase }} } from "../../../model";
+
+interface {{ $feature.FeatureName | UpperCamelCase }}EditFormProps {
+    data?: {{ $feature.FeatureName | UpperCamelCase }};
+    onSubmit: (values: Omit<{{ $feature.FeatureName | UpperCamelCase }}, "id">) => void;
+}
+
+export default function {{ $feature.FeatureName | UpperCamelCase }}EditForm({ data, onSubmit }: {{ $feature.FeatureName | UpperCamelCase }}EditFormProps) {
+    const {
+        control,
+        {{if $feature | HasFile -}} setValue, {{- end }}
+        handleSubmit,
+    } = useForm<Omit<{{ $feature.FeatureName | UpperCamelCase }}, "id">>({
+        mode: "onBlur",
+        criteriaMode: "all",
+        defaultValues: {
+            {{- range $field := $feature.Fields | NoneID }}
+            {{ $field.Name | LowerCamelCase }}: data?.{{ $field.Name | LowerCamelCase }}, {{- end }}
+        }
+    });
+
+    return (
+        <form onSubmit={handleSubmit(onSubmit)}>
+            <GridFields className="py-6">
+            {{- range $field := $feature.Fields | NoneID }}
+                <div className="sm:col-span-2">
+                    <Label htmlFor="{{ .FieldNameCamelCase }}">
+                        {{ .FieldNameHumanReadable }}
+                    </Label>
+                    {{- if $field | IsNumber }}
+                    <NumberField
+                        control={control}
+                        name="{{ .FieldNameCamelCase }}"
+                        defaultValue={data?.{{ .FieldNameCamelCase }}}
+                        rules={
+                            {
+                            {{- if $field.Nullable | not }}
+                                required: "This field is required"
+                            {{- end }}
+                            }
+                        }
+                    />{{- end }}
+                    {{- if $field | IsBoolean }}
+                    <Checkbox
+                        control={control}
+                        name="{{ $field.FieldNameCamelCase }}"
+                        id="{{ $field.FieldNameCamelCase }}"
+                        defaultValue={data?.{{ .FieldNameCamelCase }}}
+                    />{{- end }}
+                    {{- if $field | IsString }}
+                    <InputField
+                        control={control}
+                        name="{{ .FieldNameCamelCase }}"
+                        id="{{ .FieldNameCamelCase }}"
+                        defaultValue={data?.{{ .FieldNameCamelCase }}}
+                        rules={
+                            {
+                            {{- if $field.Nullable | not }}
+                                required: "This field is required"
+                            {{- end }}
+                            }
+                        }
+                    />{{- end }}
+                    {{- if $field | IsText }}
+                    <TextareaField
+                        id="{{ .FieldNameCamelCase }}"
+                        name="{{ .FieldNameCamelCase }}"
+                        control={control}
+                        defaultValue={data?.{{ .FieldNameCamelCase }}}
+                        rules={
+                            {
+                            {{- if $field.Nullable | not }}
+                                required: "This field is required"
+                            {{- end }}
+                            }
+                        }
+                    />{{- end }}
+                    {{- if $field | IsTime }}
+                    <TimeField
+                        id="{{ .FieldNameCamelCase }}"
+                        name="{{ .FieldNameCamelCase }}"
+                        control={control}
+                        defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
+                        rules={
+                            {
+                            {{- if $field.Nullable | not }}
+                                required: "This field is required"
+                            {{- end }}
+                            }
+                        }
+                    />{{- end }}
+                    {{- if $field | IsDate }}
+                    <DateField
+                        id="{{ .FieldNameCamelCase }}"
+                        name="{{ .FieldNameCamelCase }}"
+                        control={control}
+                        defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
+                        rules={
+                            {
+                            {{- if $field.Nullable | not }}
+                                required: "This field is required"
+                            {{- end }}
+                            }
+                        }
+                    />{{- end }}
+                    {{- if $field | IsFile }}
+                    <FileField
+                        id="{{ $field.FieldNameCamelCase }}"
+                        name="{{ $field.FieldNameCamelCase }}"
+                        resource={RESOURCE_NAME.toLowerCase()}
+                        control={control}
+                        rules={
+                            {
+                            {{- if $field.Nullable | not }}
+                                required: "This field is required"
+                            {{- end }}
+                            }
+                        }
+                        defaultValue={data?.{{ .FieldNameCamelCase }}?.toString()}
+                        onChange={e => {
+                            if (!e) {
+                                setValue("{{ .FieldNameCamelCase }}", "");
+                                return
+                            }
+                            setValue("{{ .FieldNameCamelCase }}", e)
+                        }}
+                    />{{- end }}
+                    {{- if $field | IsUndefined -}}
+                    <InputField
+                        control={control}
+                        name="{{ .FieldNameCamelCase }}"
+                        id="{{ .FieldNameCamelCase }}"
+                        defaultValue={data?.{{ .FieldNameCamelCase }}}
+                        rules={
+                            {
+                            {{- if $field.Nullable | not }}
+                                required: "This field is required"
+                            {{- end }}
+                            }
+                        }
+                    />{{- end}}
+                </div>
+            {{- end }}
+            </GridFields>
+        </form>
+    )
+}
