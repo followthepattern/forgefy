@@ -37,6 +37,10 @@ const DateField = (props: DateFieldProperties) => {
         defaultCalendarDate = parseDate(props.defaultValue);
     }
 
+    if (props.defaultValue instanceof CustomDate) {
+        defaultCalendarDate = props.defaultValue;
+    }
+
     const [value, setValue] = React.useState(defaultCalendarDate);
     const { field, fieldState: { invalid, error } } = useController({
         ...props,
