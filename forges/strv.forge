@@ -245,3 +245,106 @@ features:
         type: number
       - name: notes
         type: text
+
+  # --------------------------
+  # FOOD CATALOG
+  # --------------------------
+  - name: food
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: name
+        type: text
+      - name: brand
+        type: text
+      - name: barcode
+        type: text
+      - name: source
+        type: string     # e.g., 'manual', 'off', 'usda'
+      - name: lang
+        type: string     # e.g., 'en', 'hu'
+      - name: is_custom
+        type: bool
+      - name: created_by_user
+        type: id
+      - name: kcal_per_100g
+        type: number
+      - name: protein_per_100g
+        type: number
+      - name: fat_per_100g
+        type: number
+      - name: carbs_per_100g
+        type: number
+      - name: nutrients_json
+        type: text        # optional micronutrients, e.g. {"fiber":2.7}
+      - name: density_g_per_ml
+        type: number
+      - name: created_at
+        type: datetime
+      - name: updated_at
+        type: datetime
+
+  - name: food_measure
+    fields:
+      - name: id
+        type: id
+      - name: food_id
+        type: id                    # references food.id
+      - name: label
+        type: text                  # e.g., "large egg", "cup", "slice"
+      - name: grams
+        type: number
+      - name: ml
+        type: number
+      - name: is_default
+        type: bool
+
+  - name: meal_entry
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: user_id
+        type: id
+      - name: meal_type
+        type: string      # e.g., breakfast, lunch, dinner, snack
+      - name: name
+        type: text        # optional, like "Omelette"
+      - name: notes
+        type: text
+      - name: served_at
+        type: datetime
+      - name: tz
+        type: string
+      - name: created_at
+        type: datetime
+      - name: updated_at
+        type: datetime
+
+  - name: meal_item
+    fields:
+      - name: id
+        type: id
+      - name: org_id
+        type: id
+      - name: meal_entry_id
+        type: id                    # references meal_entry.id
+      - name: food_id
+        type: id                    # references food.id
+      - name: food_measure_id
+        type: id         # references food_measure.id
+      - name: quantity
+        type: number
+      - name: grams_override
+        type: number
+      - name: order_index
+        type: number
+      - name: notes
+        type: text
+      - name: created_at
+        type: datetime
+      - name: updated_at
+        type: datetime
