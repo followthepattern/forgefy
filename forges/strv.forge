@@ -266,7 +266,7 @@ features:
       - name: lang
         type: string     # e.g., 'en', 'hu'
       - name: is_custom
-        type: bool
+        type: boolean
       - name: created_by_user
         type: id
       - name: kcal_per_100g
@@ -299,7 +299,7 @@ features:
       - name: ml
         type: number
       - name: is_default
-        type: bool
+        type: boolean
 
   - name: meal_entry
     fields:
