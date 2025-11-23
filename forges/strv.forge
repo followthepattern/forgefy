@@ -348,3 +348,18 @@ features:
         type: datetime
       - name: updated_at
         type: datetime
+
+  - name: calendar
+    fields:
+      - name: id
+        type: id
+      - name: title
+        type: string
+      - name: start
+        type: date
+      - name: end
+        type: date
+      - name: allDay
+        type: boolean
+      - name: eventType
+        type: string
