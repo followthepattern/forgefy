@@ -363,3 +363,10 @@ features:
         type: boolean
       - name: eventType
         type: string
+
+  - name: AIChat
+    fields:
+      - name: session_id
+        type: id
+      - name: message
+        type: string
